@@ -1,0 +1,48 @@
+{
+  "name": "dcs-ramonage",
+  "version": "1.0.0",
+  "description": "Site vitrine et plateforme de gestion pour DCS Ramonage - Powered by RamonPro",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@prisma/client": "^6.0.0",
+    "next-auth": "^5.0.0-beta.25",
+    "@auth/prisma-adapter": "^2.7.0",
+    "zod": "^3.23.0",
+    "react-hook-form": "^7.53.0",
+    "@hookform/resolvers": "^3.9.0",
+    "lucide-react": "^0.460.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.0",
+    "class-variance-authority": "^0.7.0",
+    "framer-motion": "^11.11.0",
+    "@react-email/components": "^0.0.28",
+    "resend": "^4.0.0",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0",
+    "prisma": "^6.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^15.0.0"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "DCS Ramonage",
+  "short_name": "DCS Ramonage",
+  "description": "Artisan ramoneur certifié dans l'Oise et le Val-d'Oise. Ramonage, débistrage, tubage et entretien de poêles.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#f97316",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["business", "lifestyle"],
+  "lang": "fr-FR",
+  "dir": "ltr"
+}

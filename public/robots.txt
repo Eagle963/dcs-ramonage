@@ -1,0 +1,12 @@
+# robots.txt pour DCS Ramonage
+# https://dcs-ramonage.fr
+
+User-agent: *
+Allow: /
+
+# Bloquer les pages admin/API
+Disallow: /api/
+Disallow: /_next/
+
+# Sitemap
+Sitemap: https://dcs-ramonage.fr/sitemap.xml

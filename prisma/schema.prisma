@@ -1,0 +1,628 @@
+// ===========================================
+// Schema Prisma - DCS Ramonage / RamonPro
+// ===========================================
+// Architecture multi-tenant préparée pour SaaS
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================
+// GESTION DES ORGANISATIONS (Multi-tenant)
+// ===========================================
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  legalName   String?
+  siret       String?
+  tva         String?
+  
+  email       String
+  phone       String?
+  website     String?
+  
+  address     String?
+  city        String?
+  postalCode  String?
+  country     String   @default("FR")
+  
+  logo        String?
+  primaryColor String? @default("#f97316")
+  secondaryColor String? @default("#0f172a")
+  
+  plan        Plan     @default(SOLO)
+  planStatus  PlanStatus @default(TRIAL)
+  trialEndsAt DateTime?
+  subscriptionId String?
+  
+  settings    Json?    @default("{}")
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  users       User[]
+  customers   Customer[]
+  services    Service[]
+  appointments Appointment[]
+  quotes      Quote[]
+  invoices    Invoice[]
+  interventions Intervention[]
+  
+  @@index([slug])
+}
+
+enum Plan {
+  SOLO
+  PRO
+  BUSINESS
+  ENTERPRISE
+}
+
+enum PlanStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  PAUSED
+}
+
+// ===========================================
+// UTILISATEURS ET AUTHENTIFICATION
+// ===========================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  phone         String?
+  image         String?
+  password      String?
+  
+  role          UserRole  @default(TECH)
+  
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+  
+  accounts      Account[]
+  sessions      Session[]
+  appointments  Appointment[]
+  interventions Intervention[]
+  
+  @@index([organizationId])
+  @@index([email])
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  TECH
+  CLIENT
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ===========================================
+// GESTION DES CLIENTS
+// ===========================================
+
+model Customer {
+  id          String   @id @default(cuid())
+  
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String
+  phoneAlt    String?
+  
+  address     String
+  addressComplement String?
+  city        String
+  postalCode  String
+  
+  notes       String?  @db.Text
+  tags        String[] @default([])
+  
+  source      CustomerSource @default(OTHER)
+  sourceDetail String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  equipments    Equipment[]
+  appointments  Appointment[]
+  quotes        Quote[]
+  invoices      Invoice[]
+  interventions Intervention[]
+  
+  @@index([organizationId])
+  @@index([postalCode])
+  @@index([lastName, firstName])
+}
+
+enum CustomerSource {
+  WEBSITE
+  PHONE
+  RECOMMENDATION
+  GOOGLE
+  SOCIAL
+  FLYER
+  OTHER
+}
+
+// ===========================================
+// ÉQUIPEMENTS CLIENTS
+// ===========================================
+
+model Equipment {
+  id          String   @id @default(cuid())
+  
+  type        EquipmentType
+  brand       String?
+  model       String?
+  year        Int?
+  serialNumber String?
+  
+  location    String?
+  floorLevel  Int?
+  accessNotes String?
+  
+  fuelType    FuelType?
+  power       Float?
+  
+  photos      String[] @default([])
+  documents   String[] @default([])
+  notes       String?  @db.Text
+  
+  lastServiceDate DateTime?
+  nextServiceDate DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  interventions Intervention[]
+  
+  @@index([customerId])
+}
+
+enum EquipmentType {
+  CHIMNEY_OPEN
+  CHIMNEY_INSERT
+  WOOD_STOVE
+  PELLET_STOVE
+  OIL_BOILER
+  GAS_BOILER
+  WOOD_BOILER
+  OTHER
+}
+
+enum FuelType {
+  WOOD
+  PELLET
+  OIL
+  GAS
+  COAL
+  OTHER
+}
+
+// ===========================================
+// CATALOGUE DE SERVICES
+// ===========================================
+
+model Service {
+  id          String   @id @default(cuid())
+  
+  name        String
+  slug        String
+  description String?  @db.Text
+  
+  priceHT     Float
+  vatRate     Float    @default(10)
+  
+  duration    Int?
+  
+  category    ServiceCategory
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  quoteLines    QuoteLine[]
+  invoiceLines  InvoiceLine[]
+  appointments  Appointment[]
+  
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+}
+
+enum ServiceCategory {
+  RAMONAGE
+  DEBISTRAGE
+  TUBAGE
+  ENTRETIEN
+  DIAGNOSTIC
+  FUMISTERIE
+  DEPANNAGE
+  OTHER
+}
+
+// ===========================================
+// RENDEZ-VOUS / PLANNING
+// ===========================================
+
+model Appointment {
+  id          String   @id @default(cuid())
+  
+  scheduledAt DateTime
+  duration    Int      @default(60)
+  
+  status      AppointmentStatus @default(SCHEDULED)
+  
+  notes       String?  @db.Text
+  internalNotes String? @db.Text
+  
+  reminderSentAt DateTime?
+  confirmedAt    DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id])
+  
+  serviceId   String?
+  service     Service? @relation(fields: [serviceId], references: [id])
+  
+  technicianId String?
+  technician   User?   @relation(fields: [technicianId], references: [id])
+  
+  intervention Intervention?
+  
+  @@index([organizationId])
+  @@index([scheduledAt])
+  @@index([customerId])
+  @@index([technicianId])
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+  NO_SHOW
+}
+
+// ===========================================
+// DEVIS
+// ===========================================
+
+model Quote {
+  id          String   @id @default(cuid())
+  number      String
+  
+  status      QuoteStatus @default(DRAFT)
+  
+  validUntil  DateTime
+  
+  totalHT     Float
+  totalVAT    Float
+  totalTTC    Float
+  
+  notes       String?  @db.Text
+  conditions  String?  @db.Text
+  
+  sentAt      DateTime?
+  viewedAt    DateTime?
+  acceptedAt  DateTime?
+  rejectedAt  DateTime?
+  
+  signatureData String? @db.Text
+  signedAt    DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id])
+  
+  lines       QuoteLine[]
+  invoice     Invoice?
+  
+  @@unique([organizationId, number])
+  @@index([organizationId])
+  @@index([customerId])
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  VIEWED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  INVOICED
+}
+
+model QuoteLine {
+  id          String   @id @default(cuid())
+  
+  description String
+  quantity    Float    @default(1)
+  unitPriceHT Float
+  vatRate     Float    @default(10)
+  totalHT     Float
+  
+  sortOrder   Int      @default(0)
+  
+  quoteId     String
+  quote       Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  
+  serviceId   String?
+  service     Service? @relation(fields: [serviceId], references: [id])
+  
+  @@index([quoteId])
+}
+
+// ===========================================
+// FACTURES
+// ===========================================
+
+model Invoice {
+  id          String   @id @default(cuid())
+  number      String
+  
+  status      InvoiceStatus @default(DRAFT)
+  
+  issueDate   DateTime @default(now())
+  dueDate     DateTime
+  
+  totalHT     Float
+  totalVAT    Float
+  totalTTC    Float
+  amountPaid  Float    @default(0)
+  
+  notes       String?  @db.Text
+  paymentTerms String?
+  
+  sentAt      DateTime?
+  paidAt      DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id])
+  
+  quoteId     String?  @unique
+  quote       Quote?   @relation(fields: [quoteId], references: [id])
+  
+  lines       InvoiceLine[]
+  payments    Payment[]
+  
+  @@unique([organizationId, number])
+  @@index([organizationId])
+  @@index([customerId])
+  @@index([status])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  VIEWED
+  PARTIAL
+  PAID
+  OVERDUE
+  CANCELED
+  REFUNDED
+}
+
+model InvoiceLine {
+  id          String   @id @default(cuid())
+  
+  description String
+  quantity    Float    @default(1)
+  unitPriceHT Float
+  vatRate     Float    @default(10)
+  totalHT     Float
+  
+  sortOrder   Int      @default(0)
+  
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  
+  serviceId   String?
+  service     Service? @relation(fields: [serviceId], references: [id])
+  
+  @@index([invoiceId])
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  
+  amount      Float
+  method      PaymentMethod
+  reference   String?
+  
+  paidAt      DateTime @default(now())
+  notes       String?
+  
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  
+  @@index([invoiceId])
+}
+
+enum PaymentMethod {
+  CASH
+  CHECK
+  CARD
+  TRANSFER
+  STRIPE
+  OTHER
+}
+
+// ===========================================
+// INTERVENTIONS / RAPPORTS
+// ===========================================
+
+model Intervention {
+  id          String   @id @default(cuid())
+  
+  status      InterventionStatus @default(PENDING)
+  
+  startedAt   DateTime?
+  completedAt DateTime?
+  
+  observations String? @db.Text
+  workDone    String?  @db.Text
+  recommendations String? @db.Text
+  
+  photos      String[] @default([])
+  documents   String[] @default([])
+  
+  certificateNumber String?
+  certificateUrl    String?
+  certificateIssuedAt DateTime?
+  
+  signatureData String? @db.Text
+  signedAt    DateTime?
+  signerName  String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id])
+  
+  equipmentId String?
+  equipment   Equipment? @relation(fields: [equipmentId], references: [id])
+  
+  technicianId String?
+  technician   User?   @relation(fields: [technicianId], references: [id])
+  
+  appointmentId String? @unique
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  
+  @@index([organizationId])
+  @@index([customerId])
+  @@index([technicianId])
+}
+
+enum InterventionStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REQUIRES_FOLLOWUP
+  CANCELED
+}
+
+// ===========================================
+// DEMANDES DE CONTACT (Leads)
+// ===========================================
+
+model ContactRequest {
+  id          String   @id @default(cuid())
+  
+  name        String
+  email       String
+  phone       String
+  postalCode  String
+  
+  service     String?
+  message     String   @db.Text
+  
+  source      String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  
+  status      LeadStatus @default(NEW)
+  
+  respondedAt DateTime?
+  convertedAt DateTime?
+  
+  notes       String?  @db.Text
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([status])
+  @@index([createdAt])
+  @@index([postalCode])
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+  SPAM
+}
