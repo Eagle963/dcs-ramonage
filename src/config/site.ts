@@ -105,7 +105,6 @@ export const siteConfig = {
       'tubage',
       'entretien cheminée',
       'certificat ramonage',
-    ],
     ] as string[],
     locale: 'fr_FR',
     type: 'website',
