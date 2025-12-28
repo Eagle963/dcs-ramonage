@@ -39,7 +39,7 @@ export default function NettoyageDemoussagePage() {
               Nettoyage et démoussage{' '}
               <span className="text-gradient">professionnel</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-center">
               Redonnez un coup d'éclat à votre maison !
               <br />
               Nous nettoyons et traitons vos toitures, murs, sols extérieurs et vérandas avec des équipements professionnels.
@@ -70,7 +70,7 @@ export default function NettoyageDemoussagePage() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
               Nos prestations de nettoyage
             </h2>
-            <p className="text-secondary-600">
+            <p className="text-secondary-600 text-center">
               Un service complet pour l'extérieur de votre maison.
             </p>
           </div>
@@ -161,7 +161,7 @@ export default function NettoyageDemoussagePage() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
               Tarification
             </h2>
-            <p className="text-secondary-600">
+            <p className="text-secondary-600 text-center">
               Chaque chantier est unique. Nous établissons un devis gratuit après 
               évaluation de la surface et de l'état de vos extérieurs.
             </p>

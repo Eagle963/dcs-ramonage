@@ -46,7 +46,7 @@ export function LocalPageTemplate({
               Ramonage à{' '}
               <span className="text-gradient">{city}</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-center">
               Votre artisan ramoneur certifié à {city} et ses environs. 
               Ramonage de cheminées, poêles à bois et à granulés. 
               Certificat officiel pour votre assurance.

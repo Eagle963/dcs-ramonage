@@ -77,7 +77,7 @@ export function Footer() {
                     className="flex items-center gap-2 text-secondary-300 hover:text-primary-400 
                                transition-colors group"
                   >
-                    <ChevronRight className="w-4 h-4 text-primary-500 group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight className="w-4 h-4 text-primary-600 group-hover:translate-x-1 transition-transform" />
                     {service.name}
                   </Link>
                 </li>

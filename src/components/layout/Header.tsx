@@ -231,13 +231,15 @@ export function Header() {
             </a>
             
             {/* Bouton RDV - principal */}
-            <Link
-              href="/contact"
+            <a
+              href={siteConfig.urls.booking}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-primary btn-md"
             >
               <Calendar className="w-4 h-4" />
               Prendre RDV
-            </Link>
+            </a>
           </div>
 
           {/* Bouton menu mobile */}

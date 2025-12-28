@@ -101,7 +101,7 @@ export function TestimonialsSection() {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <MessageSquare className="w-5 h-5 text-primary-500" />
+              <MessageSquare className="w-5 h-5 text-primary-600" />
               <span className="badge-primary">Témoignages</span>
             </div>
             <h2 className="section-title">
@@ -127,7 +127,7 @@ export function TestimonialsSection() {
               href={siteConfig.urls.googleBusiness}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary-500 hover:text-primary-600 text-sm font-medium flex items-center gap-1"
+              className="text-primary-600 hover:text-primary-600 text-sm font-medium flex items-center gap-1"
             >
               Voir tous les avis
               <ExternalLink className="w-3 h-3" />
@@ -138,7 +138,7 @@ export function TestimonialsSection() {
         <div className="relative">
           <button
             onClick={prevPage}
-            className="absolute -left-4 lg:-left-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white shadow-soft flex items-center justify-center text-secondary-600 hover:text-primary-500 hover:shadow-soft-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="absolute -left-4 lg:-left-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white shadow-soft flex items-center justify-center text-secondary-600 hover:text-primary-600 hover:shadow-soft-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary-500"
             aria-label="Page précédente"
           >
             <ChevronLeft className="w-6 h-6" />
@@ -146,7 +146,7 @@ export function TestimonialsSection() {
 
           <button
             onClick={nextPage}
-            className="absolute -right-4 lg:-right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white shadow-soft flex items-center justify-center text-secondary-600 hover:text-primary-500 hover:shadow-soft-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="absolute -right-4 lg:-right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white shadow-soft flex items-center justify-center text-secondary-600 hover:text-primary-600 hover:shadow-soft-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary-500"
             aria-label="Page suivante"
           >
             <ChevronRight className="w-6 h-6" />
@@ -161,7 +161,7 @@ export function TestimonialsSection() {
                     {testimonial.name.charAt(0)}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-secondary-900">{testimonial.name}</h4>
+                    <p className="font-semibold text-secondary-900">{testimonial.name}</p>
                     <p className="text-sm text-secondary-500">{testimonial.location}</p>
                   </div>
                 </div>

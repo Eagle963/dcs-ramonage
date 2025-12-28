@@ -18,8 +18,8 @@ const faqs: FAQ[] = [
     answer: 'Oui, le ramonage est obligatoire en France. Selon le Règlement Sanitaire Départemental, vous devez faire ramoner vos conduits de fumée au moins une fois par an pour les conduits de gaz, et deux fois par an pour les conduits de bois, charbon ou fioul (dont une fois pendant la période de chauffe). Un certificat de ramonage vous est remis après chaque intervention.',
   },
   {
-    question: 'Combien coûte un ramonage à Beauvais ?',
-    answer: 'Le prix d\'un ramonage varie selon le type de conduit et l\'accessibilité. En moyenne, comptez entre 60€ et 90€ pour un ramonage standard de cheminée ou poêle à bois dans l\'Oise. Nous établissons un devis gratuit et personnalisé avant toute intervention. Les tarifs incluent le déplacement et la remise du certificat officiel.',
+    question: 'Combien coûte un ramonage ?',
+    answer: 'Le prix d\'un ramonage varie selon le type de conduit et l\'accessibilité. En moyenne, comptez entre 60€ et 90€ pour un ramonage standard de cheminée ou poêle à bois. Nous établissons un devis gratuit et personnalisé avant toute intervention. Les tarifs incluent le déplacement et la remise du certificat officiel.',
   },
   {
     question: 'Dans quel délai pouvez-vous intervenir ?',

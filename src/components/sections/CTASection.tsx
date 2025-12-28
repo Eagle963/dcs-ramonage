@@ -41,15 +41,17 @@ export function CTASection() {
 
             {/* Boutons d'action - RDV en priorité */}
             <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
-              <Link
-                href="/contact"
+              <a
+                href={siteConfig.urls.booking}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg w-full sm:w-auto
                            shadow-lg shadow-primary-500/30"
               >
                 <Calendar className="w-5 h-5" />
                 Réserver un créneau
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+              </a>
               
               {/* Téléphone secondaire */}
               <a

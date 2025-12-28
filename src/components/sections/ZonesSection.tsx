@@ -51,7 +51,7 @@ export function ZonesSection() {
                       <Navigation className="w-5 h-5 text-success-600" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-secondary-900">Basé à Beauvais</h4>
+                      <p className="font-semibold text-secondary-900">Basé à Beauvais</p>
                       <p className="text-sm text-secondary-500">Intervention rapide dans un rayon de 40km</p>
                     </div>
                   </div>
@@ -100,9 +100,9 @@ export function ZonesSection() {
               <div className="absolute inset-0 bg-pattern opacity-10" />
               
               <div className="relative z-10">
-                <h4 className="font-display font-bold text-lg mb-2">
+                <p className="font-display font-bold text-lg mb-2">
                   Votre ville n&apos;est pas listée ?
-                </h4>
+                </p>
                 <p className="text-white/80 text-sm mb-4">
                   Contactez-nous pour vérifier notre disponibilité dans votre secteur.
                 </p>

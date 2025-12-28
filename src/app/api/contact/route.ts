@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-// Initialiser Resend avec la clé API
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialiser Resend seulement si la clé API existe
+const resend = process.env.RESEND_API_KEY 
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 // Email de destination
 const TO_EMAIL = process.env.CONTACT_EMAIL || 'contact@dcs-ramonage.fr';
@@ -169,6 +171,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: validationError },
         { status: 400 }
+      );
+    }
+
+    // Vérifier que Resend est initialisé
+    if (!resend) {
+      return NextResponse.json(
+        { error: 'Service email non configuré' },
+        { status: 500 }
       );
     }
 

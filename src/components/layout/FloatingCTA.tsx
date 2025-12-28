@@ -37,8 +37,10 @@ export function FloatingCTA() {
         <div className="container-site py-3">
           <div className="flex items-center gap-3">
             {/* Bouton RDV - Principal */}
-            <Link
-              href="/contact"
+            <a
+              href={siteConfig.urls.booking}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-[2] flex items-center justify-center gap-2 
                          bg-primary-500 hover:bg-primary-600 
                          text-white font-semibold py-3.5 rounded-xl
@@ -46,7 +48,7 @@ export function FloatingCTA() {
             >
               <Calendar className="w-5 h-5" />
               <span>Prendre RDV</span>
-            </Link>
+            </a>
 
             {/* Bouton Appeler - Secondaire et plus petit */}
             <a

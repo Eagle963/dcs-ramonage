@@ -11,7 +11,7 @@ export function StatsSection() {
               className="text-center animate-fade-in-up"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="text-3xl md:text-4xl font-display font-bold text-primary-500 mb-2">
+              <div className="text-3xl md:text-4xl font-display font-bold text-primary-600 mb-2">
                 {stat.value}
               </div>
               <div className="text-sm md:text-base text-secondary-600 font-medium">

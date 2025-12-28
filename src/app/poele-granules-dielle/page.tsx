@@ -39,7 +39,7 @@ export default function PoeleDiellePage() {
               Expert poêles à granulés{' '}
               <span className="text-gradient">Dielle</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-center">
               Formés directement par Dielle, nous sommes spécialistes de l'entretien et du dépannage de vos poêles à granulés de cette marque italienne reconnue.
             </p>
             
@@ -127,7 +127,7 @@ export default function PoeleDiellePage() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
               Nos prestations pour poêles Dielle
             </h2>
-            <p className="text-secondary-600">
+            <p className="text-secondary-600 text-center">
               Un entretien complet adapté aux spécificités de votre appareil.
             </p>
           </div>

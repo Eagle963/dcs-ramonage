@@ -64,7 +64,7 @@ export default function ZonesInterventionPage() {
               Nous intervenons dans{' '}
               <span className="text-gradient">l'Oise et le Val-d'Oise</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-center">
               DCS Ramonage intervient dans l'Oise (60) et le Val-d'Oise (95).
               <br />
               Déplacement inclus dans nos tarifs.
@@ -97,7 +97,7 @@ export default function ZonesInterventionPage() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
               Notre zone d'intervention
             </h2>
-            <p className="text-secondary-600">
+            <p className="text-secondary-600 text-center">
               Cliquez sur la carte pour voir notre localisation et calculer votre itinéraire.
             </p>
           </div>
@@ -183,7 +183,7 @@ export default function ZonesInterventionPage() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
               Votre commune n'est pas listée ?
             </h2>
-            <p className="text-secondary-600">
+            <p className="text-secondary-600 text-center">
               Nous intervenons dans l'Oise (60) et le Val-d'Oise (95). 
               Contactez-nous pour vérifier notre disponibilité dans votre secteur.
             </p>

@@ -91,7 +91,7 @@ export function HeroSection() {
                   className="flex items-center gap-2 text-secondary-700 animate-fade-in"
                   style={{ animationDelay: `${400 + index * 100}ms` }}
                 >
-                  <item.icon className="w-5 h-5 text-primary-500" />
+                  <item.icon className="w-5 h-5 text-primary-600" />
                   <span className="font-medium">{item.text}</span>
                 </div>
               ))}
@@ -99,14 +99,16 @@ export function HeroSection() {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-in animation-delay-500">
-              <Link
-                href="/contact"
+              <a
+                href={siteConfig.urls.booking}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn-primary btn-lg w-full sm:w-auto group"
               >
                 <Calendar className="w-5 h-5" />
                 Prendre rendez-vous
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+              </a>
               
               {/* Téléphone discret */}
               <a
@@ -122,7 +124,7 @@ export function HeroSection() {
 
             {/* Réassurance */}
             <p className="mt-6 text-sm text-secondary-500 animate-fade-in animation-delay-700">
-              ✓ Réponse sous 2h • ✓ RDV confirmé par SMS • ✓ Paiement après intervention
+              ✓ Réponse sous 2h • ✓ RDV confirmé par mail • ✓ Paiement après intervention
             </p>
           </div>
 

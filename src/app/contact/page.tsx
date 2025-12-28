@@ -27,7 +27,7 @@ export default function ContactPage() {
               Contactez{' '}
               <span className="text-gradient">-nous</span>
             </h1>
-            <p className="text-lg text-secondary-600">
+            <p className="text-lg text-secondary-600 text-center">
               Une question ? Besoin d'un renseignement ?
               <br />
               Nous sommes à votre écoute.

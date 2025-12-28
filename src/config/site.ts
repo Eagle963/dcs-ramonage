@@ -76,6 +76,7 @@ export const siteConfig = {
   // URLs
   urls: {
     website: 'https://dcs-ramonage.fr',
+    booking: 'https://cal.com/dcs-ramonage',
     googleMaps: 'https://maps.google.com/?q=DCS+Ramonage+Beauvais',
     googleBusiness: 'https://share.google/t0sDSjWHOgewnkfDR',
   },

@@ -41,7 +41,7 @@ export default function TarifsPage() {
               Nos tarifs{' '}
               <span className="text-gradient">transparents</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-center">
               Des prix clairs, sans surprise.
               <br />
               Déplacement inclus dans l'Oise (60) et le Val-d'Oise (95).

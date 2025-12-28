@@ -132,7 +132,7 @@ export function ServicePageTemplate({
               {title}{' '}
               <span className="text-gradient">{titleHighlight}</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-center">
               {description.split('. ').map((sentence, index, array) => (
                 <span key={index}>
                   {sentence}{index < array.length - 1 ? '.' : ''}

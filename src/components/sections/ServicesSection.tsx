@@ -64,7 +64,7 @@ export function ServicesSection() {
                 </p>
 
                 {/* Lien */}
-                <div className="flex items-center gap-2 text-primary-500 font-medium text-sm
+                <div className="flex items-center gap-2 text-primary-600 font-medium text-sm
                                 group-hover:gap-3 transition-all">
                   En savoir plus
                   <ArrowRight className="w-4 h-4" />
