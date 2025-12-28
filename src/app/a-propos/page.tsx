@@ -202,7 +202,7 @@ export default function AProposPage() {
                 <span className="badge-primary">Zone d'intervention</span>
               </div>
               <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-6">
-                Nous intervenons dans l'Oise et le Val-d'Oise
+                Nous intervenons dans<br />l'Oise et le Val-d'Oise
               </h2>
               <p className="text-secondary-600 mb-6">
                 Nous intervenons dans l'Oise (60) et le Val-d'Oise (95). 
