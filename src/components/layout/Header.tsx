@@ -144,8 +144,8 @@ export function Header() {
                     className={cn(
                       'flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-all',
                       pathname.startsWith('/services') || siteConfig.services.some(s => pathname === `/${s.slug}`)
-                        ? 'text-primary-600 bg-primary-50'
-                        : 'text-secondary-600 hover:text-primary-600 hover:bg-primary-50/50'
+                        ? 'text-primary-700 bg-primary-50'
+                        : 'text-secondary-600 hover:text-primary-700 hover:bg-primary-50/50'
                     )}
                     aria-expanded={isServicesOpen}
                     aria-haspopup="true"
@@ -182,7 +182,7 @@ export function Header() {
                               <div className={cn(
                                 'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
                                 pathname === child.href
-                                  ? 'bg-primary-100 text-primary-600'
+                                  ? 'bg-primary-100 text-primary-700'
                                   : 'bg-secondary-100 text-secondary-600'
                               )}>
                                 <IconComponent className="w-5 h-5" />
@@ -208,8 +208,8 @@ export function Header() {
                   className={cn(
                     'px-4 py-2 rounded-lg text-sm font-medium transition-all',
                     pathname === item.href
-                      ? 'text-primary-600 bg-primary-50'
-                      : 'text-secondary-600 hover:text-primary-600 hover:bg-primary-50/50'
+                      ? 'text-primary-700 bg-primary-50'
+                      : 'text-secondary-600 hover:text-primary-700 hover:bg-primary-50/50'
                   )}
                 >
                   {item.name}

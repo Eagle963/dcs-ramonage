@@ -326,11 +326,11 @@ export default function TarifsPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/contact" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
+              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
                 <Calendar className="w-5 h-5" />
                 Demander un devis
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+              </a>
               <a
                 href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
                 className="text-secondary-400 hover:text-white text-sm transition-colors"

@@ -53,7 +53,7 @@ export function LocalPageTemplate({
             </p>
             
             {/* CTA */}
-            <div className="flex flex-col sm:flex-row items-start gap-4">
+            <div className="flex flex-col items-start gap-3">
               <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-lg">
                 <Calendar className="w-5 h-5" />
                 Prendre rendez-vous à {city}
@@ -123,7 +123,7 @@ export function LocalPageTemplate({
                   <p className="text-sm text-secondary-600 mb-2">
                     {service.desc}
                   </p>
-                  <span className="text-primary-600 font-bold">{service.price}</span>
+                  <span className="text-primary-700 font-bold">{service.price}</span>
                 </div>
               ))}
             </div>

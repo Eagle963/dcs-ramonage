@@ -142,7 +142,7 @@ export function ServicePageTemplate({
             </p>
             
             {/* CTA */}
-            <div className="flex flex-col sm:flex-row items-start gap-4">
+            <div className="flex flex-col items-start gap-3">
               <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-lg">
                 <Calendar className="w-5 h-5" />
                 Prendre rendez-vous
@@ -232,7 +232,7 @@ export function ServicePageTemplate({
                   className="flex gap-4 p-5 rounded-2xl bg-white border border-secondary-100"
                 >
                   <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
-                    <span className="font-bold text-primary-600">{index + 1}</span>
+                    <span className="font-bold text-primary-700">{index + 1}</span>
                   </div>
                   <p className="text-secondary-700 pt-2">{step}</p>
                 </div>
@@ -256,10 +256,10 @@ export function ServicePageTemplate({
                 et la remise du certificat officiel.
               </p>
               
-              <Link href="/contact" className="btn-primary btn-md">
+              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-md">
                 <Calendar className="w-4 h-4" />
                 Demander un devis personnalisé
-              </Link>
+              </a>
             </div>
 
             <div className="bg-white rounded-3xl border border-secondary-100 shadow-soft overflow-hidden">
@@ -283,7 +283,7 @@ export function ServicePageTemplate({
                         <span className="block text-xs text-secondary-500">{item.note}</span>
                       )}
                     </div>
-                    <span className="font-bold text-primary-600 text-lg">{item.price}</span>
+                    <span className="font-bold text-primary-700 text-lg">{item.price}</span>
                   </div>
                 ))}
               </div>
@@ -428,13 +428,13 @@ export function ServicePageTemplate({
                            hover:border-primary-200 hover:shadow-soft transition-all"
               >
                 <h3 className="font-display font-semibold text-secondary-900 mb-2 
-                               group-hover:text-primary-600 transition-colors">
+                               group-hover:text-primary-700 transition-colors">
                   {service.name}
                 </h3>
                 <p className="text-sm text-secondary-600 mb-4">
                   {service.description}
                 </p>
-                <span className="inline-flex items-center gap-1 text-primary-600 text-sm font-medium">
+                <span className="inline-flex items-center gap-1 text-primary-700 text-sm font-medium">
                   En savoir plus
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>

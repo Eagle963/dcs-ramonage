@@ -34,7 +34,7 @@ export function ZonesSection() {
                   {siteConfig.serviceAreas.departments.map((dept) => (
                     <div key={dept.code} className="bg-white rounded-2xl p-6 shadow-soft">
                       <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center mb-4">
-                        <MapPin className="w-6 h-6 text-primary-600" />
+                        <MapPin className="w-6 h-6 text-primary-700" />
                       </div>
                       <h3 className="font-display font-bold text-xl text-secondary-900 mb-1">
                         {dept.name}
@@ -78,7 +78,7 @@ export function ZonesSection() {
                   className={cn(
                     'flex items-center gap-2 p-3 rounded-xl',
                     'bg-secondary-50 hover:bg-primary-50',
-                    'text-secondary-700 hover:text-primary-600',
+                    'text-secondary-700 hover:text-primary-700',
                     'transition-all duration-200 group',
                     'animate-fade-in'
                   )}
@@ -108,7 +108,7 @@ export function ZonesSection() {
                 </p>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white text-primary-600 
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white text-primary-700 
                              rounded-lg font-semibold text-sm hover:bg-secondary-50 transition-colors"
                 >
                   Nous contacter

@@ -90,7 +90,7 @@ export default function ZonesInterventionPage() {
         </div>
       </section>
 
-      {/* Carte interactive */}
+      {/* Carte des zones */}
       <section className="section-padding bg-secondary-50">
         <div className="container-site">
           <div className="text-center max-w-2xl mx-auto mb-8">
@@ -98,33 +98,86 @@ export default function ZonesInterventionPage() {
               Notre zone d'intervention
             </h2>
             <p className="text-secondary-600">
-              Cliquez sur la carte pour voir notre localisation et calculer votre itinéraire.
+              Nous intervenons dans le sud de l'Oise et le nord du Val-d'Oise.
             </p>
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="rounded-3xl overflow-hidden shadow-soft border border-secondary-100">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d330638.5489438446!2d1.9!3d49.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e6441d8c9d5a6f%3A0x40af13e81647e40!2sOise!5e0!3m2!1sfr!2sfr!4v1234567890"
-                width="100%"
-                height="400"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Zone d'intervention DCS Ramonage - Oise et Val-d'Oise"
-                className="w-full"
-              />
+            <div className="rounded-3xl overflow-hidden shadow-soft border border-secondary-100 bg-white p-8">
+              {/* Carte SVG stylisée */}
+              <svg viewBox="0 0 400 300" className="w-full h-auto">
+                {/* Fond */}
+                <rect width="400" height="300" fill="#f8fafc" />
+                
+                {/* Oise (60) - Zone couverte (sud du département) */}
+                <path
+                  d="M50 50 L200 30 L280 60 L300 120 L260 180 L180 200 L100 170 L60 120 Z"
+                  fill="#fed7aa"
+                  stroke="#ea580c"
+                  strokeWidth="2"
+                  opacity="0.7"
+                />
+                
+                {/* Val-d'Oise (95) - Zone couverte (nord du département) */}
+                <path
+                  d="M100 170 L180 200 L260 180 L280 220 L240 260 L160 270 L80 240 L60 200 Z"
+                  fill="#fed7aa"
+                  stroke="#ea580c"
+                  strokeWidth="2"
+                  opacity="0.7"
+                />
+                
+                {/* Zone non couverte Oise (nord) - grisée */}
+                <path
+                  d="M50 50 L200 30 L350 40 L380 100 L300 120 L280 60 L200 30"
+                  fill="#e2e8f0"
+                  stroke="#94a3b8"
+                  strokeWidth="1"
+                  opacity="0.5"
+                />
+                
+                {/* Marqueur Beauvais */}
+                <circle cx="120" cy="100" r="8" fill="#ea580c" />
+                <text x="120" y="125" textAnchor="middle" className="text-xs font-semibold" fill="#1e293b">Beauvais</text>
+                
+                {/* Marqueur Creil */}
+                <circle cx="220" cy="150" r="8" fill="#ea580c" />
+                <text x="220" y="175" textAnchor="middle" className="text-xs font-semibold" fill="#1e293b">Creil</text>
+                
+                {/* Marqueur Chantilly */}
+                <circle cx="250" cy="185" r="6" fill="#c2410c" />
+                <text x="285" y="188" textAnchor="start" className="text-xs" fill="#475569">Chantilly</text>
+                
+                {/* Marqueur Cergy */}
+                <circle cx="130" cy="220" r="8" fill="#ea580c" />
+                <text x="130" y="245" textAnchor="middle" className="text-xs font-semibold" fill="#1e293b">Cergy</text>
+                
+                {/* Marqueur Pontoise */}
+                <circle cx="160" cy="210" r="6" fill="#c2410c" />
+                <text x="175" y="205" textAnchor="start" className="text-xs" fill="#475569">Pontoise</text>
+                
+                {/* Marqueur L'Isle-Adam */}
+                <circle cx="200" cy="200" r="6" fill="#c2410c" />
+                <text x="200" y="192" textAnchor="middle" className="text-xs" fill="#475569">L'Isle-Adam</text>
+                
+                {/* Marqueur Argenteuil */}
+                <circle cx="210" cy="250" r="6" fill="#c2410c" />
+                <text x="210" y="268" textAnchor="middle" className="text-xs" fill="#475569">Argenteuil</text>
+                
+                {/* Légende */}
+                <rect x="290" y="220" width="16" height="16" fill="#fed7aa" stroke="#ea580c" strokeWidth="1" rx="2" />
+                <text x="312" y="233" className="text-xs" fill="#475569">Zone couverte</text>
+                
+                <rect x="290" y="245" width="16" height="16" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="1" rx="2" />
+                <text x="312" y="258" className="text-xs" fill="#475569">Hors zone</text>
+                
+                {/* Labels départements */}
+                <text x="150" y="80" className="text-sm font-bold" fill="#c2410c">OISE (60)</text>
+                <text x="140" y="235" className="text-sm font-bold" fill="#c2410c">VAL-D'OISE (95)</text>
+              </svg>
             </div>
             <p className="text-center text-sm text-secondary-500 mt-4">
-              <a 
-                href={siteConfig.urls.googleMaps}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-600 hover:text-primary-700 font-medium"
-              >
-                Ouvrir dans Google Maps →
-              </a>
+              Votre commune n'est pas listée ? Contactez-nous pour vérifier notre disponibilité.
             </p>
           </div>
         </div>

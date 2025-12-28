@@ -23,18 +23,38 @@ const faqs: FAQ[] = [
   },
   {
     question: 'Dans quel délai pouvez-vous intervenir ?',
-    answer: 'Nous intervenons généralement sous 24 à 48 heures dans l\'Oise (60) et le Val-d\'Oise (95). En cas d\'urgence (problème de tirage, suspicion de fuite), nous faisons notre maximum pour intervenir le jour même. Contactez-nous par téléphone pour les situations urgentes.',
+    answer: 'Les délais varient selon la période :',
+    list: [
+      'Hors saison de chauffe : délais généralement plus courts',
+      'En pleine saison (automne/hiver) : le planning est plus chargé',
+      'En cas d\'urgence (panne totale, problème de sécurité), nous faisons notre maximum pour intervenir au plus vite',
+    ],
+    listNote: 'Le mieux est de prendre votre rendez-vous d\'entretien avant l\'hiver pour éviter l\'urgence.',
   },
   {
     question: 'Que puis-je vérifier moi-même avant de demander un dépannage ?',
     answer: 'Avant de nous appeler, quelques vérifications simples peuvent résoudre le problème :',
     list: [
-      'Il y a bien des granulés dans le réservoir',
+      'Le réservoir a bien des granulés',
       'Le poêle est branché et le disjoncteur n\'a pas sauté',
-      'Le poêle a été vidé de ses cendres',
-      'Les arrivées d\'air ne sont pas bouchées',
+      'Le poêle a été vidé de ses cendres régulièrement',
+      'L\'arrivée d\'air n\'est pas obstruée',
+      'La trappe à cendres est fermée correctement',
     ],
-    listNote: 'Au-delà de ça : on évite de démonter, on laisse faire le technicien.',
+    listNote: 'En revanche, pas de démontage hasardeux : électronique, sondes, pressostats, vis sans fin… c\'est pour le technicien.',
+  },
+  {
+    question: 'Quels sont les signes que mon poêle à granulés a besoin d\'un dépannage ?',
+    answer: 'Plusieurs symptômes doivent vous alerter :',
+    list: [
+      'Le poêle ne démarre plus ou s\'éteint tout seul',
+      'Messages d\'erreur ou code défaut à l\'écran',
+      'Message type « ATTENTION SERVICE »',
+      'Fumées inhabituelles ou odeur anormale',
+      'Bruit inhabituel (ventilateur, vis sans fin, extracteur…)',
+      'Température qui ne monte plus correctement',
+    ],
+    listNote: 'Si vous constatez l\'un de ces problèmes, il est préférable de stopper l\'appareil et de nous contacter.',
   },
   {
     question: 'Le certificat de ramonage est-il vraiment nécessaire ?',
@@ -42,19 +62,61 @@ const faqs: FAQ[] = [
   },
   {
     question: 'Quelle est la différence entre ramonage et débistrage ?',
-    answer: 'Le ramonage consiste à nettoyer les suies et dépôts légers dans le conduit à l\'aide d\'un hérisson. Le débistrage est une opération plus lourde qui élimine le bistre, un dépôt durci et goudronné très inflammable. Le débistrage nécessite un équipement spécial (débistreuse rotative) et est obligatoire avant un tubage. Nous proposons les deux services.',
+    answer: 'Le ramonage consiste à nettoyer les suies et dépôts légers dans le conduit à l\'aide d\'un hérisson. Le débistrage est une opération plus lourde qui élimine le bistre, un dépôt durci et goudronné très inflammable. Le débistrage nécessite un équipement spécial et est obligatoire avant un tubage. Nous proposons les deux services.',
+  },
+  {
+    question: 'Quelle est la différence entre un entretien et un dépannage ?',
+    answer: 'Ce sont deux prestations distinctes :',
+    list: [
+      'Entretien/ramonage : nettoyage complet du poêle, ramonage du conduit, contrôles de sécurité, attestation de ramonage',
+      'Dépannage : recherche de panne (diagnostic), tests sur les composants, remplacement ou réparation de pièces si nécessaire',
+    ],
+    listNote: 'Un poêle mal entretenu finit souvent… en dépannage.',
   },
   {
     question: 'Intervenez-vous sur tous les types de poêles ?',
-    answer: 'Oui, nous intervenons sur tous les types d\'appareils de chauffage : cheminées ouvertes, inserts, poêles à bois, poêles à granulés (pellets), chaudières bois/fioul/gaz. Nous assurons également l\'entretien complet des poêles à granulés (nettoyage du brûleur, vérification des joints, etc.).',
+    answer: 'Oui, nous intervenons sur tous les types d\'appareils de chauffage : cheminées ouvertes, inserts, poêles à bois, poêles à granulés (pellets), chaudières bois/fioul/gaz. Nous intervenons sur la plupart des marques courantes (sous réserve de disponibilité des pièces détachées). Lors de votre demande, merci de préciser la marque, le modèle et si possible une photo de la plaque signalétique.',
   },
   {
-    question: 'Proposez-vous des contrats d\'entretien annuel ?',
-    answer: 'Oui, nous proposons des contrats d\'entretien qui vous permettent de bénéficier d\'un suivi régulier et de tarifs préférentiels. Nous vous contactons automatiquement avant la période de chauffe pour planifier l\'intervention. C\'est la solution idéale pour ne jamais oublier votre ramonage obligatoire.',
+    question: 'Le message « ATTENTION SERVICE » s\'affiche, est-ce une panne ?',
+    answer: 'Dans la majorité des cas, ce message indique que le nombre d\'heures de fonctionnement est atteint et qu\'un entretien complet (ramonage + nettoyage poêle) est nécessaire. Ce n\'est pas forcément une grosse panne, mais sans entretien conforme, nous ne pouvons pas délivrer d\'attestation, et le poêle peut finir par se mettre en sécurité.',
+  },
+  {
+    question: 'Combien coûte un dépannage de poêle à granulés ?',
+    answer: 'Le tarif dépend de plusieurs facteurs :',
+    list: [
+      'Le type de panne (simple réglage, capteur, carte électronique, moteur…)',
+      'Le temps passé sur place',
+      'Le prix des pièces détachées éventuelles',
+    ],
+    listNote: 'Il y a un forfait déplacement + diagnostic. Si des pièces sont nécessaires, un devis vous est proposé avant toute intervention supplémentaire.',
   },
   {
     question: 'Comment se déroule une intervention de ramonage ?',
     answer: 'L\'intervention dure environ 30 à 45 minutes. Nous protégeons d\'abord votre intérieur avec des bâches. Ensuite, nous ramonons le conduit par le haut ou le bas selon l\'accessibilité. Nous vérifions le bon tirage et l\'état du conduit. Enfin, nous nettoyons notre zone de travail et vous remettons le certificat de ramonage.',
+  },
+  {
+    question: 'Faut-il être présent pendant l\'intervention ?',
+    answer: 'Oui, il est impératif qu\'un adulte soit présent :',
+    list: [
+      'Pour ouvrir et fermer le logement',
+      'Pour répondre aux questions du technicien',
+      'Pour valider le diagnostic et le devis si des réparations sont nécessaires',
+    ],
+  },
+  {
+    question: 'Que dois-je préparer avant votre venue ?',
+    answer: 'Pour gagner du temps et éviter les allers-retours :',
+    list: [
+      'Libérer l\'accès au poêle et au conduit',
+      'Prévoir un point d\'électricité',
+      'Noter les messages d\'erreur qui s\'affichent',
+      'Garder sous la main la notice du poêle et les anciennes factures si vous les avez',
+    ],
+  },
+  {
+    question: 'Fournissez-vous une attestation lors d\'un dépannage ?',
+    answer: 'Si l\'intervention inclut un ramonage complet conforme, nous délivrons une attestation de ramonage. Si nous intervenons uniquement pour du dépannage/réglage sans ramonage, aucune attestation ne peut être fournie. Même si vous avez ramoné vous-même, nous ne pouvons pas attester d\'un travail que nous n\'avons pas réalisé.',
   },
 ];
 

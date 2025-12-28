@@ -68,7 +68,7 @@ export function CTASection() {
             <div className="flex flex-wrap justify-center lg:justify-start gap-6 text-secondary-400 text-sm">
               <span className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-primary-400" />
-                Confirmation immédiate
+                Confirmation par email
               </span>
               <span className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary-400" />
@@ -85,8 +85,10 @@ export function CTASection() {
             
             <div className="space-y-6">
               {/* RDV en ligne - mis en avant */}
-              <Link
-                href="/contact"
+              <a
+                href={siteConfig.urls.booking}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-4 p-4 rounded-xl bg-primary-500/20 hover:bg-primary-500/30 
                            transition-colors group border border-primary-500/30"
               >
@@ -98,7 +100,7 @@ export function CTASection() {
                   <span className="text-white font-semibold text-lg">Prendre RDV en ligne</span>
                 </div>
                 <ArrowRight className="w-5 h-5 text-primary-400 ml-auto group-hover:translate-x-1 transition-transform" />
-              </Link>
+              </a>
 
               {/* Email protégé (image) */}
               <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
