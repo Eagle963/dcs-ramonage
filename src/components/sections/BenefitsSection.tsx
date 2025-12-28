@@ -1,5 +1,6 @@
 import { Clock, FileCheck, FileText, Award, Shield, Wrench, Phone, ThumbsUp, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { siteConfig } from '@/config/site';
 
 const benefits = [
   {
