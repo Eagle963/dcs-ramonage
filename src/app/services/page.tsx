@@ -25,6 +25,7 @@ const services = [
     title: 'Ramonage',
     slug: 'ramonage',
     icon: Flame,
+    color: 'bg-orange-50 group-hover:bg-orange-100 text-orange-600',
     description: 'Ramonage certifié de cheminées, inserts, poêles à bois et conduits. Certificat officiel fourni pour votre assurance.',
     features: ['Certificat de ramonage', 'Tous types de conduits', 'Intervention sous 24-48h'],
     price: 'À partir de 60€',
@@ -33,6 +34,7 @@ const services = [
     title: 'Débistrage',
     slug: 'debistrage',
     icon: Hammer,
+    color: 'bg-red-50 group-hover:bg-red-100 text-red-600',
     description: 'Élimination professionnelle du bistre et des dépôts de goudron dans vos conduits de cheminée.',
     features: ['Débistrage mécanique', 'Nettoyage en profondeur', 'Prévention des feux de cheminée'],
     price: 'Sur devis',
@@ -41,6 +43,7 @@ const services = [
     title: 'Tubage',
     slug: 'tubage-cheminee',
     icon: CircleDot,
+    color: 'bg-blue-50 group-hover:bg-blue-100 text-blue-600',
     description: 'Installation et rénovation de tubage aux normes pour sécuriser et optimiser vos conduits.',
     features: ['Tubage inox', 'Mise aux normes', 'Garantie décennale'],
     price: 'Sur devis',
@@ -49,6 +52,7 @@ const services = [
     title: 'Entretien Poêles à Granulés',
     slug: 'entretien-poele-granules',
     icon: Settings,
+    color: 'bg-green-50 group-hover:bg-green-100 text-green-600',
     description: 'Entretien complet et dépannage de poêles à bois et à granulés toutes marques.',
     features: ['Nettoyage complet', 'Vérification des composants', 'Optimisation des performances'],
     price: 'À partir de 90€',
@@ -57,6 +61,7 @@ const services = [
     title: 'Diagnostic de Conduit',
     slug: 'diagnostic-conduit',
     icon: Search,
+    color: 'bg-purple-50 group-hover:bg-purple-100 text-purple-600',
     description: 'Inspection et diagnostic complet de vos conduits pour identifier les problèmes potentiels.',
     features: ['Inspection visuelle', 'Test d\'étanchéité', 'Rapport détaillé'],
     price: 'Sur devis',
@@ -65,6 +70,7 @@ const services = [
     title: 'Fumisterie',
     slug: 'fumisterie',
     icon: Wrench,
+    color: 'bg-amber-50 group-hover:bg-amber-100 text-amber-600',
     description: 'Travaux de fumisterie : création, rénovation et mise aux normes de vos installations.',
     features: ['Création de conduits', 'Rénovation', 'Mise aux normes'],
     price: 'Sur devis',
@@ -73,6 +79,7 @@ const services = [
     title: 'Nettoyage & Démoussage',
     slug: 'nettoyage-demoussage',
     icon: Droplets,
+    color: 'bg-teal-50 group-hover:bg-teal-100 text-teal-600',
     description: 'Nettoyage de toiture, démoussage, nettoyage de façade et entretien extérieur.',
     features: ['Démoussage toiture', 'Nettoyage façade', 'Traitement hydrofuge'],
     price: 'Sur devis',
@@ -105,6 +112,7 @@ export default function ServicesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service) => {
               const IconComponent = service.icon;
+              const [bgColor, hoverColor, textColor] = service.color.split(' ');
               return (
                 <Link
                   key={service.slug}
@@ -113,9 +121,8 @@ export default function ServicesPage() {
                            hover:border-primary-200 hover:shadow-lg transition-all duration-300"
                 >
                   {/* Icône */}
-                  <div className="w-14 h-14 rounded-xl bg-primary-50 flex items-center justify-center mb-4
-                               group-hover:bg-primary-100 transition-colors">
-                    <IconComponent className="w-7 h-7 text-primary-600" />
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-colors ${bgColor} ${hoverColor}`}>
+                    <IconComponent className={`w-7 h-7 ${textColor}`} />
                   </div>
 
                   {/* Titre */}

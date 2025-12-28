@@ -90,7 +90,7 @@ export default function ZonesInterventionPage() {
         </div>
       </section>
 
-      {/* Carte des zones */}
+      {/* Cartes des zones - Leaflet */}
       <section className="section-padding bg-secondary-50">
         <div className="container-site">
           <div className="text-center max-w-2xl mx-auto mb-8">
@@ -98,89 +98,141 @@ export default function ZonesInterventionPage() {
               Notre zone d'intervention
             </h2>
             <p className="text-secondary-600">
-              Nous intervenons dans le sud de l'Oise et le nord du Val-d'Oise.
+              Nous intervenons dans le sud de l'Oise et dans tout le Val-d'Oise.
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="rounded-3xl overflow-hidden shadow-soft border border-secondary-100 bg-white p-8">
-              {/* Carte SVG stylisée */}
-              <svg viewBox="0 0 400 300" className="w-full h-auto">
-                {/* Fond */}
-                <rect width="400" height="300" fill="#f8fafc" />
-                
-                {/* Oise (60) - Zone couverte (sud du département) */}
-                <path
-                  d="M50 50 L200 30 L280 60 L300 120 L260 180 L180 200 L100 170 L60 120 Z"
-                  fill="#fed7aa"
-                  stroke="#ea580c"
-                  strokeWidth="2"
-                  opacity="0.7"
-                />
-                
-                {/* Val-d'Oise (95) - Zone couverte (nord du département) */}
-                <path
-                  d="M100 170 L180 200 L260 180 L280 220 L240 260 L160 270 L80 240 L60 200 Z"
-                  fill="#fed7aa"
-                  stroke="#ea580c"
-                  strokeWidth="2"
-                  opacity="0.7"
-                />
-                
-                {/* Zone non couverte Oise (nord) - grisée */}
-                <path
-                  d="M50 50 L200 30 L350 40 L380 100 L300 120 L280 60 L200 30"
-                  fill="#e2e8f0"
-                  stroke="#94a3b8"
-                  strokeWidth="1"
-                  opacity="0.5"
-                />
-                
-                {/* Marqueur Beauvais */}
-                <circle cx="120" cy="100" r="8" fill="#ea580c" />
-                <text x="120" y="125" textAnchor="middle" className="text-xs font-semibold" fill="#1e293b">Beauvais</text>
-                
-                {/* Marqueur Creil */}
-                <circle cx="220" cy="150" r="8" fill="#ea580c" />
-                <text x="220" y="175" textAnchor="middle" className="text-xs font-semibold" fill="#1e293b">Creil</text>
-                
-                {/* Marqueur Chantilly */}
-                <circle cx="250" cy="185" r="6" fill="#c2410c" />
-                <text x="285" y="188" textAnchor="start" className="text-xs" fill="#475569">Chantilly</text>
-                
-                {/* Marqueur Cergy */}
-                <circle cx="130" cy="220" r="8" fill="#ea580c" />
-                <text x="130" y="245" textAnchor="middle" className="text-xs font-semibold" fill="#1e293b">Cergy</text>
-                
-                {/* Marqueur Pontoise */}
-                <circle cx="160" cy="210" r="6" fill="#c2410c" />
-                <text x="175" y="205" textAnchor="start" className="text-xs" fill="#475569">Pontoise</text>
-                
-                {/* Marqueur L'Isle-Adam */}
-                <circle cx="200" cy="200" r="6" fill="#c2410c" />
-                <text x="200" y="192" textAnchor="middle" className="text-xs" fill="#475569">L'Isle-Adam</text>
-                
-                {/* Marqueur Argenteuil */}
-                <circle cx="210" cy="250" r="6" fill="#c2410c" />
-                <text x="210" y="268" textAnchor="middle" className="text-xs" fill="#475569">Argenteuil</text>
-                
-                {/* Légende */}
-                <rect x="290" y="220" width="16" height="16" fill="#fed7aa" stroke="#ea580c" strokeWidth="1" rx="2" />
-                <text x="312" y="233" className="text-xs" fill="#475569">Zone couverte</text>
-                
-                <rect x="290" y="245" width="16" height="16" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="1" rx="2" />
-                <text x="312" y="258" className="text-xs" fill="#475569">Hors zone</text>
-                
-                {/* Labels départements */}
-                <text x="150" y="80" className="text-sm font-bold" fill="#c2410c">OISE (60)</text>
-                <text x="140" y="235" className="text-sm font-bold" fill="#c2410c">VAL-D'OISE (95)</text>
-              </svg>
+          {/* 2 cartes côte à côte */}
+          <div className="grid lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {/* Carte Oise */}
+            <div className="bg-white rounded-2xl overflow-hidden shadow-soft border border-secondary-100">
+              <div className="p-4 border-b border-secondary-100">
+                <h3 className="font-display font-bold text-lg text-secondary-900">Oise (60)</h3>
+                <p className="text-sm text-secondary-500">Sud du département couvert</p>
+              </div>
+              <div id="map-oise" className="h-[350px] w-full"></div>
+              <div className="p-3 bg-secondary-50 flex justify-center gap-6 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded bg-orange-500/70 border border-orange-600"></span>
+                  <span className="text-secondary-600">Zone couverte</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded bg-slate-300/70 border border-slate-400"></span>
+                  <span className="text-secondary-600">Hors zone</span>
+                </div>
+              </div>
             </div>
-            <p className="text-center text-sm text-secondary-500 mt-4">
-              Votre commune n'est pas listée ? Contactez-nous pour vérifier notre disponibilité.
-            </p>
+
+            {/* Carte Val-d'Oise */}
+            <div className="bg-white rounded-2xl overflow-hidden shadow-soft border border-secondary-100">
+              <div className="p-4 border-b border-secondary-100">
+                <h3 className="font-display font-bold text-lg text-secondary-900">Val-d'Oise (95)</h3>
+                <p className="text-sm text-secondary-500">Tout le département couvert</p>
+              </div>
+              <div id="map-valdoise" className="h-[350px] w-full"></div>
+              <div className="p-3 bg-secondary-50 flex justify-center gap-6 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded bg-orange-500/70 border border-orange-600"></span>
+                  <span className="text-secondary-600">Zone couverte</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded bg-slate-300/70 border border-slate-400"></span>
+                  <span className="text-secondary-600">Hors zone</span>
+                </div>
+              </div>
+            </div>
           </div>
+
+          <p className="text-center text-sm text-secondary-500 mt-6">
+            Votre commune n'est pas listée ? Contactez-nous pour vérifier notre disponibilité.
+          </p>
         </div>
+
+        {/* Scripts Leaflet */}
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              document.addEventListener('DOMContentLoaded', function() {
+                // Attendre que Leaflet soit chargé
+                setTimeout(function() {
+                  if (typeof L === 'undefined') return;
+                  
+                  // Carte Oise
+                  var mapOise = L.map('map-oise', { scrollWheelZoom: false }).setView([49.35, 2.4], 9);
+                  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '© OpenStreetMap, © CARTO'
+                  }).addTo(mapOise);
+                  
+                  // Carte Val-d'Oise
+                  var mapValdoise = L.map('map-valdoise', { scrollWheelZoom: false }).setView([49.05, 2.15], 10);
+                  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '© OpenStreetMap, © CARTO'
+                  }).addTo(mapValdoise);
+                  
+                  // Codes postaux exclus Oise (nord)
+                  var excludedOise = ['60128','60150','60170','60320','60330','60350','60400','60440','60800','60138','60129','60117','60640','60380','60810','60141','60123','60490','60950','60890','60157','60420','60220','60127','60620'];
+                  
+                  // Charger GeoJSON
+                  fetch('https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements-version-simplifiee.geojson')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                      // Oise
+                      var oise = data.features.find(function(f) { return f.properties.code === '60'; });
+                      if (oise) {
+                        L.geoJSON(oise, {
+                          style: { fillColor: '#f97316', fillOpacity: 0.4, color: '#ea580c', weight: 2 }
+                        }).addTo(mapOise);
+                        mapOise.fitBounds(L.geoJSON(oise).getBounds(), { padding: [20, 20] });
+                      }
+                      
+                      // Val-d'Oise
+                      var valdoise = data.features.find(function(f) { return f.properties.code === '95'; });
+                      if (valdoise) {
+                        L.geoJSON(valdoise, {
+                          style: { fillColor: '#f97316', fillOpacity: 0.4, color: '#ea580c', weight: 2 }
+                        }).addTo(mapValdoise);
+                        mapValdoise.fitBounds(L.geoJSON(valdoise).getBounds(), { padding: [20, 20] });
+                      }
+                      
+                      // Villes Oise
+                      var villesOise = [
+                        { name: 'Beauvais', lat: 49.4295, lng: 2.0807 },
+                        { name: 'Creil', lat: 49.2583, lng: 2.4833 },
+                        { name: 'Chantilly', lat: 49.1947, lng: 2.4711 },
+                        { name: 'Senlis', lat: 49.2069, lng: 2.5864 },
+                        { name: 'Méru', lat: 49.2364, lng: 2.1339 },
+                        { name: 'Chambly', lat: 49.1656, lng: 2.2478 }
+                      ];
+                      villesOise.forEach(function(v) {
+                        L.circleMarker([v.lat, v.lng], {
+                          radius: 6, fillColor: '#1e293b', fillOpacity: 1, color: '#fff', weight: 2
+                        }).bindTooltip(v.name, { direction: 'top' }).addTo(mapOise);
+                      });
+                      
+                      // Villes Val-d'Oise
+                      var villesValdoise = [
+                        { name: 'Cergy', lat: 49.0364, lng: 2.0633 },
+                        { name: 'Vauréal', lat: 49.0308, lng: 2.0297 },
+                        { name: 'Pontoise', lat: 49.0500, lng: 2.1000 },
+                        { name: "L'Isle-Adam", lat: 49.1081, lng: 2.2283 },
+                        { name: 'Argenteuil', lat: 48.9472, lng: 2.2467 },
+                        { name: 'Taverny', lat: 49.0264, lng: 2.2258 },
+                        { name: 'Ermont', lat: 48.9903, lng: 2.2578 },
+                        { name: 'Persan', lat: 49.1531, lng: 2.2728 }
+                      ];
+                      villesValdoise.forEach(function(v) {
+                        L.circleMarker([v.lat, v.lng], {
+                          radius: 6, fillColor: '#1e293b', fillOpacity: 1, color: '#fff', weight: 2
+                        }).bindTooltip(v.name, { direction: 'top' }).addTo(mapValdoise);
+                      });
+                    });
+                }, 500);
+              });
+            `,
+          }}
+        />
       </section>
 
       {/* Zones par département */}
