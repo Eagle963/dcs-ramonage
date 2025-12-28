@@ -32,9 +32,9 @@ export function HeroSection() {
           <div className="text-center lg:text-left animate-fade-in-up">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full 
-                           bg-primary-50 border border-primary-100 mb-6 animate-fade-in animation-delay-200">
-              <span className="flex items-center gap-1 text-primary-600 font-medium text-sm">
-                <Star className="w-4 h-4 fill-primary-500" />
+                           bg-white border border-secondary-200 mb-6 animate-fade-in animation-delay-200 shadow-sm">
+              <span className="flex items-center gap-1 text-secondary-900 font-medium text-sm">
+                <Star className="w-4 h-4 fill-primary-500 text-primary-500" />
                 5/5 sur Google
               </span>
               <span className="text-secondary-400">•</span>
@@ -91,7 +91,7 @@ export function HeroSection() {
                   className="flex items-center gap-2 text-secondary-700 animate-fade-in"
                   style={{ animationDelay: `${400 + index * 100}ms` }}
                 >
-                  <item.icon className="w-5 h-5 text-primary-600" />
+                  <item.icon className="w-5 h-5 text-primary-700" />
                   <span className="font-medium">{item.text}</span>
                 </div>
               ))}

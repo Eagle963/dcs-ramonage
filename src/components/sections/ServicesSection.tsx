@@ -56,7 +56,7 @@ export function ServicesSection() {
 
                 {/* Contenu */}
                 <h3 className="text-xl font-display font-semibold text-secondary-900 mb-2 
-                               group-hover:text-primary-600 transition-colors">
+                               group-hover:text-primary-700 transition-colors">
                   {service.name}
                 </h3>
                 <p className="text-secondary-600 text-sm leading-relaxed mb-4">
@@ -64,7 +64,7 @@ export function ServicesSection() {
                 </p>
 
                 {/* Lien */}
-                <div className="flex items-center gap-2 text-primary-600 font-medium text-sm
+                <div className="flex items-center gap-2 text-primary-700 font-medium text-sm
                                 group-hover:gap-3 transition-all">
                   En savoir plus
                   <ArrowRight className="w-4 h-4" />

@@ -39,18 +39,18 @@ export default function NettoyageDemoussagePage() {
               Nettoyage et démoussage{' '}
               <span className="text-gradient">professionnel</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8 text-center">
+            <p className="text-xl text-secondary-600 mb-8">
               Redonnez un coup d'éclat à votre maison !
               <br />
               Nous nettoyons et traitons vos toitures, murs, sols extérieurs et vérandas avec des équipements professionnels.
             </p>
 
             <div className="flex flex-col sm:flex-row items-start gap-4">
-              <Link href="/contact" className="btn-primary btn-lg">
+              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-lg">
                 <Calendar className="w-5 h-5" />
                 Demander un devis gratuit
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+              </a>
               <a
                 href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
                 className="btn-outline btn-lg"
@@ -70,7 +70,7 @@ export default function NettoyageDemoussagePage() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
               Nos prestations de nettoyage
             </h2>
-            <p className="text-secondary-600 text-center">
+            <p className="text-secondary-600">
               Un service complet pour l'extérieur de votre maison.
             </p>
           </div>
@@ -161,7 +161,7 @@ export default function NettoyageDemoussagePage() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
               Tarification
             </h2>
-            <p className="text-secondary-600 text-center">
+            <p className="text-secondary-600">
               Chaque chantier est unique. Nous établissons un devis gratuit après 
               évaluation de la surface et de l'état de vos extérieurs.
             </p>
@@ -249,11 +249,11 @@ export default function NettoyageDemoussagePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/contact" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
+              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
                 <Calendar className="w-5 h-5" />
                 Demander un devis
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+              </a>
               <a
                 href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
                 className="text-secondary-400 hover:text-white text-sm transition-colors"

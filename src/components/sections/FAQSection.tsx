@@ -106,11 +106,11 @@ export function FAQSection() {
               
               <div className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-soft">
                 <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
-                  <HelpCircle className="w-5 h-5 text-primary-600" />
+                  <HelpCircle className="w-5 h-5 text-primary-700" />
                 </div>
                 <div>
                   <p className="text-sm text-secondary-600">Une autre question ?</p>
-                  <a href="/contact" className="text-primary-600 font-semibold hover:text-primary-700">
+                  <a href="/contact" className="text-primary-700 font-semibold hover:text-primary-700">
                     Contactez-nous →
                   </a>
                 </div>
@@ -138,14 +138,14 @@ export function FAQSection() {
                   >
                     <h3 className={cn(
                       'font-display font-semibold text-lg transition-colors',
-                      openIndex === index ? 'text-primary-600' : 'text-secondary-900'
+                      openIndex === index ? 'text-primary-700' : 'text-secondary-900'
                     )}>
                       {faq.question}
                     </h3>
                     <div className={cn(
                       'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
                       openIndex === index 
-                        ? 'bg-primary-100 text-primary-600 rotate-180' 
+                        ? 'bg-primary-100 text-primary-700 rotate-180' 
                         : 'bg-secondary-100 text-secondary-600'
                     )}>
                       <ChevronDown className="w-5 h-5" />

@@ -64,7 +64,7 @@ export default function ZonesInterventionPage() {
               Nous intervenons dans{' '}
               <span className="text-gradient">l'Oise et le Val-d'Oise</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8 text-center">
+            <p className="text-xl text-secondary-600 mb-8">
               DCS Ramonage intervient dans l'Oise (60) et le Val-d'Oise (95).
               <br />
               Déplacement inclus dans nos tarifs.
@@ -97,7 +97,7 @@ export default function ZonesInterventionPage() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
               Notre zone d'intervention
             </h2>
-            <p className="text-secondary-600 text-center">
+            <p className="text-secondary-600">
               Cliquez sur la carte pour voir notre localisation et calculer votre itinéraire.
             </p>
           </div>
@@ -183,18 +183,18 @@ export default function ZonesInterventionPage() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
               Votre commune n'est pas listée ?
             </h2>
-            <p className="text-secondary-600 text-center">
+            <p className="text-secondary-600">
               Nous intervenons dans l'Oise (60) et le Val-d'Oise (95). 
               Contactez-nous pour vérifier notre disponibilité dans votre secteur.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/contact" className="btn-primary btn-lg">
+            <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-lg">
               <Calendar className="w-5 h-5" />
               Vérifier la disponibilité
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </a>
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
               className="btn-outline btn-lg"
@@ -219,11 +219,11 @@ export default function ZonesInterventionPage() {
               Réservez votre créneau en ligne. Intervention rapide sous 24-48h dans l'Oise et le Val-d'Oise.
             </p>
             
-            <Link href="/contact" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
+            <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
               <Calendar className="w-5 h-5" />
               Prendre rendez-vous
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </a>
           </div>
         </div>
       </section>

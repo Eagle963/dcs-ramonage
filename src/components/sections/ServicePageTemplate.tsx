@@ -132,7 +132,7 @@ export function ServicePageTemplate({
               {title}{' '}
               <span className="text-gradient">{titleHighlight}</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8 text-center">
+            <p className="text-xl text-secondary-600 mb-8">
               {description.split('. ').map((sentence, index, array) => (
                 <span key={index}>
                   {sentence}{index < array.length - 1 ? '.' : ''}
@@ -143,11 +143,11 @@ export function ServicePageTemplate({
             
             {/* CTA */}
             <div className="flex flex-col sm:flex-row items-start gap-4">
-              <Link href="/contact" className="btn-primary btn-lg">
+              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-lg">
                 <Calendar className="w-5 h-5" />
                 Prendre rendez-vous
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+              </a>
               <div className="flex items-center gap-2 text-secondary-500 text-sm">
                 <Clock className="w-4 h-4" />
                 <span>Intervention sous 24-48h</span>
@@ -460,10 +460,10 @@ export function ServicePageTemplate({
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/contact" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
+              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
                 <Calendar className="w-5 h-5" />
                 Prendre rendez-vous
-              </Link>
+              </a>
               <a
                 href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
                 className="text-secondary-400 hover:text-white text-sm transition-colors"

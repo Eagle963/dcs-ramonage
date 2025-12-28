@@ -77,7 +77,7 @@ export function Footer() {
                     className="flex items-center gap-2 text-secondary-300 hover:text-primary-400 
                                transition-colors group"
                   >
-                    <ChevronRight className="w-4 h-4 text-primary-600 group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight className="w-4 h-4 text-primary-700 group-hover:translate-x-1 transition-transform" />
                     {service.name}
                   </Link>
                 </li>
@@ -131,7 +131,7 @@ export function Footer() {
                     <Phone className="w-5 h-5 text-primary-400" />
                   </div>
                   <div>
-                    <span className="text-xs text-secondary-500 block">Téléphone</span>
+                    <span className="text-xs text-secondary-400 block">Téléphone</span>
                     <span className="font-semibold">{siteConfig.contact.phone}</span>
                   </div>
                 </a>
@@ -142,7 +142,7 @@ export function Footer() {
                     <Mail className="w-5 h-5 text-primary-400" />
                   </div>
                   <div>
-                    <span className="text-xs text-secondary-500 block">Email</span>
+                    <span className="text-xs text-secondary-400 block">Email</span>
                     <EmailImageLight size="md" />
                   </div>
                 </div>
@@ -153,7 +153,7 @@ export function Footer() {
                     <MapPin className="w-5 h-5 text-primary-400" />
                   </div>
                   <div>
-                    <span className="text-xs text-secondary-500 block">Zone principale</span>
+                    <span className="text-xs text-secondary-400 block">Zone principale</span>
                     <span className="font-semibold">Beauvais et environs</span>
                     <span className="text-sm block">Oise (60) & Val-d'Oise (95)</span>
                   </div>
@@ -165,7 +165,7 @@ export function Footer() {
                     <Clock className="w-5 h-5 text-primary-400" />
                   </div>
                   <div>
-                    <span className="text-xs text-secondary-500 block">Horaires</span>
+                    <span className="text-xs text-secondary-400 block">Horaires</span>
                     <span className="font-semibold">Lun-Ven: {siteConfig.hours.weekdays}</span>
                     <span className="text-sm block">Sam: {siteConfig.hours.saturday}</span>
                   </div>
@@ -189,13 +189,15 @@ export function Footer() {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <Link
-                href="/contact"
-                className="btn bg-white text-primary-600 hover:bg-secondary-50 btn-md"
+              <a
+                href={siteConfig.urls.booking}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn bg-white text-primary-700 hover:bg-secondary-50 btn-md"
               >
                 <Calendar className="w-4 h-4" />
                 Prendre RDV
-              </Link>
+              </a>
               <a
                 href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
                 className="btn bg-secondary-800 text-secondary-300 hover:bg-secondary-700 btn-md text-sm"

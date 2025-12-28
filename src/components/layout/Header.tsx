@@ -347,13 +347,15 @@ export function Header() {
             {/* Contact */}
             <div className="space-y-4">
               {/* Bouton RDV - principal */}
-              <Link
-                href="/contact"
+              <a
+                href={siteConfig.urls.booking}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn-primary btn-lg w-full"
               >
                 <Calendar className="w-5 h-5" />
                 Prendre rendez-vous
-              </Link>
+              </a>
               
               {/* Téléphone - secondaire et discret */}
               <a

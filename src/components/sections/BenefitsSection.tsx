@@ -43,7 +43,7 @@ const benefits = [
 const colorClasses = {
   primary: {
     bg: 'bg-primary-100',
-    icon: 'text-primary-600',
+    icon: 'text-primary-700',
     gradient: 'from-primary-500 to-primary-600',
   },
   success: {
@@ -142,14 +142,16 @@ export function BenefitsSection() {
             
             <div className="flex items-center gap-4">
               <a
-                href="/contact"
+                href={siteConfig.urls.booking}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn bg-primary-500 text-white hover:bg-primary-600 btn-md"
               >
                 <Calendar className="w-4 h-4" />
                 Prendre RDV
               </a>
               <a
-                href="tel:0600000000"
+                href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
                 className="btn bg-secondary-700 text-secondary-300 hover:bg-secondary-600 btn-md text-sm"
               >
                 <Phone className="w-4 h-4" />

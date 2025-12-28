@@ -39,7 +39,7 @@ export default function PoeleDiellePage() {
               Expert poêles à granulés{' '}
               <span className="text-gradient">Dielle</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8 text-center">
+            <p className="text-xl text-secondary-600 mb-8">
               Formés directement par Dielle, nous sommes spécialistes de l'entretien et du dépannage de vos poêles à granulés de cette marque italienne reconnue.
             </p>
             
@@ -56,11 +56,11 @@ export default function PoeleDiellePage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-start gap-4">
-              <Link href="/contact" className="btn-primary btn-lg">
+              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-lg">
                 <Calendar className="w-5 h-5" />
                 Prendre rendez-vous
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+              </a>
               <a
                 href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
                 className="btn-outline btn-lg"
@@ -127,7 +127,7 @@ export default function PoeleDiellePage() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
               Nos prestations pour poêles Dielle
             </h2>
-            <p className="text-secondary-600 text-center">
+            <p className="text-secondary-600">
               Un entretien complet adapté aux spécificités de votre appareil.
             </p>
           </div>
@@ -278,11 +278,11 @@ export default function PoeleDiellePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/contact" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
+              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
                 <Calendar className="w-5 h-5" />
                 Prendre rendez-vous
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+              </a>
               <a
                 href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
                 className="text-secondary-400 hover:text-white text-sm transition-colors"

@@ -68,7 +68,7 @@ export default function AProposPage() {
               Votre artisan ramoneur{' '}
               <span className="text-gradient">de confiance</span>
             </h1>
-            <p className="text-xl text-secondary-600 text-center">
+            <p className="text-xl text-secondary-600">
               DCS Ramonage, c'est un savoir-faire artisanal au service de votre sécurité.
               <br />
               Nous intervenons dans l'Oise et le Val-d'Oise pour l'entretien de vos cheminées, poêles et conduits de fumée.
@@ -127,7 +127,7 @@ export default function AProposPage() {
             <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
               Nos valeurs
             </h2>
-            <p className="text-secondary-600 text-center">
+            <p className="text-secondary-600">
               Ce qui nous guide au quotidien dans notre métier d'artisan ramoneur.
             </p>
           </div>
@@ -204,14 +204,14 @@ export default function AProposPage() {
               <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-6">
                 Nous intervenons dans l'Oise et le Val-d'Oise
               </h2>
-              <p className="text-secondary-600 mb-6 text-center">
+              <p className="text-secondary-600 mb-6">
                 Nous intervenons dans l'Oise (60) et le Val-d'Oise (95). 
                 Déplacement inclus dans nos tarifs.
               </p>
-              <Link href="/contact" className="btn-primary btn-md">
+              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-md">
                 <Calendar className="w-4 h-4" />
                 Vérifier notre disponibilité
-              </Link>
+              </a>
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -245,11 +245,11 @@ export default function AProposPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/contact" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
+              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
                 <Calendar className="w-5 h-5" />
                 Prendre rendez-vous
                 <ArrowRight className="w-5 h-5" />
-              </Link>
+              </a>
               <a
                 href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
                 className="text-secondary-400 hover:text-white text-sm transition-colors"
