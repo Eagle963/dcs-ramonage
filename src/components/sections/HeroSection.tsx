@@ -136,33 +136,16 @@ export function HeroSection() {
               <div className="absolute -inset-4 bg-gradient-to-br from-primary-500/20 to-accent-500/20 
                               rounded-3xl blur-2xl" />
               
-              {/* Image/Illustration placeholder */}
-              <div className="relative bg-gradient-to-br from-secondary-800 to-secondary-900 
-                              rounded-3xl overflow-hidden aspect-[4/3] shadow-2xl">
-                {/* Overlay avec motif */}
-                <div className="absolute inset-0 bg-pattern opacity-10" />
+              {/* Image du poêle */}
+              <div className="relative rounded-3xl overflow-hidden aspect-[4/3] shadow-2xl">
+                <img 
+                  src="/images/hero-poele.webp" 
+                  alt="Poêle à bois moderne avec flammes" 
+                  className="w-full h-full object-cover"
+                />
                 
-                {/* Contenu de la card */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                  {/* Icône flamme animée */}
-                  <div className="relative mb-6">
-                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary-500 to-accent-600 
-                                    flex items-center justify-center animate-flame">
-                      <Flame className="w-12 h-12 text-white" />
-                    </div>
-                    {/* Cercles concentriques */}
-                    <div className="absolute inset-0 rounded-2xl border-2 border-primary-400/30 
-                                    animate-ping" style={{ animationDuration: '2s' }} />
-                  </div>
-                  
-                  {/* Texte */}
-                  <h3 className="text-white font-display font-bold text-2xl mb-2 text-center">
-                    Votre sécurité,<br />notre priorité
-                  </h3>
-                  <p className="text-secondary-300 text-center max-w-xs">
-                    Ramonage professionnel certifié pour cheminées et poêles
-                  </p>
-                </div>
+                {/* Overlay léger pour contraste des badges */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
                 {/* Badge flottant - Avis */}
                 <div className="absolute top-6 right-6 bg-white rounded-xl shadow-lg p-3 

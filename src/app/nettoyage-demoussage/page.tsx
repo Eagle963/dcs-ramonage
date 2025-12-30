@@ -250,15 +250,15 @@ export default function NettoyageDemoussagePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {/* Réalisation 1 */}
+            {/* Réalisation 1 - Façade */}
             <div className="bg-white rounded-2xl border border-secondary-100 overflow-hidden shadow-soft">
               <div className="grid grid-cols-2 gap-1">
                 <div className="relative aspect-square bg-secondary-100">
-                  <img src="/images/nettoyage-avant-1.webp" alt="Façade avant nettoyage" className="w-full h-full object-cover" />
+                  <img src="/images/nettoyage-facade-avant.webp" alt="Façade avant nettoyage" className="w-full h-full object-cover" />
                   <span className="absolute bottom-2 left-2 bg-secondary-900/80 text-white text-xs px-2 py-1 rounded">Avant</span>
                 </div>
                 <div className="relative aspect-square bg-secondary-100">
-                  <img src="/images/nettoyage-apres-1.webp" alt="Façade après nettoyage" className="w-full h-full object-cover" />
+                  <img src="/images/nettoyage-facade-apres.webp" alt="Façade après nettoyage" className="w-full h-full object-cover" />
                   <span className="absolute bottom-2 right-2 bg-teal-500/90 text-white text-xs px-2 py-1 rounded">Après</span>
                 </div>
               </div>
@@ -268,15 +268,15 @@ export default function NettoyageDemoussagePage() {
               </div>
             </div>
 
-            {/* Réalisation 2 */}
+            {/* Réalisation 2 - Bardage */}
             <div className="bg-white rounded-2xl border border-secondary-100 overflow-hidden shadow-soft">
               <div className="grid grid-cols-2 gap-1">
                 <div className="relative aspect-square bg-secondary-100">
-                  <img src="/images/nettoyage-avant-2.webp" alt="Façade avant nettoyage" className="w-full h-full object-cover" />
+                  <img src="/images/nettoyage-bardage-avant.webp" alt="Bardage avant nettoyage" className="w-full h-full object-cover" />
                   <span className="absolute bottom-2 left-2 bg-secondary-900/80 text-white text-xs px-2 py-1 rounded">Avant</span>
                 </div>
                 <div className="relative aspect-square bg-secondary-100">
-                  <img src="/images/nettoyage-apres-2.webp" alt="Façade après nettoyage" className="w-full h-full object-cover" />
+                  <img src="/images/nettoyage-bardage-apres.webp" alt="Bardage après nettoyage" className="w-full h-full object-cover" />
                   <span className="absolute bottom-2 right-2 bg-teal-500/90 text-white text-xs px-2 py-1 rounded">Après</span>
                 </div>
               </div>
@@ -286,15 +286,15 @@ export default function NettoyageDemoussagePage() {
               </div>
             </div>
 
-            {/* Réalisation 3 */}
+            {/* Réalisation 3 - Mur */}
             <div className="bg-white rounded-2xl border border-secondary-100 overflow-hidden shadow-soft">
               <div className="grid grid-cols-2 gap-1">
                 <div className="relative aspect-square bg-secondary-100">
-                  <img src="/images/nettoyage-avant-3.webp" alt="Mur avant nettoyage" className="w-full h-full object-cover" />
+                  <img src="/images/nettoyage-mur-avant.webp" alt="Mur avant nettoyage" className="w-full h-full object-cover" />
                   <span className="absolute bottom-2 left-2 bg-secondary-900/80 text-white text-xs px-2 py-1 rounded">Avant</span>
                 </div>
                 <div className="relative aspect-square bg-secondary-100">
-                  <img src="/images/nettoyage-apres-3.webp" alt="Mur après nettoyage" className="w-full h-full object-cover" />
+                  <img src="/images/nettoyage-mur-apres.webp" alt="Mur après nettoyage" className="w-full h-full object-cover" />
                   <span className="absolute bottom-2 right-2 bg-teal-500/90 text-white text-xs px-2 py-1 rounded">Après</span>
                 </div>
               </div>
