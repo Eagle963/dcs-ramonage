@@ -147,15 +147,15 @@ export default function ZonesInterventionPage() {
         
         <div className="container-site relative z-10">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center justify-start gap-2 mb-4">
               <MapPin className="w-5 h-5 text-blue-500" />
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700">Zones d'intervention</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6 text-left">
               Nous intervenons dans{' '}
               <span className="text-gradient">l'Oise et le Val-d'Oise</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8 text-center md:text-left">
+            <p className="text-xl text-secondary-600 mb-8 text-left">
               DCS Ramonage intervient dans l'Oise (60) et le Val-d'Oise (95).
               <br />
               Déplacement inclus dans nos tarifs.
@@ -163,7 +163,7 @@ export default function ZonesInterventionPage() {
               Intervention sous 24-48h.
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap justify-start gap-4">
               <div className="flex items-center gap-2 text-secondary-600">
                 <CheckCircle2 className="w-5 h-5 text-primary-500" />
                 <span>Déplacement inclus</span>

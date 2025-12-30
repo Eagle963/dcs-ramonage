@@ -38,15 +38,15 @@ export function LocalPageTemplate({
         
         <div className="container-site relative z-10">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center justify-start gap-2 mb-4">
               <MapPin className="w-5 h-5 text-primary-500" />
               <span className="badge-primary">{department}</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6 text-left">
               Ramonage à{' '}
               <span className="text-gradient">{city}</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8 text-center md:text-left">
+            <p className="text-xl text-secondary-600 mb-8 text-left">
               Votre artisan ramoneur certifié à {city} et ses environs. 
               Ramonage de cheminées, poêles à bois et à granulés. 
               Certificat officiel pour votre assurance.
@@ -73,16 +73,16 @@ export function LocalPageTemplate({
         <div className="container-site">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
-              <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-6">
+              <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-6 text-left">
                 Nos services de ramonage à {city}
               </h2>
-              <p className="text-secondary-600 leading-relaxed mb-6 text-center md:text-left">
+              <p className="text-secondary-600 leading-relaxed mb-6 text-left">
                 DCS Ramonage intervient à {city} ({postalCodes.join(', ')}) pour tous vos besoins en ramonage et entretien de conduits de fumée.
                 <br />
                 Nous sommes votre ramoneur de proximité, disponible rapidement pour les particuliers et les professionnels.
               </p>
               {specificContent && (
-                <p className="text-secondary-600 leading-relaxed mb-6 text-center md:text-left">
+                <p className="text-secondary-600 leading-relaxed mb-6 text-left">
                   {specificContent}
                 </p>
               )}

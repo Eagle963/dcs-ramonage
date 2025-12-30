@@ -29,17 +29,17 @@ export default function NettoyageDemoussagePage() {
         
         <div className="container-site relative z-10">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center justify-start gap-2 mb-4">
               <Droplets className="w-5 h-5 text-blue-500" />
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700">
                 Nettoyage & Démoussage
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6 text-left">
               Nettoyage et démoussage{' '}
               <span className="text-gradient">professionnel</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-left">
               Redonnez un coup d'éclat à votre maison !
               <br />
               Nous nettoyons et traitons vos toitures, murs, sols extérieurs et vérandas avec des équipements professionnels.
@@ -230,6 +230,79 @@ export default function NettoyageDemoussagePage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Réalisations Avant/Après */}
+      <section className="section-padding">
+        <div className="container-site">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 text-teal-700 mb-4">
+              Nos réalisations
+            </span>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
+              Avant / Après
+            </h2>
+            <p className="text-secondary-600 mt-4">
+              Découvrez la différence après notre intervention
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Réalisation 1 */}
+            <div className="bg-white rounded-2xl border border-secondary-100 overflow-hidden shadow-soft">
+              <div className="grid grid-cols-2 gap-1">
+                <div className="relative aspect-square bg-secondary-100">
+                  <img src="/images/nettoyage-avant-1.webp" alt="Façade avant nettoyage" className="w-full h-full object-cover" />
+                  <span className="absolute bottom-2 left-2 bg-secondary-900/80 text-white text-xs px-2 py-1 rounded">Avant</span>
+                </div>
+                <div className="relative aspect-square bg-secondary-100">
+                  <img src="/images/nettoyage-apres-1.webp" alt="Façade après nettoyage" className="w-full h-full object-cover" />
+                  <span className="absolute bottom-2 right-2 bg-teal-500/90 text-white text-xs px-2 py-1 rounded">Après</span>
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="font-semibold text-secondary-900 mb-1">Façade maison moderne</h3>
+                <p className="text-sm text-secondary-600">Nettoyage haute pression et traitement anti-mousse</p>
+              </div>
+            </div>
+
+            {/* Réalisation 2 */}
+            <div className="bg-white rounded-2xl border border-secondary-100 overflow-hidden shadow-soft">
+              <div className="grid grid-cols-2 gap-1">
+                <div className="relative aspect-square bg-secondary-100">
+                  <img src="/images/nettoyage-avant-2.webp" alt="Façade avant nettoyage" className="w-full h-full object-cover" />
+                  <span className="absolute bottom-2 left-2 bg-secondary-900/80 text-white text-xs px-2 py-1 rounded">Avant</span>
+                </div>
+                <div className="relative aspect-square bg-secondary-100">
+                  <img src="/images/nettoyage-apres-2.webp" alt="Façade après nettoyage" className="w-full h-full object-cover" />
+                  <span className="absolute bottom-2 right-2 bg-teal-500/90 text-white text-xs px-2 py-1 rounded">Après</span>
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="font-semibold text-secondary-900 mb-1">Façade avec bardage bois</h3>
+                <p className="text-sm text-secondary-600">Traitement complet mur et bardage</p>
+              </div>
+            </div>
+
+            {/* Réalisation 3 */}
+            <div className="bg-white rounded-2xl border border-secondary-100 overflow-hidden shadow-soft">
+              <div className="grid grid-cols-2 gap-1">
+                <div className="relative aspect-square bg-secondary-100">
+                  <img src="/images/nettoyage-avant-3.webp" alt="Mur avant nettoyage" className="w-full h-full object-cover" />
+                  <span className="absolute bottom-2 left-2 bg-secondary-900/80 text-white text-xs px-2 py-1 rounded">Avant</span>
+                </div>
+                <div className="relative aspect-square bg-secondary-100">
+                  <img src="/images/nettoyage-apres-3.webp" alt="Mur après nettoyage" className="w-full h-full object-cover" />
+                  <span className="absolute bottom-2 right-2 bg-teal-500/90 text-white text-xs px-2 py-1 rounded">Après</span>
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="font-semibold text-secondary-900 mb-1">Mur extérieur encrassé</h3>
+                <p className="text-sm text-secondary-600">Élimination des traces de rouille et salissures</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

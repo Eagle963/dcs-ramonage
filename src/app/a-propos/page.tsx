@@ -61,15 +61,15 @@ export default function AProposPage() {
         
         <div className="container-site relative z-10">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center justify-start gap-2 mb-4">
               <Users className="w-5 h-5 text-amber-500" />
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700">À propos</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6 text-left">
               Votre artisan ramoneur{' '}
               <span className="text-gradient">de confiance</span>
             </h1>
-            <p className="text-xl text-secondary-600 text-center md:text-left">
+            <p className="text-xl text-secondary-600 text-left">
               DCS Ramonage, c'est un savoir-faire artisanal au service de votre sécurité.
               <br />
               Nous intervenons dans l'Oise et le Val-d'Oise pour l'entretien de vos cheminées, poêles et conduits de fumée.
@@ -82,11 +82,25 @@ export default function AProposPage() {
       <section className="section-padding">
         <div className="container-site">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Photo */}
+            <div className="relative">
+              <div className="relative rounded-3xl overflow-hidden shadow-soft">
+                <img 
+                  src="/images/fondateur.webp" 
+                  alt="Fondateur de DCS Ramonage" 
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+              {/* Décoration */}
+              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-primary-500/20 rounded-2xl -z-10" />
+              <div className="absolute -top-4 -left-4 w-16 h-16 bg-amber-500/20 rounded-xl -z-10" />
+            </div>
+
             <div>
-              <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-6">
+              <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-6 text-left">
                 Notre histoire
               </h2>
-              <div className="space-y-4 text-secondary-600">
+              <div className="space-y-4 text-secondary-600 text-left">
                 <p>
                   DCS Ramonage est né de la volonté de proposer un service de ramonage 
                   professionnel, fiable et accessible dans l'Oise et le Val-d'Oise.
@@ -102,21 +116,22 @@ export default function AProposPage() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4">
-              {stats.map((stat, index) => (
-                <div
-                  key={index}
-                  className="p-6 rounded-2xl bg-white border border-secondary-100 text-center"
-                >
-                  <span className="block text-3xl font-display font-bold text-primary-500 mb-1">
-                    {stat.value}
-                  </span>
-                  <span className="text-sm text-secondary-600">{stat.label}</span>
-                </div>
-              ))}
-            </div>
+      {/* Stats */}
+      <section className="py-12 bg-secondary-900">
+        <div className="container-site">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <span className="block text-3xl md:text-4xl font-display font-bold text-white mb-1">
+                  {stat.value}
+                </span>
+                <span className="text-sm text-secondary-400">{stat.label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>

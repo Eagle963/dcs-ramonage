@@ -34,15 +34,15 @@ export default function TarifsPage() {
         
         <div className="container-site relative z-10">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center justify-start gap-2 mb-4">
               <Euro className="w-5 h-5 text-green-500" />
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">Tarifs</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6 text-left">
               Nos tarifs{' '}
               <span className="text-gradient">transparents</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8 text-center md:text-left">
+            <p className="text-xl text-secondary-600 mb-8 text-left">
               Des prix clairs, sans surprise.
               <br />
               Déplacement inclus dans l'Oise (60) et le Val-d'Oise (95).

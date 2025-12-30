@@ -31,20 +31,20 @@ export default function PoeleDiellePage() {
         
         <div className="container-site relative z-10">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center justify-start gap-2 mb-4">
               <Award className="w-5 h-5 text-primary-500" />
               <span className="badge-primary">Spécialiste Certifié Dielle</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6 text-left">
               Expert poêles à granulés{' '}
               <span className="text-gradient">Dielle</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-left">
               Formés directement par Dielle, nous sommes spécialistes de l'entretien et du dépannage de vos poêles à granulés de cette marque italienne reconnue.
             </p>
             
             {/* Trust badges */}
-            <div className="flex flex-wrap gap-4 mb-8">
+            <div className="flex flex-wrap justify-start gap-4 mb-8">
               <div className="flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full">
                 <Award className="w-5 h-5 text-primary-500" />
                 <span className="text-sm font-medium text-primary-700">Formé par Dielle</span>

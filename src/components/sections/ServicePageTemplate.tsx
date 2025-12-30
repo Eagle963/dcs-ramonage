@@ -169,7 +169,7 @@ export function ServicePageTemplate({
         
         <div className="container-site relative z-10">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center justify-start gap-2 mb-4">
               {serviceIcons[badge] && (() => {
                 const IconComponent = serviceIcons[badge];
                 return <IconComponent className={`w-5 h-5 ${colors.icon}`} />;
@@ -178,11 +178,11 @@ export function ServicePageTemplate({
                 {badge}
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6 text-left">
               {title}{' '}
               <span className="text-gradient">{titleHighlight}</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8 text-center md:text-left">
+            <p className="text-xl text-secondary-600 mb-8 text-left">
               {description.split('. ').map((sentence, index, array) => (
                 <span key={index}>
                   {sentence}{index < array.length - 1 ? '.' : ''}
@@ -213,10 +213,10 @@ export function ServicePageTemplate({
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             {/* Intro */}
             <div>
-              <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-6">
+              <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-6 text-left">
                 Pourquoi faire appel à un professionnel ?
               </h2>
-              <p className="text-secondary-600 leading-relaxed mb-6 text-center md:text-left">
+              <p className="text-secondary-600 leading-relaxed mb-6 text-left">
                 {intro.split('. ').map((sentence, index, array) => (
                   <span key={index}>
                     {sentence}{index < array.length - 1 ? '.' : ''}
@@ -296,7 +296,7 @@ export function ServicePageTemplate({
       <section className="section-padding">
         <div className="container-site">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
+            <div className="text-left">
               <span className="badge-primary mb-4">Tarifs transparents</span>
               <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-4">
                 Nos prix tout compris
@@ -306,7 +306,7 @@ export function ServicePageTemplate({
                 et la remise du certificat officiel.
               </p>
               
-              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-md">
+              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-md inline-flex">
                 <Calendar className="w-4 h-4" />
                 Demander un devis personnalisé
               </a>
@@ -390,9 +390,9 @@ export function ServicePageTemplate({
                           <img
                             src={realisation.afterImage}
                             alt={`Après - ${realisation.title}`}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover scale-x-[-1]"
                           />
-                          <span className="absolute bottom-2 left-2 bg-primary-500/90 text-white text-xs px-2 py-1 rounded">
+                          <span className="absolute bottom-2 right-2 bg-primary-500/90 text-white text-xs px-2 py-1 rounded">
                             Après
                           </span>
                         </div>

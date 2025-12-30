@@ -90,6 +90,14 @@ export default function DebistragePage() {
           description: 'Inspection vidéo pour évaluer l\'état de votre conduit.',
         },
       ]}
+      realisations={[
+        {
+          title: 'Débistrage complet d\'un conduit maçonné',
+          description: 'Conduit fortement encrassé par des années de combustion. Débistrage mécanique avec plusieurs passages.',
+          beforeImage: '/images/debistrage-avant.webp',
+          afterImage: '/images/debistrage-apres.webp',
+        },
+      ]}
     />
   );
 }
