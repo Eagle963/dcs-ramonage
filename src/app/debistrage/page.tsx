@@ -17,6 +17,7 @@ export default function DebistragePage() {
       badge="Débistrage"
       title="Débistrage de"
       titleHighlight="cheminée"
+      color="red"
       description="Élimination professionnelle du bistre dans vos conduits avec équipement spécialisé. Le bistre est un dépôt dangereux qui nécessite une intervention experte."
       intro="Le bistre est un dépôt noir et goudronné qui se forme dans les conduits de cheminée lorsque la combustion est incomplète ou que le bois est trop humide. Contrairement à la suie, le bistre est dur, inflammable et ne peut pas être éliminé par un simple ramonage. Notre équipement spécialisé pour le débistrage permet de retirer ces dépôts dangereux et de restaurer un tirage optimal."
       features={[

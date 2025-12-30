@@ -17,6 +17,7 @@ export default function FumisteriePage() {
       badge="Fumisterie"
       title="Travaux de"
       titleHighlight="fumisterie"
+      color="amber"
       description="Pose et installation d'accessoires pour conduits de fumée : chapeaux, plaques d'étanchéité, aspirateurs statiques, trappes de visite."
       intro="La fumisterie regroupe les travaux de pose et d'installation d'accessoires liés aux conduits de fumée. Que ce soit pour installer un chapeau anti-pluie, remplacer une plaque d'étanchéité ou poser un aspirateur statique pour améliorer le tirage, nous réalisons ces interventions dans les règles de l'art et en conformité avec le DTU 24.1."
       features={[

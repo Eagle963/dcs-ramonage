@@ -17,6 +17,7 @@ export default function EntretienPoelePage() {
       badge="Entretien Poêles"
       title="Entretien poêle à"
       titleHighlight="granulés"
+      color="green"
       description="Entretien complet et dépannage de votre poêle à granulés. Nettoyage, vérifications, réglages pour des performances optimales et une durée de vie prolongée."
       intro="Un poêle à granulés nécessite un entretien annuel professionnel en plus du ramonage obligatoire. Cet entretien permet de maintenir les performances de chauffe, de réduire la consommation de pellets et d'éviter les pannes coûteuses. Nous intervenons sur toutes les marques : MCZ, Piazzetta, Palazzetti, Ravelli, Edilkamin, Invicta, Dielle, et bien d'autres."
       features={[

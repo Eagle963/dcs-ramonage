@@ -17,6 +17,7 @@ export default function RamonagePage() {
       badge="Ramonage"
       title="Ramonage de cheminée"
       titleHighlight="certifié"
+      color="orange"
       description="Service de ramonage professionnel pour cheminées, inserts et poêles à bois. Certificat officiel remis après chaque intervention, valable pour votre assurance."
       intro="Le ramonage est une obligation légale en France. Il permet d'éliminer les dépôts de suie et de créosote qui s'accumulent dans vos conduits, réduisant ainsi les risques d'incendie et d'intoxication au monoxyde de carbone. Notre intervention professionnelle garantit un nettoyage complet et vous assure la délivrance d'un certificat conforme aux exigences de votre assurance."
       features={[
@@ -51,6 +52,7 @@ export default function RamonagePage() {
         { label: 'Ramonage cheminée ouverte ou insert', price: '70 €', note: 'Foyer ouvert ou insert bois' },
         { label: 'Ramonage poêle à bois', price: '80 €', note: 'Poêle à bûches, certificat inclus' },
         { label: 'Ramonage chaudière à fioul', price: '80 €', note: 'Conduit fioul, certificat inclus' },
+        { label: 'Ramonage cheminée Polyflam', price: '90 €', note: 'Cheminée Polyflam, certificat inclus' },
         { label: 'Ramonage conduit difficile', price: '100 €', note: 'Abbaye, château, manoir, accès complexe ou conduit > 10m' },
       ]}
       priceNote="* Tarifs TTC, déplacement inclus (Oise 60 et Val-d'Oise 95). Professionnels : tarifs HT."

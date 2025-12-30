@@ -56,19 +56,20 @@ export default function AProposPage() {
     <>
       {/* Hero */}
       <section className="pt-32 pb-16 bg-mesh relative overflow-hidden">
-        <div className="absolute top-20 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-20 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-300/10 rounded-full blur-3xl" />
         
         <div className="container-site relative z-10">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-4">
-              <Users className="w-5 h-5 text-primary-500" />
-              <span className="badge-primary">À propos</span>
+              <Users className="w-5 h-5 text-amber-500" />
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700">À propos</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6">
               Votre artisan ramoneur{' '}
               <span className="text-gradient">de confiance</span>
             </h1>
-            <p className="text-xl text-secondary-600">
+            <p className="text-xl text-secondary-600 text-center md:text-left">
               DCS Ramonage, c'est un savoir-faire artisanal au service de votre sécurité.
               <br />
               Nous intervenons dans l'Oise et le Val-d'Oise pour l'entretien de vos cheminées, poêles et conduits de fumée.

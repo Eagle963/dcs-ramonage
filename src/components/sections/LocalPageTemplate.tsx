@@ -46,7 +46,7 @@ export function LocalPageTemplate({
               Ramonage à{' '}
               <span className="text-gradient">{city}</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-center md:text-left">
               Votre artisan ramoneur certifié à {city} et ses environs. 
               Ramonage de cheminées, poêles à bois et à granulés. 
               Certificat officiel pour votre assurance.
@@ -76,13 +76,13 @@ export function LocalPageTemplate({
               <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-6">
                 Nos services de ramonage à {city}
               </h2>
-              <p className="text-secondary-600 leading-relaxed mb-6">
+              <p className="text-secondary-600 leading-relaxed mb-6 text-center md:text-left">
                 DCS Ramonage intervient à {city} ({postalCodes.join(', ')}) pour tous vos besoins en ramonage et entretien de conduits de fumée.
                 <br />
                 Nous sommes votre ramoneur de proximité, disponible rapidement pour les particuliers et les professionnels.
               </p>
               {specificContent && (
-                <p className="text-secondary-600 leading-relaxed mb-6">
+                <p className="text-secondary-600 leading-relaxed mb-6 text-center md:text-left">
                   {specificContent}
                 </p>
               )}

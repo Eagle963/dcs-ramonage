@@ -1,4 +1,6 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { 
   Calendar, 
@@ -8,13 +10,6 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { siteConfig } from '@/config/site';
-
-export const metadata: Metadata = {
-  title: 'Zones d\'intervention | Ramonage Oise et Val-d\'Oise',
-  description: 'DCS Ramonage intervient dans l\'Oise (60) et le Val-d\'Oise (95) : Beauvais, Creil, Chantilly, Senlis, Cergy, Pontoise, Argenteuil.',
-  keywords: ['ramonage Oise', 'ramonage Val-d\'Oise', 'ramoneur 60', 'ramoneur 95', 'zone intervention ramonage'],
-  alternates: { canonical: `${siteConfig.urls.website}/zones-intervention` },
-};
 
 const zones = [
   {
@@ -48,23 +43,119 @@ const zones = [
 ];
 
 export default function ZonesInterventionPage() {
+  useEffect(() => {
+    // Charger Leaflet CSS
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+
+    // Charger Leaflet JS
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = () => {
+      initMaps();
+    };
+    document.body.appendChild(script);
+
+    function initMaps() {
+      // @ts-expect-error Leaflet global
+      const L = window.L;
+      if (!L) return;
+
+      // Carte Oise
+      const mapOise = L.map('map-oise', { scrollWheelZoom: false }).setView([49.35, 2.4], 9);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap, © CARTO'
+      }).addTo(mapOise);
+
+      // Carte Val-d'Oise
+      const mapValdoise = L.map('map-valdoise', { scrollWheelZoom: false }).setView([49.05, 2.15], 10);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap, © CARTO'
+      }).addTo(mapValdoise);
+
+      // Charger GeoJSON
+      fetch('https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements-version-simplifiee.geojson')
+        .then(r => r.json())
+        .then(data => {
+          // Oise
+          const oise = data.features.find((f: { properties: { code: string } }) => f.properties.code === '60');
+          if (oise) {
+            L.geoJSON(oise, {
+              style: { fillColor: '#f97316', fillOpacity: 0.4, color: '#ea580c', weight: 2 }
+            }).addTo(mapOise);
+            mapOise.fitBounds(L.geoJSON(oise).getBounds(), { padding: [20, 20] });
+          }
+
+          // Val-d'Oise
+          const valdoise = data.features.find((f: { properties: { code: string } }) => f.properties.code === '95');
+          if (valdoise) {
+            L.geoJSON(valdoise, {
+              style: { fillColor: '#f97316', fillOpacity: 0.4, color: '#ea580c', weight: 2 }
+            }).addTo(mapValdoise);
+            mapValdoise.fitBounds(L.geoJSON(valdoise).getBounds(), { padding: [20, 20] });
+          }
+
+          // Villes Oise
+          const villesOise = [
+            { name: 'Beauvais', lat: 49.4295, lng: 2.0807 },
+            { name: 'Creil', lat: 49.2583, lng: 2.4833 },
+            { name: 'Chantilly', lat: 49.1947, lng: 2.4711 },
+            { name: 'Senlis', lat: 49.2069, lng: 2.5864 },
+            { name: 'Méru', lat: 49.2364, lng: 2.1339 },
+            { name: 'Chambly', lat: 49.1656, lng: 2.2478 }
+          ];
+          villesOise.forEach(v => {
+            L.circleMarker([v.lat, v.lng], {
+              radius: 6, fillColor: '#1e293b', fillOpacity: 1, color: '#fff', weight: 2
+            }).bindTooltip(v.name, { direction: 'top' }).addTo(mapOise);
+          });
+
+          // Villes Val-d'Oise
+          const villesValdoise = [
+            { name: 'Cergy', lat: 49.0364, lng: 2.0633 },
+            { name: 'Vauréal', lat: 49.0308, lng: 2.0297 },
+            { name: 'Pontoise', lat: 49.0500, lng: 2.1000 },
+            { name: "L'Isle-Adam", lat: 49.1081, lng: 2.2283 },
+            { name: 'Argenteuil', lat: 48.9472, lng: 2.2467 },
+            { name: 'Taverny', lat: 49.0264, lng: 2.2258 },
+            { name: 'Ermont', lat: 48.9903, lng: 2.2578 },
+            { name: 'Persan', lat: 49.1531, lng: 2.2728 }
+          ];
+          villesValdoise.forEach(v => {
+            L.circleMarker([v.lat, v.lng], {
+              radius: 6, fillColor: '#1e293b', fillOpacity: 1, color: '#fff', weight: 2
+            }).bindTooltip(v.name, { direction: 'top' }).addTo(mapValdoise);
+          });
+        });
+    }
+
+    return () => {
+      // Cleanup
+      link.remove();
+      script.remove();
+    };
+  }, []);
+
   return (
     <>
       {/* Hero */}
       <section className="pt-32 pb-16 bg-mesh relative overflow-hidden">
-        <div className="absolute top-20 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-20 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-300/10 rounded-full blur-3xl" />
         
         <div className="container-site relative z-10">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-4">
-              <MapPin className="w-5 h-5 text-primary-500" />
-              <span className="badge-primary">Zones d'intervention</span>
+              <MapPin className="w-5 h-5 text-blue-500" />
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700">Zones d'intervention</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6">
               Nous intervenons dans{' '}
               <span className="text-gradient">l'Oise et le Val-d'Oise</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-center md:text-left">
               DCS Ramonage intervient dans l'Oise (60) et le Val-d'Oise (95).
               <br />
               Déplacement inclus dans nos tarifs.
@@ -147,92 +238,6 @@ export default function ZonesInterventionPage() {
             Votre commune n'est pas listée ? Contactez-nous pour vérifier notre disponibilité.
           </p>
         </div>
-
-        {/* Scripts Leaflet */}
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              document.addEventListener('DOMContentLoaded', function() {
-                // Attendre que Leaflet soit chargé
-                setTimeout(function() {
-                  if (typeof L === 'undefined') return;
-                  
-                  // Carte Oise
-                  var mapOise = L.map('map-oise', { scrollWheelZoom: false }).setView([49.35, 2.4], 9);
-                  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '© OpenStreetMap, © CARTO'
-                  }).addTo(mapOise);
-                  
-                  // Carte Val-d'Oise
-                  var mapValdoise = L.map('map-valdoise', { scrollWheelZoom: false }).setView([49.05, 2.15], 10);
-                  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '© OpenStreetMap, © CARTO'
-                  }).addTo(mapValdoise);
-                  
-                  // Codes postaux exclus Oise (nord)
-                  var excludedOise = ['60128','60150','60170','60320','60330','60350','60400','60440','60800','60138','60129','60117','60640','60380','60810','60141','60123','60490','60950','60890','60157','60420','60220','60127','60620'];
-                  
-                  // Charger GeoJSON
-                  fetch('https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements-version-simplifiee.geojson')
-                    .then(function(r) { return r.json(); })
-                    .then(function(data) {
-                      // Oise
-                      var oise = data.features.find(function(f) { return f.properties.code === '60'; });
-                      if (oise) {
-                        L.geoJSON(oise, {
-                          style: { fillColor: '#f97316', fillOpacity: 0.4, color: '#ea580c', weight: 2 }
-                        }).addTo(mapOise);
-                        mapOise.fitBounds(L.geoJSON(oise).getBounds(), { padding: [20, 20] });
-                      }
-                      
-                      // Val-d'Oise
-                      var valdoise = data.features.find(function(f) { return f.properties.code === '95'; });
-                      if (valdoise) {
-                        L.geoJSON(valdoise, {
-                          style: { fillColor: '#f97316', fillOpacity: 0.4, color: '#ea580c', weight: 2 }
-                        }).addTo(mapValdoise);
-                        mapValdoise.fitBounds(L.geoJSON(valdoise).getBounds(), { padding: [20, 20] });
-                      }
-                      
-                      // Villes Oise
-                      var villesOise = [
-                        { name: 'Beauvais', lat: 49.4295, lng: 2.0807 },
-                        { name: 'Creil', lat: 49.2583, lng: 2.4833 },
-                        { name: 'Chantilly', lat: 49.1947, lng: 2.4711 },
-                        { name: 'Senlis', lat: 49.2069, lng: 2.5864 },
-                        { name: 'Méru', lat: 49.2364, lng: 2.1339 },
-                        { name: 'Chambly', lat: 49.1656, lng: 2.2478 }
-                      ];
-                      villesOise.forEach(function(v) {
-                        L.circleMarker([v.lat, v.lng], {
-                          radius: 6, fillColor: '#1e293b', fillOpacity: 1, color: '#fff', weight: 2
-                        }).bindTooltip(v.name, { direction: 'top' }).addTo(mapOise);
-                      });
-                      
-                      // Villes Val-d'Oise
-                      var villesValdoise = [
-                        { name: 'Cergy', lat: 49.0364, lng: 2.0633 },
-                        { name: 'Vauréal', lat: 49.0308, lng: 2.0297 },
-                        { name: 'Pontoise', lat: 49.0500, lng: 2.1000 },
-                        { name: "L'Isle-Adam", lat: 49.1081, lng: 2.2283 },
-                        { name: 'Argenteuil', lat: 48.9472, lng: 2.2467 },
-                        { name: 'Taverny', lat: 49.0264, lng: 2.2258 },
-                        { name: 'Ermont', lat: 48.9903, lng: 2.2578 },
-                        { name: 'Persan', lat: 49.1531, lng: 2.2728 }
-                      ];
-                      villesValdoise.forEach(function(v) {
-                        L.circleMarker([v.lat, v.lng], {
-                          radius: 6, fillColor: '#1e293b', fillOpacity: 1, color: '#fff', weight: 2
-                        }).bindTooltip(v.name, { direction: 'top' }).addTo(mapValdoise);
-                      });
-                    });
-                }, 500);
-              });
-            `,
-          }}
-        />
       </section>
 
       {/* Zones par département */}

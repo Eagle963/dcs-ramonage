@@ -17,6 +17,7 @@ export default function DiagnosticPage() {
       badge="Diagnostic"
       title="Diagnostic de"
       titleHighlight="conduit"
+      color="purple"
       description="Inspection complète de vos conduits de fumée par caméra endoscopique. Identifiez les problèmes avant qu'ils ne deviennent critiques."
       intro="Un diagnostic de conduit permet d'évaluer précisément l'état de votre cheminée : fissures, joints défaillants, dépôts de bistre, obstructions ou défauts de construction. Cette inspection est recommandée avant l'achat d'une maison avec cheminée, avant l'installation d'un insert, ou en cas de problème de tirage. Notre caméra endoscopique filme l'intérieur du conduit et vous recevez un rapport détaillé."
       features={[

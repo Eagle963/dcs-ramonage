@@ -16,18 +16,21 @@ export default function ContactPage() {
   return (
     <>
       {/* Hero */}
-      <section className="pt-32 pb-16 bg-mesh">
-        <div className="container-site">
+      <section className="pt-32 pb-16 bg-mesh relative overflow-hidden">
+        <div className="absolute top-20 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-300/10 rounded-full blur-3xl" />
+        
+        <div className="container-site relative z-10">
           <div className="text-center max-w-2xl mx-auto">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <MessageSquare className="w-5 h-5 text-primary-500" />
-              <span className="badge-primary">Contact</span>
+              <MessageSquare className="w-5 h-5 text-purple-500" />
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-700">Contact</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-4">
               Contactez{' '}
               <span className="text-gradient">-nous</span>
             </h1>
-            <p className="text-lg text-secondary-600">
+            <p className="text-lg text-secondary-600 text-center">
               Une question ? Besoin d'un renseignement ?
               <br />
               Nous sommes à votre écoute.

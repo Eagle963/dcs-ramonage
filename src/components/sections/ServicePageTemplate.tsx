@@ -70,6 +70,7 @@ interface ServicePageProps {
   title: string;
   titleHighlight: string;
   description: string;
+  color?: 'orange' | 'red' | 'blue' | 'green' | 'purple' | 'amber' | 'teal';
   
   // Contenu principal
   intro: string;
@@ -101,6 +102,7 @@ export function ServicePageTemplate({
   title,
   titleHighlight,
   description,
+  color = 'orange',
   intro,
   features,
   processSteps,
@@ -110,21 +112,69 @@ export function ServicePageTemplate({
   realisations,
   relatedServices,
 }: ServicePageProps) {
+  // Classes de couleur par service
+  const colorClasses = {
+    orange: {
+      blob1: 'bg-orange-500/10',
+      blob2: 'bg-orange-300/10',
+      icon: 'text-orange-500',
+      badge: 'bg-orange-100 text-orange-700',
+    },
+    red: {
+      blob1: 'bg-red-500/10',
+      blob2: 'bg-red-300/10',
+      icon: 'text-red-500',
+      badge: 'bg-red-100 text-red-700',
+    },
+    blue: {
+      blob1: 'bg-blue-500/10',
+      blob2: 'bg-blue-300/10',
+      icon: 'text-blue-500',
+      badge: 'bg-blue-100 text-blue-700',
+    },
+    green: {
+      blob1: 'bg-green-500/10',
+      blob2: 'bg-green-300/10',
+      icon: 'text-green-500',
+      badge: 'bg-green-100 text-green-700',
+    },
+    purple: {
+      blob1: 'bg-purple-500/10',
+      blob2: 'bg-purple-300/10',
+      icon: 'text-purple-500',
+      badge: 'bg-purple-100 text-purple-700',
+    },
+    amber: {
+      blob1: 'bg-amber-500/10',
+      blob2: 'bg-amber-300/10',
+      icon: 'text-amber-500',
+      badge: 'bg-amber-100 text-amber-700',
+    },
+    teal: {
+      blob1: 'bg-teal-500/10',
+      blob2: 'bg-teal-300/10',
+      icon: 'text-teal-500',
+      badge: 'bg-teal-100 text-teal-700',
+    },
+  };
+
+  const colors = colorClasses[color];
+
   return (
     <>
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-mesh relative overflow-hidden">
-        <div className="absolute top-20 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl" />
+        <div className={`absolute top-20 right-0 w-96 h-96 ${colors.blob1} rounded-full blur-3xl`} />
+        <div className={`absolute bottom-0 left-0 w-80 h-80 ${colors.blob2} rounded-full blur-3xl`} />
         
         <div className="container-site relative z-10">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-4">
               {serviceIcons[badge] && (() => {
                 const IconComponent = serviceIcons[badge];
-                return <IconComponent className="w-5 h-5 text-primary-500" />;
+                return <IconComponent className={`w-5 h-5 ${colors.icon}`} />;
               })()}
-              <span className="badge-primary">
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${colors.badge}`}>
                 {badge}
               </span>
             </div>
@@ -132,7 +182,7 @@ export function ServicePageTemplate({
               {title}{' '}
               <span className="text-gradient">{titleHighlight}</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-center md:text-left">
               {description.split('. ').map((sentence, index, array) => (
                 <span key={index}>
                   {sentence}{index < array.length - 1 ? '.' : ''}
@@ -166,7 +216,7 @@ export function ServicePageTemplate({
               <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900 mb-6">
                 Pourquoi faire appel à un professionnel ?
               </h2>
-              <p className="text-secondary-600 leading-relaxed mb-6">
+              <p className="text-secondary-600 leading-relaxed mb-6 text-center md:text-left">
                 {intro.split('. ').map((sentence, index, array) => (
                   <span key={index}>
                     {sentence}{index < array.length - 1 ? '.' : ''}
@@ -273,17 +323,17 @@ export function ServicePageTemplate({
                   <div
                     key={index}
                     className={cn(
-                      'flex items-center justify-between py-3',
+                      'flex items-center justify-between gap-4 py-3',
                       index !== priceItems.length - 1 && 'border-b border-secondary-100'
                     )}
                   >
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <span className="font-medium text-secondary-900">{item.label}</span>
                       {item.note && (
                         <span className="block text-xs text-secondary-500">{item.note}</span>
                       )}
                     </div>
-                    <span className="font-bold text-primary-700 text-lg">{item.price}</span>
+                    <span className="font-bold text-primary-700 text-lg flex-shrink-0 whitespace-nowrap">{item.price}</span>
                   </div>
                 ))}
               </div>

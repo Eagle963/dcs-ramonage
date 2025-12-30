@@ -17,6 +17,7 @@ export default function TubagePage() {
       badge="Tubage"
       title="Tubage de cheminée"
       titleHighlight="aux normes"
+      color="blue"
       description="Installation et rénovation de tubage inox pour sécuriser et optimiser vos conduits de fumée. Solution durable pour cheminées, inserts et poêles."
       intro="Le tubage consiste à insérer un conduit en inox à l'intérieur de votre cheminée existante. Cette technique permet de rénover un conduit vétuste, d'améliorer le tirage, de réduire les risques d'incendie et de condensation. Le tubage est souvent obligatoire lors de l'installation d'un insert ou d'un poêle pour garantir la conformité aux normes en vigueur."
       features={[

@@ -29,19 +29,20 @@ export default function TarifsPage() {
     <>
       {/* Hero */}
       <section className="pt-32 pb-16 bg-mesh relative overflow-hidden">
-        <div className="absolute top-20 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-20 right-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-green-300/10 rounded-full blur-3xl" />
         
         <div className="container-site relative z-10">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-4">
-              <Euro className="w-5 h-5 text-primary-500" />
-              <span className="badge-primary">Tarifs</span>
+              <Euro className="w-5 h-5 text-green-500" />
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">Tarifs</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-6">
               Nos tarifs{' '}
               <span className="text-gradient">transparents</span>
             </h1>
-            <p className="text-xl text-secondary-600 mb-8">
+            <p className="text-xl text-secondary-600 mb-8 text-center md:text-left">
               Des prix clairs, sans surprise.
               <br />
               Déplacement inclus dans l'Oise (60) et le Val-d'Oise (95).
@@ -71,6 +72,7 @@ export default function TarifsPage() {
               { label: 'Cheminée ouverte ou insert', price: '70 €', note: 'Foyer ouvert ou insert bois' },
               { label: 'Poêle à bois', price: '80 €', note: 'Poêle à bûches, certificat inclus' },
               { label: 'Chaudière à fioul', price: '80 €', note: 'Conduit fioul, certificat inclus' },
+              { label: 'Cheminée Polyflam', price: '90 €', note: 'Cheminée Polyflam, certificat inclus' },
               { label: 'Conduit difficile', price: '100 €', note: 'Accès complexe ou conduit > 10m' },
             ].map((item, index) => (
               <div
