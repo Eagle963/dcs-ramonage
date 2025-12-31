@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { 
+  Calendar,
   ChevronLeft, 
   ChevronRight, 
   Plus,
