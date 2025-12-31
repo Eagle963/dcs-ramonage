@@ -626,3 +626,100 @@ enum LeadStatus {
   LOST
   SPAM
 }
+
+// ===========================================
+// SYSTÈME DE RÉSERVATION EN LIGNE
+// ===========================================
+
+// Jours bloqués (vacances, jours fériés, indisponibilités)
+model BlockedDay {
+  id          String   @id @default(cuid())
+  
+  date        DateTime @db.Date
+  slot        TimeSlot? // null = journée entière bloquée, MORNING ou AFTERNOON = demi-journée
+  reason      String?
+  
+  createdAt   DateTime @default(now())
+  
+  organizationId String
+  
+  @@unique([organizationId, date, slot])
+  @@index([organizationId])
+  @@index([date])
+}
+
+// Demandes de réservation (avant validation)
+model BookingRequest {
+  id          String   @id @default(cuid())
+  
+  // Date et créneau souhaités
+  date        DateTime @db.Date
+  slot        TimeSlot // MORNING ou AFTERNOON
+  
+  // Infos client
+  firstName   String
+  lastName    String
+  email       String
+  phone       String
+  
+  // Adresse intervention
+  address     String
+  city        String
+  postalCode  String
+  
+  // Type de prestation
+  serviceType ServiceCategory
+  equipmentType EquipmentType?
+  
+  // Détails
+  message     String?  @db.Text
+  
+  // Statut
+  status      BookingStatus @default(PENDING)
+  
+  // Suivi
+  adminNotes  String?  @db.Text
+  
+  // Converti en RDV
+  appointmentId String? @unique
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  organizationId String
+  
+  @@index([organizationId])
+  @@index([date])
+  @@index([status])
+  @@index([postalCode])
+}
+
+enum TimeSlot {
+  MORNING    // 5 places max
+  AFTERNOON  // 5 places max
+}
+
+enum BookingStatus {
+  PENDING     // En attente de validation
+  CONFIRMED   // Validé par admin
+  REJECTED    // Refusé (hors zone, complet...)
+  CANCELED    // Annulé par le client
+  CONVERTED   // Transformé en RDV/intervention
+}
+
+// Codes postaux desservis
+model ServiceArea {
+  id          String   @id @default(cuid())
+  
+  postalCode  String
+  city        String
+  department  String   // 60 ou 95
+  
+  isActive    Boolean  @default(true)
+  
+  organizationId String
+  
+  @@unique([organizationId, postalCode])
+  @@index([organizationId])
+  @@index([postalCode])
+}
