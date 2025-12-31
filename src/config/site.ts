@@ -86,6 +86,7 @@ export const siteConfig = {
     facebook: 'https://www.facebook.com/dcsramonage',
     instagram: 'https://www.instagram.com/dcsramonage/',
     linkedin: 'https://www.linkedin.com/company/104959213',
+    youtube: 'https://www.youtube.com/@dcsramonage',
   },
 
   // SEO

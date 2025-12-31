@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
+import { GoogleIcon } from '@/components/ui/GoogleIcon';
 
 // Map des icônes par nom de service
 const serviceIcons: { [key: string]: LucideIcon } = {
@@ -236,8 +237,9 @@ export function ServicePageTemplate({
                   <span>Certificat officiel</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-secondary-600">
+                  <GoogleIcon className="w-5 h-5" />
                   <Star className="w-5 h-5 text-primary-500 fill-primary-500" />
-                  <span>5/5 sur Google</span>
+                  <span>5/5</span>
                 </div>
               </div>
             </div>
@@ -402,9 +404,12 @@ export function ServicePageTemplate({
                   
                   {/* Vidéo YouTube */}
                   {realisation.videoUrl && (
-                    <div className="aspect-video bg-secondary-100">
+                    <div className={realisation.videoUrl.includes('/shorts/') ? 'aspect-[9/16] max-h-[400px] mx-auto' : 'aspect-video'}>
                       <iframe
-                        src={realisation.videoUrl.replace('watch?v=', 'embed/')}
+                        src={realisation.videoUrl
+                          .replace('watch?v=', 'embed/')
+                          .replace('/shorts/', '/embed/')
+                        }
                         title={realisation.title}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen

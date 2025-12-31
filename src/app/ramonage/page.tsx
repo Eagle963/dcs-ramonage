@@ -95,6 +95,29 @@ export default function RamonagePage() {
           description: 'Entretien complet de votre poêle à bois ou à granulés.',
         },
       ]}
+      realisations={[
+        {
+          title: 'Ramonage en action',
+          description: 'Intervention de ramonage sur un conduit de cheminée',
+          videoUrl: 'https://youtube.com/shorts/6mpAfMtbRa8',
+        },
+        {
+          title: 'Ramonage conduit tubé',
+          description: 'Avant/après ramonage d\'un conduit avec tubage inox',
+          beforeImage: '/images/ramonage-conduit-avant.webp',
+          afterImage: '/images/ramonage-conduit-apres.webp',
+        },
+        {
+          title: 'Ramonage insert',
+          description: 'Nettoyage complet d\'un insert de cheminée',
+          afterImage: '/images/ramonage-insert.webp',
+        },
+        {
+          title: 'Ramonage poêle à bois',
+          description: 'Intervention sur un poêle à bois encrassé',
+          afterImage: '/images/ramonage-poele-bois.webp',
+        },
+      ]}
     />
   );
 }

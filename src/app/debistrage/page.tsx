@@ -97,6 +97,12 @@ export default function DebistragePage() {
           beforeImage: '/images/debistrage-avant.webp',
           afterImage: '/images/debistrage-apres.webp',
         },
+        {
+          title: 'Débistrage conduit avec tubage',
+          description: 'Nettoyage en profondeur avant pose d\'un nouveau tubage',
+          beforeImage: '/images/debistrage-avant-2.webp',
+          afterImage: '/images/debistrage-apres-2.webp',
+        },
       ]}
     />
   );

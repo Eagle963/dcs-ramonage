@@ -10,6 +10,7 @@ import {
   Facebook, 
   Instagram, 
   Linkedin,
+  Youtube,
   ChevronRight,
   Shield,
   Award,
@@ -279,6 +280,18 @@ export function Footer() {
                   aria-label="LinkedIn"
                 >
                   <Linkedin className="w-4 h-4" />
+                </a>
+              )}
+              {siteConfig.social.youtube && (
+                <a
+                  href={siteConfig.social.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-lg bg-secondary-800 flex items-center justify-center
+                             text-secondary-400 hover:bg-primary-500 hover:text-white transition-all"
+                  aria-label="YouTube"
+                >
+                  <Youtube className="w-4 h-4" />
                 </a>
               )}
             </div>

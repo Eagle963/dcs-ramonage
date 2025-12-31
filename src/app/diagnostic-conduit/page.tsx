@@ -93,6 +93,28 @@ export default function DiagnosticPage() {
           description: 'Travaux de réparation ou création de conduit.',
         },
       ]}
+      realisations={[
+        {
+          title: 'Inspection vidéo en direct',
+          description: 'Visualisation de l\'intérieur d\'un conduit avec notre caméra endoscopique',
+          videoUrl: 'https://youtube.com/shorts/U3EAShVDU9A',
+        },
+        {
+          title: 'Inspection caméra Bosch Professional',
+          description: 'Caméra endoscopique pour inspection détaillée de l\'intérieur des conduits',
+          afterImage: '/images/diagnostic-camera-1.webp',
+        },
+        {
+          title: 'Diagnostic Wöhler VIS 700',
+          description: 'Inspection vidéo haute définition avec mesure de profondeur',
+          afterImage: '/images/diagnostic-camera-2.webp',
+        },
+        {
+          title: 'Visualisation conduit tubé',
+          description: 'Vue de l\'intérieur d\'un conduit tubé en bon état',
+          afterImage: '/images/diagnostic-camera-3.webp',
+        },
+      ]}
     />
   );
 }

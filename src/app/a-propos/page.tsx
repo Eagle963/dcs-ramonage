@@ -84,11 +84,11 @@ export default function AProposPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Photo */}
             <div className="relative">
-              <div className="relative rounded-3xl overflow-hidden shadow-soft">
+              <div className="relative rounded-3xl overflow-hidden shadow-soft bg-secondary-800 flex items-center justify-center" style={{ aspectRatio: '1/1' }}>
                 <img 
-                  src="/images/fondateur.webp" 
-                  alt="Fondateur de DCS Ramonage" 
-                  className="w-full h-auto object-cover"
+                  src="/logo-dcs.svg" 
+                  alt="Logo DCS Ramonage" 
+                  className="w-3/4 h-3/4 object-contain"
                 />
               </div>
               {/* Décoration */}

@@ -4,59 +4,90 @@ import { useState, useEffect, useCallback } from 'react';
 import { Star, Quote, ChevronLeft, ChevronRight, ExternalLink, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { siteConfig } from '@/config/site';
+import { GoogleIcon } from '@/components/ui/GoogleIcon';
 
-// VRAIS AVIS GOOGLE - DCS Ramonage (mis à jour décembre 2024)
+// VRAIS AVIS GOOGLE - DCS Ramonage (65 avis - mis à jour décembre 2025)
 const testimonials = [
-  { id: 1, name: 'Abdelkader B.', location: 'Oise', rating: 5, date: 'Décembre 2024', text: 'Personnel efficace très professionnel à l\'écoute de ses clients très organisé je recommande fortement merci Dcs Ramonage', service: 'Ramonage' },
-  { id: 2, name: 'Thierry L.', location: 'Oise', rating: 5, date: 'Décembre 2024', text: 'Ponctuel, réactif, sympathique, travail soigné. Je recommande', service: 'Ramonage' },
-  { id: 3, name: 'Barbara S.', location: 'Oise', rating: 5, date: 'Novembre 2024', text: 'Excellent travail. Personnes très agréables et professionnelles. Ils ont laissé la maison impeccable et le poêle nickel. Avec un tarif défiant toute concurrence.', service: 'Entretien poêle' },
-  { id: 4, name: 'Marie-Hélène D.', location: 'Oise', rating: 5, date: 'Novembre 2024', text: 'Non seulement les rendez-vous sont rapides mais en plus vous allez rencontrer des personnes compétentes et méticuleuses.', service: 'Ramonage' },
-  { id: 5, name: 'Sophie D.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Prise de rendez vous rapide. Très professionnel. Je recommande', service: 'Ramonage' },
-  { id: 6, name: 'Martine L.', location: 'Oise', rating: 5, date: 'Novembre 2024', text: 'Travail propre, rapide et efficace. Vraiment c\'est la première fois que j\'ai ce ressenti sur ce genre d\'intervention et je les recommande à 100%', service: 'Ramonage' },
-  { id: 7, name: 'Cédric S.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Top merci efficace rapide et pro', service: 'Ramonage' },
-  { id: 8, name: 'Said B.', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Travail professionnel, de bon conseil, je recommande vivement cet artisan', service: 'Ramonage poêle à bois' },
-  { id: 9, name: 'Ines L.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Super service, professionnel, courtois je recommande les yeux fermés !!!', service: 'Ramonage' },
-  { id: 10, name: 'Emmanuelle L.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Je recommande cette société. Un artisan très sérieux et courtois.', service: 'Ramonage' },
-  { id: 11, name: 'Abdel E.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Je recommande chaleureusement cette entreprise. Prise de rendez-vous rapide, prestation pro et propreté assurée.', service: 'Ramonage' },
-  { id: 12, name: 'Mathilde G.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Équipe super agréable, donne de bons conseils pour entretenir le poêle à granulés et le ramonage parfait et fait proprement je les recommande vraiment, merci', service: 'Entretien poêle à granulés' },
-  { id: 13, name: 'Amélie S.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Je recommande Dcs ramonage. L\'entretien a été rapide et j\'ai été très surprise qu\'ils démontent tout afin de nettoyer en profondeur. Merci beaucoup.', service: 'Entretien poêle' },
-  { id: 14, name: 'Mélanie S.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Je recommande. Prise de rendez-vous via le site la veille pour le lendemain. Des artisans courtois pour un travail propre! On rappellera à coup sûr pour l\'année prochaine !', service: 'Ramonage' },
-  { id: 15, name: 'Fernand D.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Service parfait, travail soigné', service: 'Ramonage' },
-  { id: 16, name: 'Kissley P.', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Très professionnel, de bon conseil et vraiment très sympathique ! Je recommande vivement ! Très bonne équipe.', service: 'Ramonage' },
-  { id: 17, name: 'Anonyme B.', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Un grand merci pour cette intervention rapide et efficace. Très sérieux et très professionnel je recommande.', service: 'Ramonage' },
-  { id: 18, name: 'Thibault D.', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Très bonne société. Je recommande', service: 'Ramonage' },
-  { id: 19, name: 'Pascal P.', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Equipe soigneuse, professionnelle. Laisse la maison impeccable. Allez y les yeux fermés.', service: 'Ramonage' },
-  { id: 20, name: 'Aicha G.', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Super, ce jeune homme est un vrai professionnel. Amabilité, à l\'écoute, explique le travail qu\'il fait.', service: 'Ramonage' },
-  { id: 21, name: 'Dillan P.', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Je recommande fortement cette société, très réactive, travail propre et de bons conseils. J\'ai eu un rendez-vous très rapidement.', service: 'Ramonage' },
-  { id: 22, name: 'Emmanuel B.', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Rapides, efficaces et sympathiques. A l\'année prochaine...', service: 'Ramonage' },
-  { id: 23, name: 'Régine D.', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Au niveau ponctualité très sérieux même en avance de quelques jours. Travail très propre et pro. Je recommande.', service: 'Ramonage' },
-  { id: 24, name: 'Khalid', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Travail propre, sérieux et professionnel', service: 'Entretien poêle Palazzetti' },
-  { id: 25, name: 'Mélanie D.', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Rapide, efficace et professionnel! J\'ai pu réserver un créneau en ligne.', service: 'Ramonage' },
-  { id: 26, name: 'Jérémie G.', location: 'Oise', rating: 5, date: 'Août 2024', text: 'Service au top, très sympa et réactif. Je recommande les yeux fermés. 👍', service: 'Ramonage' },
-  { id: 27, name: 'Laetitia H.', location: 'Oise', rating: 5, date: 'Août 2024', text: 'Très rapide efficace prise de rendez vous la veille pour le lendemain enfin quelqu\'un qui se déplace courtois aimable.', service: 'Ramonage' },
-  { id: 28, name: 'Danielle V.', location: 'Oise', rating: 5, date: 'Juillet 2024', text: 'Très bonne expérience avec cette société je recommande très agréable personne.', service: 'Ramonage' },
-  { id: 29, name: 'Yvette B.', location: 'Oise', rating: 5, date: 'Juin 2024', text: 'Travail correctement effectué tout en respectant l\'intérieur de la maison. Ainsi qu\'une grande gentillesse. Je recommande cette société à 100%', service: 'Entretien poêle à granulés' },
-  { id: 30, name: 'RachL B.', location: 'Oise', rating: 5, date: 'Juin 2024', text: 'Je recommande à 100% tant sur la prestation que sur les conseils prodigués par le professionnel !', service: 'Ramonage' },
-  { id: 31, name: 'Guerroumist G.', location: 'Oise', rating: 5, date: 'Juin 2024', text: 'Travail soigné, équipe au top. Ponctuelle polis et travailleur. Je recommande les yeux fermés', service: 'Ramonage' },
-  { id: 32, name: 'Farouk A.', location: 'Oise', rating: 5, date: 'Avril 2024', text: 'Une équipe super sérieuse et professionnelle!!! Ils ont pris le temps qu\'il fallait.', service: 'Entretien poêle Palazzetti' },
-  { id: 33, name: 'Lolo S.', location: 'Oise', rating: 5, date: 'Mars 2024', text: 'Panne de bougie de préchauffage le 13 mars, intervention le lendemain ! Entreprise sérieuse, rapide, professionnelle et technicien très sympa 👍🏻', service: 'Dépannage poêle à granulés' },
-  { id: 34, name: 'Gérard G.', location: 'Oise', rating: 5, date: 'Avril 2024', text: 'Entretien poêle à granulés et ramonage parfaitement effectué ! Ce poêle n\'avait jamais été aussi bien nettoyé !! Super travail, et en plus super sympa.', service: 'Entretien & Ramonage' },
-  { id: 35, name: 'Didier B.', location: 'Oise', rating: 5, date: 'Avril 2024', text: 'Je recommande cette société, entretien de notre poêle à granulés et ramonage de deux conduits de cheminée réalisés avec un grand professionnalisme.', service: 'Entretien & Ramonage' },
-  { id: 36, name: 'M A.', location: 'Oise', rating: 5, date: 'Avril 2024', text: 'Je recommande vivement la société DCS RAMONAGE ! Une équipe très professionnelle, réactive et surtout très sympathique.', service: 'Dépannage poêle' },
-  { id: 37, name: 'Pascal', location: 'Oise', rating: 5, date: 'Mars 2024', text: 'Équipe sérieuse et très très professionnelle, le travail effectué a été propre et minutieux, à recommander', service: 'Ramonage' },
-  { id: 38, name: 'Estela S.', location: 'Oise', rating: 5, date: 'Mars 2024', text: 'J\'ai fait appel à cette société pour le débistrage du conduit de ma cheminée. Le travail a été fait avec matériel professionnel et proprement. Je suis très satisfaite du résultat.', service: 'Débistrage' },
-  { id: 39, name: 'Audrey C.', location: 'Oise', rating: 5, date: 'Mars 2024', text: 'C\'était parfait ! Travail bien fait et personnes très sympathiques. Je recommande vivement', service: 'Ramonage' },
-  { id: 40, name: 'Sandrine G.', location: 'Oise', rating: 5, date: 'Mars 2024', text: 'Monsieur très agréable, à l\'écoute et surtout très compétent. Vous pouvez le contacter les yeux fermés.', service: 'Ramonage' },
-  { id: 41, name: 'Laurine R.', location: 'Oise', rating: 5, date: 'Février 2024', text: 'Dépannage en urgence, fuite, plusieurs éléments obstrués. Ils étaient là 1h après le premier appel. Professionnels, consciencieux, rassurants et agréables! Je recommande +++', service: 'Dépannage urgence' },
-  { id: 42, name: 'Laure G.', location: 'Oise', rating: 5, date: 'Février 2024', text: 'Service pro. Très satisfaite de l\'entretien de mon poêle Piazzetta', service: 'Entretien poêle Piazzetta' },
-  { id: 43, name: 'Capucine D.', location: 'Oise', rating: 5, date: 'Janvier 2024', text: 'Professionnels et efficaces je recommande vivement !', service: 'Ramonage' },
-  { id: 44, name: 'Jordan D.', location: 'Oise', rating: 5, date: 'Janvier 2024', text: 'Je recommande, professionnel rien à dire 👍', service: 'Ramonage' },
-  { id: 45, name: 'Fabien G.', location: 'Oise', rating: 5, date: 'Janvier 2024', text: 'Entreprise sérieuse et réactive, prend le temps nécessaire pour l\'entretien de l\'appareil.', service: 'Entretien poêle' },
-  { id: 46, name: 'Amandine G.', location: 'Oise', rating: 5, date: 'Janvier 2024', text: 'Entreprise très professionnelle. Un excellent travail d\'entretien.', service: 'Entretien poêle' },
-  { id: 47, name: 'Sylvain G.', location: 'Oise', rating: 5, date: 'Janvier 2024', text: 'Très réactif et efficace. A recommander', service: 'Ramonage' },
-  { id: 48, name: 'Xavier L.', location: 'Oise', rating: 5, date: 'Janvier 2024', text: 'Intervention sur mon Piazzetta à granulés le travail est vraiment fait à fond personnel expérimenté consciencieux et agréable je recommande fortement', service: 'Entretien poêle Piazzetta' },
-  { id: 49, name: 'Julien V.', location: 'Oise', rating: 5, date: 'Janvier 2024', text: 'Artisan consciencieux et travail de qualité, je recommande sans hésiter.', service: 'Ramonage' },
-  { id: 50, name: 'Marcelino B.', location: 'Oise', rating: 5, date: 'Janvier 2024', text: 'Entreprise très consciencieuse et professionnelle. Travail soigné, parfaitement équipée. Une grande rigueur et du sérieux. Rdv déjà pris pour 2026 😁', service: 'Ramonage' },
+  // Décembre 2025
+  { id: 1, name: 'Abdelkader B.', location: 'Oise', rating: 5, date: 'Décembre 2025', text: 'Personnel efficace très professionnel à l\'écoute de ses clients très organisé je recommande fortement merci Dcs Ramonage', service: 'Ramonage' },
+  { id: 2, name: 'Thierry L.', location: 'Oise', rating: 5, date: 'Décembre 2025', text: 'Ponctuel, réactif, sympathique, travail soigné. Je recommande', service: 'Ramonage' },
+  // Novembre 2025
+  { id: 3, name: 'Barbara S.', location: 'Oise', rating: 5, date: 'Novembre 2025', text: 'Excellent travail. Personnes très agréable et professionnel. Ils ont laissé la maison impeccable et le poêle nickel. Avec un tarif défiant toute concurrence. Je referai appel à eux sans problème.', service: 'Entretien poêle' },
+  { id: 4, name: 'Marie-Hélène D.', location: 'Oise', rating: 5, date: 'Novembre 2025', text: 'Non seulement les rendez-vous sont rapides mais en plus vous allez rencontrer des personnes compétentes et méticuleuses. Cerise sur le gâteau: fort sympathiques!', service: 'Ramonage' },
+  { id: 5, name: 'Martine L.', location: 'Oise', rating: 5, date: 'Novembre 2025', text: 'Travail propre, rapide et efficace. Vraiment c\'est la première fois que j\'ai ce ressenti sur ce genre d\'intervention et je les recommande à 100%', service: 'Ramonage' },
+  // Octobre 2025
+  { id: 6, name: 'Sophie D.', location: 'Oise', rating: 5, date: 'Octobre 2025', text: 'Prise de rendez vous rapide. Très professionnel. Je recommande', service: 'Ramonage' },
+  { id: 7, name: 'Cédric S.', location: 'Oise', rating: 5, date: 'Octobre 2025', text: 'Top merci efficace rapide et pro', service: 'Ramonage' },
+  { id: 8, name: 'Ines L.', location: 'Oise', rating: 5, date: 'Octobre 2025', text: 'Super service, professionnel, courtois je recommande les yeux fermés !!!', service: 'Ramonage' },
+  { id: 9, name: 'Emmanuelle L.', location: 'Oise', rating: 5, date: 'Octobre 2025', text: 'Je recommande cette société. Un artisan très sérieux et courtois.', service: 'Ramonage' },
+  { id: 10, name: 'Abdel E.', location: 'Oise', rating: 5, date: 'Octobre 2025', text: 'Je recommande chaleureusement cette entreprise. Prise de rendez-vous rapide, prestation pro et propreté assurée et la cerise sur le gâteau de très bon conseil sans volonté d\'en faire trop. Alors oui, vous pouvez y aller les yeux fermés.', service: 'Ramonage' },
+  { id: 11, name: 'Mathilde G.', location: 'Oise', rating: 5, date: 'Octobre 2025', text: 'Équipe super agréable, donne de bon conseil pour entretenir le poêle à granulés et le ramonage parfait et fait proprement je les recommande vraiment, merci', service: 'Entretien poêle à granulés' },
+  { id: 12, name: 'Amélie S.', location: 'Oise', rating: 5, date: 'Octobre 2025', text: 'Je recommande Dcs ramonage. L\'entretien a été rapide et j\'ai été très surpris qu\'ils démontent tout afin de nettoyer en profondeur. Merci beaucoup. Je n\'hésiterai pas à vous recontacter.', service: 'Entretien poêle' },
+  { id: 13, name: 'Mélanie S.', location: 'Oise', rating: 5, date: 'Octobre 2025', text: 'Je recommande. Prise de rendez-vous via le site la veille pour le lendemain. Des artisans courtois pour un travail propre! On rappellera à coup sûr pour l\'année prochaine ! Merci', service: 'Ramonage' },
+  { id: 14, name: 'Fernand D.', location: 'Oise', rating: 5, date: 'Octobre 2025', text: 'Service parfait, travail soigné', service: 'Ramonage' },
+  // Septembre 2025
+  { id: 15, name: 'Said B.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Travail professionnel, de bon conseil, je recommande vivement cet artisan', service: 'Ramonage poêle à bois' },
+  { id: 16, name: 'E. A.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Équipe très professionnelle 👍👍', service: 'Ramonage' },
+  { id: 17, name: 'Kissley P.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Très professionnel, de bon conseil et vraiment très sympathique ! Je recommande vivement ! Très bonne équipe.', service: 'Ramonage' },
+  { id: 18, name: 'Anonyme B.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Un grand merci pour cette intervention rapide et efficace. Très sérieux et très professionnel je recommande.', service: 'Ramonage' },
+  { id: 19, name: 'Thibault D.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Très bonne société. Je recommande', service: 'Ramonage' },
+  { id: 20, name: 'Pascal P.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Equipe soigneuse, professionnelle. Laisse la maison impeccable. Allez y les yeux fermés.', service: 'Ramonage' },
+  { id: 21, name: 'Aicha G.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Super, ce jeune homme est un vrai professionnel. Amabilité, à l\'écoute, explique le travail qu\'il fait et met les clients très à l\'aise. En plus côté tarif, il est moins cher que ses confrères. Satisfaction totale.', service: 'Ramonage' },
+  { id: 22, name: 'Dillan P.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Je recommande fortement cette société, très réactive, travail propre et de bons conseils J\'ai un rendez-vous très rapidement et l\'intervention s\'est très bien passé', service: 'Ramonage' },
+  { id: 23, name: 'Emmanuel B.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Rapides, efficaces et sympathiques. A l\'année prochaine...', service: 'Ramonage' },
+  { id: 24, name: 'Régine D.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Au niveau ponctualité très serieux même en avance de quelques jours. Travail très propre et pro. Je recommande. Bonne continuation 😊', service: 'Ramonage' },
+  { id: 25, name: 'Khalid K.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Travail propre, sérieux et professionnel', service: 'Ramonage' },
+  { id: 26, name: 'Mélanie D.', location: 'Oise', rating: 5, date: 'Septembre 2025', text: 'Rapide, efficace et professionnel! J\'ai pu réserver un créneau en ligne, validé rapidement après. Ils sont intervenus hyper proprement', service: 'Ramonage' },
+  // Août 2025
+  { id: 27, name: 'Jeremie G.', location: 'Oise', rating: 5, date: 'Août 2025', text: 'Service au top, très sympa et réactif. Je recommande les yeux fermés. 👍', service: 'Ramonage' },
+  { id: 28, name: 'Laetitia H.', location: 'Oise', rating: 5, date: 'Août 2025', text: 'Très rapide efficace prise de rendez vous la veille pour le lendemain enfin quelqu\'un qui se déplace courtois aimable à l\'heure fait son travail n\'hésites pas à nous rappeler pour des conseils je recommande les yeux fermés.', service: 'Ramonage' },
+  // Juillet 2025
+  { id: 29, name: 'Danielle V.', location: 'Oise', rating: 5, date: 'Juillet 2025', text: 'Très bonne expérience avec cette société je recommande très agréable personne.', service: 'Ramonage' },
+  // Juin 2025
+  { id: 30, name: 'Yvette B.', location: 'Oise', rating: 5, date: 'Juin 2025', text: 'Travail correctement effectué tout en respectant l\'intérieur de la maison. Ainsi qu\'une grande gentillesse. Je recommande cette société a 100%', service: 'Ramonage' },
+  { id: 31, name: 'RachL B.', location: 'Oise', rating: 5, date: 'Juin 2025', text: 'Je recommande à 100% tant sur la prestation que sur les conseils prodigués par le professionnel ! Entretien du poêle à granulés réalisé annuellement avec soin', service: 'Entretien poêle à granulés' },
+  { id: 32, name: 'Guerroumist G.', location: 'Oise', rating: 5, date: 'Juin 2025', text: 'Travail soigné, équipe au top. Ponctuelle polis et travailleur. Je recommande les yeux fermés', service: 'Ramonage' },
+  // Avril 2025
+  { id: 33, name: 'Farouk A.', location: 'Oise', rating: 5, date: 'Avril 2025', text: 'Une équipe super sérieuse et professionnelle!!! Ils ont pris le temps qu\'il fallait pour un service au top avec des explications d\'entretien. Je recommande à 100% !', service: 'Entretien poêle' },
+  { id: 34, name: 'Gérard G.', location: 'Oise', rating: 5, date: 'Avril 2025', text: 'Entretien poêle à granulés et ramonage parfaitement effectué ! Ce poêle n\'avait jamais été aussi bien nettoyé !! Super travail, et en plus super sympa.', service: 'Entretien poêle à granulés' },
+  { id: 35, name: 'Didier B.', location: 'Oise', rating: 5, date: 'Avril 2025', text: 'Je recommande cette société, entretien de notre poêle à granulés et ramonage de deux conduits de cheminée réalisés avec un grand professionnalisme. Enfin un professionnel qui réalise une prestation à la hauteur et avec sérieux.', service: 'Entretien poêle à granulés' },
+  { id: 36, name: 'M. A.', location: 'Oise', rating: 5, date: 'Avril 2025', text: 'Je recommande vivement la société DCS RAMONAGE ! Une équipe très professionnelle, réactive et surtout très sympathique.', service: 'Ramonage' },
+  // Mars 2025
+  { id: 37, name: 'Lolo S.', location: 'Oise', rating: 5, date: 'Mars 2025', text: 'Panne de bougie de préchauffage le 13 mars, intervention le lendemain ! Entreprise sérieuse, rapide, professionnelle et technicien très sympa 👍🏻', service: 'Dépannage poêle' },
+  { id: 38, name: 'Pascal P.', location: 'Oise', rating: 5, date: 'Mars 2025', text: 'Équipe sérieuse et très très professionnel, le travail effectué à été propre et minutie, à recommander', service: 'Ramonage' },
+  { id: 39, name: 'Estela S.', location: 'Oise', rating: 5, date: 'Mars 2025', text: 'J\'ai fait appel à cette société pour le débistrage du conduit de ma cheminée. Le travail a été fait avec matériel professionnel et proprement. Je suis très satisfaite du résultat et je vais pouvoir installer mon insert', service: 'Débistrage' },
+  { id: 40, name: 'Audrey C.', location: 'Oise', rating: 5, date: 'Mars 2025', text: 'C\'était parfait ! Travail bien fait et personnes très sympathique. Je recommande vivement', service: 'Ramonage' },
+  { id: 41, name: 'Sandrine G.', location: 'Oise', rating: 5, date: 'Mars 2025', text: 'Monsieur très agréable, à l\'écoute et surtout très compétent. Vous pouvez le contacter les yeux fermés.', service: 'Ramonage' },
+  // Février 2025
+  { id: 42, name: 'Laurine R.', location: 'Oise', rating: 5, date: 'Février 2025', text: 'Dépannage en urgence, fuite, plusieurs éléments obstrués. Ils étaient là 1h après le premier appel. Professionnels, consciencieux, rassurants et agréables! Je recommande +++', service: 'Dépannage' },
+  { id: 43, name: 'Laure G.', location: 'Oise', rating: 5, date: 'Février 2025', text: 'Service pro. Très satisfaite de l\'entretiens de mon poêle Piazzetta', service: 'Entretien poêle à granulés' },
+  // Janvier 2025
+  { id: 44, name: 'Capucine D.', location: 'Oise', rating: 5, date: 'Janvier 2025', text: 'Professionnels et efficaces je recommande vivement !', service: 'Ramonage' },
+  { id: 45, name: 'Jordan D.', location: 'Oise', rating: 5, date: 'Janvier 2025', text: 'Je recommande, professionnel rien à dire 👍', service: 'Ramonage' },
+  { id: 46, name: 'Fabien G.', location: 'Oise', rating: 5, date: 'Janvier 2025', text: 'Entreprise sérieuse et réactive, prend le temps nécessaire pour l\'entretien de l\'appareil.', service: 'Entretien poêle' },
+  { id: 47, name: 'Amandine G.', location: 'Oise', rating: 5, date: 'Janvier 2025', text: 'Entreprise très professionnelle. Un excellent travail d\'entretien effectuer sur notre poêle à granule. Le personnel est très agréable et respectueux.', service: 'Entretien poêle à granulés' },
+  { id: 48, name: 'Sylvain G.', location: 'Oise', rating: 5, date: 'Janvier 2025', text: 'Très réactif et efficace. A recommander', service: 'Ramonage' },
+  { id: 49, name: 'Xavier L.', location: 'Oise', rating: 5, date: 'Janvier 2025', text: 'Intervention sur mon piezzetta a granule le travail est vraiment fait a fond personnel expérimenter consciencieux et agréable je recommande fortement mon poele respire a plein poumon👍', service: 'Entretien poêle à granulés' },
+  { id: 50, name: 'Julien V.', location: 'Oise', rating: 5, date: 'Janvier 2025', text: 'Artisan consciencieux et travail de qualité, je recommande sans hésiter.', service: 'Ramonage' },
+  { id: 51, name: 'Marlene G.', location: 'Oise', rating: 5, date: 'Janvier 2025', text: 'Rdv rapide. Travail sérieux. 👍', service: 'Ramonage' },
+  { id: 52, name: 'Antoine A.', location: 'Oise', rating: 5, date: 'Janvier 2025', text: 'Rapide et ponctuel', service: 'Ramonage' },
+  { id: 53, name: 'Marcelino B.', location: 'Oise', rating: 5, date: 'Janvier 2025', text: 'Entreprise très contentieuse et professionnelle. Travail soigné, parfaitement équipée pour les tâches à accomplir. Une grande rigueur et du sérieux. Ça fait plaisir, rdv déjà pris pour 2026 😁.', service: 'Entretien poêle' },
+  // Décembre 2024
+  { id: 54, name: 'Alexandre L.', location: 'Oise', rating: 5, date: 'Décembre 2024', text: 'Super boulot, et les 2 intervenants étaient très sympa !!', service: 'Ramonage' },
+  { id: 55, name: 'Michael H.', location: 'Oise', rating: 5, date: 'Décembre 2024', text: 'Service au top Bonne présentation et très agréable.', service: 'Ramonage' },
+  { id: 56, name: 'Christian B.', location: 'Oise', rating: 5, date: 'Décembre 2024', text: 'Travail correctement effectué tout en respectant l\'intérieur de la maison. Je recommande vivement cette société.', service: 'Ramonage' },
+  // Novembre 2024
+  { id: 57, name: 'Cédric C.', location: 'Oise', rating: 5, date: 'Novembre 2024', text: 'Ponctuel et efficace ! Je recommande.', service: 'Ramonage' },
+  { id: 58, name: 'Karine A.', location: 'Oise', rating: 5, date: 'Novembre 2024', text: 'Très compétents et sérieux, je vous les recommande ++++', service: 'Ramonage' },
+  // Octobre 2024
+  { id: 59, name: 'Anne M.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Super travail efficace, rapide et propre', service: 'Ramonage' },
+  { id: 60, name: 'Meïssa K.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Super travail rapide, efficace et très peu cher ! Abdou est très sérieux, foncez les yeux fermés !', service: 'Ramonage' },
+  { id: 61, name: 'Malika M.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Abdou est venu me nettoyer le poêle il a fait un très bon travail très sérieux. Niveau prix largement en dessous du prix habituel, je le recommande fortement à l\'année prochaine.', service: 'Entretien poêle' },
+  { id: 62, name: 'A. D.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Rdv rapide, ponctuel, professionnel & compétent. Propreté, conseils utiles, nickel rien a dire.', service: 'Ramonage' },
+  { id: 63, name: 'Julien B.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'J\'ai fait appel à DCS ramonage pour l\'entretien annuel de mon poêle à granulés. Très satisfait du travail d\'Abdou qui est aussi très sympathique. Je recommande.', service: 'Entretien poêle à granulés' },
+  { id: 64, name: 'Florent B.', location: 'Oise', rating: 5, date: 'Octobre 2024', text: 'Société sérieuse et compétente dans le domaine. Travail soigné je recommande fortement.', service: 'Ramonage' },
+  // Septembre 2024
+  { id: 65, name: 'Jean-Claude F.', location: 'Oise', rating: 5, date: 'Septembre 2024', text: 'Rien a dire personnel compétent. Fin de travail propre', service: 'Ramonage' },
 ];
 
 export function TestimonialsSection() {
@@ -109,11 +140,12 @@ export function TestimonialsSection() {
               <span className="text-gradient">nos clients</span>
             </h2>
             <p className="section-subtitle">
-              {testimonials.length} avis clients avec une note moyenne de 5/5 sur Google
+              +{testimonials.length} avis clients avec une note moyenne de 5/5 sur Google
             </p>
           </div>
 
           <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-soft">
+            <GoogleIcon className="w-8 h-8" />
             <div className="text-center">
               <div className="flex items-center gap-1 mb-1">
                 {[...Array(5)].map((_, i) => (
@@ -121,7 +153,6 @@ export function TestimonialsSection() {
                 ))}
               </div>
               <span className="text-2xl font-bold text-secondary-900">5.0</span>
-              <span className="text-secondary-500 text-sm block">sur Google</span>
             </div>
             <a
               href={siteConfig.urls.googleBusiness}

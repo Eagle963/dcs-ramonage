@@ -13,6 +13,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { siteConfig } from '@/config/site';
+import { GoogleIcon } from '@/components/ui/GoogleIcon';
 
 interface LocalPageProps {
   city: string;
@@ -98,8 +99,9 @@ export function LocalPageTemplate({
                   <span>Certificat officiel</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-secondary-600">
+                  <GoogleIcon className="w-5 h-5" />
                   <Star className="w-5 h-5 text-primary-500 fill-primary-500" />
-                  <span>5/5 sur Google</span>
+                  <span>5/5</span>
                 </div>
               </div>
             </div>

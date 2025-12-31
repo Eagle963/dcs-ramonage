@@ -95,6 +95,45 @@ export default function EntretienPoelePage() {
           description: 'Rénovation du conduit pour une meilleure évacuation.',
         },
       ]}
+      realisations={[
+        {
+          title: 'Dépannage poêle mal entretenu',
+          description: 'Sortie en extérieur pour un nettoyage approfondi d\'un poêle à granulés très encrassé',
+          videoUrl: 'https://youtube.com/shorts/o15HUD4uw9A',
+        },
+        {
+          title: 'Remplacement extracteur & bougie',
+          description: 'Dépannage avec remplacement de l\'extracteur de fumée et de la bougie d\'allumage',
+          videoUrl: 'https://youtube.com/shorts/3WOXeJz1zcs',
+        },
+        {
+          title: 'Nettoyage chambre de combustion',
+          description: 'Avant/après nettoyage complet de la chambre de combustion',
+          beforeImage: '/images/entretien-avant.webp',
+          afterImage: '/images/entretien-apres.webp',
+        },
+        {
+          title: 'Intervention complète',
+          description: 'Démontage et nettoyage approfondi de tous les composants',
+          beforeImage: '/images/entretien-demontage-1.webp',
+          afterImage: '/images/entretien-demontage-2.webp',
+        },
+        {
+          title: 'Intervention en cours',
+          description: 'Accès au conduit et démontage pour nettoyage complet',
+          afterImage: '/images/entretien-intervention.webp',
+        },
+        {
+          title: 'Poêle en fonctionnement',
+          description: 'Poêle à granulés après entretien complet',
+          afterImage: '/images/entretien-poele.webp',
+        },
+        {
+          title: 'Dépannage - Remplacement turbine',
+          description: 'Démontage complet pour remplacement de la turbine d\'extraction',
+          afterImage: '/images/depannage-pieces.webp',
+        },
+      ]}
     />
   );
 }

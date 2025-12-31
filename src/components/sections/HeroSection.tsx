@@ -12,6 +12,7 @@ import {
   Flame
 } from 'lucide-react';
 import { siteConfig } from '@/config/site';
+import { GoogleIcon } from '@/components/ui/GoogleIcon';
 
 export function HeroSection() {
   return (
@@ -37,6 +38,7 @@ export function HeroSection() {
                 <Star className="w-4 h-4 fill-primary-500 text-primary-500" />
                 5/5 sur Google
               </span>
+              <GoogleIcon className="w-4 h-4" />
               <span className="text-secondary-400">•</span>
               <span className="text-secondary-600 text-sm">+50 avis clients</span>
             </div>
@@ -144,6 +146,15 @@ export function HeroSection() {
                   className="w-full h-full object-cover"
                 />
                 
+                {/* Logo DCS en filigrane au centre */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <img 
+                    src="/logo-dcs.svg" 
+                    alt="" 
+                    className="w-24 h-24 opacity-30"
+                  />
+                </div>
+                
                 {/* Overlay léger pour contraste des badges */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
@@ -151,6 +162,7 @@ export function HeroSection() {
                 <div className="absolute top-6 right-6 bg-white rounded-xl shadow-lg p-3 
                                 animate-float" style={{ animationDelay: '0.5s' }}>
                   <div className="flex items-center gap-2">
+                    <GoogleIcon className="w-5 h-5" />
                     <div className="flex -space-x-1">
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} className="w-4 h-4 fill-warning-400 text-warning-400" />
@@ -158,7 +170,6 @@ export function HeroSection() {
                     </div>
                     <span className="text-sm font-semibold text-secondary-900">5.0</span>
                   </div>
-                  <p className="text-xs text-secondary-500 mt-1">Google Avis</p>
                 </div>
 
                 {/* Badge flottant - Intervention */}

@@ -94,6 +94,44 @@ export default function TubagePage() {
           description: 'Création de conduit ou travaux de rénovation importants.',
         },
       ]}
+      realisations={[
+        {
+          title: 'Tubage flexible inox',
+          description: 'Tubage flexible double peau prêt à être installé',
+          afterImage: '/images/tubage-flexible.webp',
+        },
+        {
+          title: 'Intervention en toiture',
+          description: 'Accès au conduit par le toit pour pose du tubage',
+          afterImage: '/images/tubage-toiture.webp',
+        },
+        {
+          title: 'Pose tubage sur toiture',
+          description: 'Installation du tubage flexible par le haut du conduit',
+          afterImage: '/images/tubage-pose-toiture.webp',
+        },
+        {
+          title: 'Raccordement cheminée',
+          description: 'Tubage raccordé dans la cheminée existante',
+          afterImage: '/images/tubage-cheminee.webp',
+        },
+        {
+          title: 'Protection chantier',
+          description: 'Installation soignée avec protection du mobilier',
+          beforeImage: '/images/tubage-protection.webp',
+          afterImage: '/images/tubage-poele-fini.webp',
+        },
+        {
+          title: 'Sortie de toit',
+          description: 'Tubage inox en sortie de souche',
+          afterImage: '/images/tubage-sortie-toit.webp',
+        },
+        {
+          title: 'Résultat final',
+          description: 'Poêle à bois moderne avec tubage neuf',
+          afterImage: '/images/tubage-poele-bois.webp',
+        },
+      ]}
     />
   );
 }
