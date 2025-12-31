@@ -151,7 +151,7 @@ export function HeroSection() {
                   <img 
                     src="/logo-dcs.svg" 
                     alt="" 
-                    className="w-24 h-24 opacity-60"
+                    className="w-50 h-50 opacity-80"
                   />
                 </div>
                 
