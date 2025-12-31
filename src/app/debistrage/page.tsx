@@ -92,16 +92,18 @@ export default function DebistragePage() {
       ]}
       realisations={[
         {
-          title: 'Débistrage complet d\'un conduit maçonné',
-          description: 'Conduit fortement encrassé par des années de combustion. Débistrage mécanique avec plusieurs passages.',
-          beforeImage: '/images/debistrage-avant.webp',
-          afterImage: '/images/debistrage-apres.webp',
+          title: 'Débistrage conduit maçonné',
+          description: 'Conduit fortement encrassé, débistrage mécanique',
+          image1: '/images/debistrage-avant.webp',
+          image2: '/images/debistrage-apres.webp',
+          isBeforeAfter: true,
         },
         {
-          title: 'Débistrage conduit avec tubage',
-          description: 'Nettoyage en profondeur avant pose d\'un nouveau tubage',
-          beforeImage: '/images/debistrage-avant-2.webp',
-          afterImage: '/images/debistrage-apres-2.webp',
+          title: 'Débistrage avant tubage',
+          description: 'Nettoyage en profondeur avant pose d\'un tubage',
+          image1: '/images/debistrage-avant-2.webp',
+          image2: '/images/debistrage-apres-2.webp',
+          isBeforeAfter: true,
         },
       ]}
     />

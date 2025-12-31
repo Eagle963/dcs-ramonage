@@ -95,24 +95,20 @@ export default function DiagnosticPage() {
       ]}
       realisations={[
         {
+          title: 'Caméras d\'inspection',
+          description: 'Équipement Bosch Professional et Wöhler VIS 700',
+          image1: '/images/diagnostic-camera-1.webp',
+          image2: '/images/diagnostic-camera-2.webp',
+        },
+        {
+          title: 'Visualisation conduit',
+          description: 'Vue de l\'intérieur d\'un conduit tubé',
+          image1: '/images/diagnostic-camera-3.webp',
+        },
+        {
           title: 'Inspection vidéo en direct',
-          description: 'Visualisation de l\'intérieur d\'un conduit avec notre caméra endoscopique',
+          description: 'Visualisation avec caméra endoscopique',
           videoUrl: 'https://youtube.com/shorts/U3EAShVDU9A',
-        },
-        {
-          title: 'Inspection caméra Bosch Professional',
-          description: 'Caméra endoscopique pour inspection détaillée de l\'intérieur des conduits',
-          afterImage: '/images/diagnostic-camera-1.webp',
-        },
-        {
-          title: 'Diagnostic Wöhler VIS 700',
-          description: 'Inspection vidéo haute définition avec mesure de profondeur',
-          afterImage: '/images/diagnostic-camera-2.webp',
-        },
-        {
-          title: 'Visualisation conduit tubé',
-          description: 'Vue de l\'intérieur d\'un conduit tubé en bon état',
-          afterImage: '/images/diagnostic-camera-3.webp',
         },
       ]}
     />

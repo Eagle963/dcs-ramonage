@@ -60,8 +60,9 @@ interface FAQItem {
 interface RealisationItem {
   title: string;
   description?: string;
-  beforeImage?: string;
-  afterImage?: string;
+  image1?: string;
+  image2?: string;
+  isBeforeAfter?: boolean; // true = avant/après, false = 2 photos simples
   videoUrl?: string; // URL YouTube ou autre
 }
 
@@ -353,88 +354,140 @@ export function ServicePageTemplate({
       </section>
 
       {/* Réalisations Section (si fournie) */}
-      {realisations && realisations.length > 0 && (
-        <section className="section-padding">
-          <div className="container-site">
-            <div className="text-center max-w-2xl mx-auto mb-12">
-              <span className="badge-primary mb-4">Nos réalisations</span>
-              <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
-                Avant / Après
-              </h2>
-              <p className="text-secondary-600 mt-4">
-                Découvrez quelques exemples de nos interventions
-              </p>
-            </div>
+      {realisations && realisations.length > 0 && (() => {
+        // Séparer photos et vidéos
+        const photoRealisations = realisations.filter(r => !r.videoUrl && (r.image1 || r.image2));
+        const videoRealisations = realisations.filter(r => r.videoUrl);
+        
+        // Classes pour centrer selon le nombre
+        const getGridClasses = (count: number) => {
+          if (count === 1) return 'flex justify-center';
+          if (count === 2) return 'flex justify-center gap-6 flex-wrap';
+          return 'grid md:grid-cols-2 lg:grid-cols-3 gap-6';
+        };
+        
+        const getItemClasses = (count: number) => {
+          if (count === 1) return 'w-full max-w-md';
+          if (count === 2) return 'w-full max-w-md';
+          return '';
+        };
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {realisations.map((realisation, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-2xl border border-secondary-100 overflow-hidden shadow-soft"
-                >
-                  {/* Images Avant/Après */}
-                  {(realisation.beforeImage || realisation.afterImage) && (
-                    <div className="grid grid-cols-2 gap-1">
-                      {realisation.beforeImage && (
-                        <div className="relative aspect-square bg-secondary-100">
+        return (
+          <section className="section-padding">
+            <div className="container-site">
+              <div className="text-center max-w-2xl mx-auto mb-12">
+                <span className="badge-primary mb-4">Nos réalisations</span>
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
+                  {photoRealisations.some(r => r.isBeforeAfter) ? 'Avant / Après' : 'Nos interventions'}
+                </h2>
+                <p className="text-secondary-600 mt-4">
+                  Découvrez quelques exemples de nos interventions
+                </p>
+              </div>
+
+              {/* Photos - max 3 blocs */}
+              {photoRealisations.length > 0 && (
+                <div className={getGridClasses(Math.min(photoRealisations.length, 3))}>
+                  {photoRealisations.slice(0, 3).map((realisation, index) => (
+                    <div
+                      key={index}
+                      className={`bg-white rounded-2xl border border-secondary-100 overflow-hidden shadow-soft ${getItemClasses(Math.min(photoRealisations.length, 3))}`}
+                    >
+                      {/* 2 images */}
+                      {realisation.image1 && realisation.image2 && (
+                        <div className="grid grid-cols-2 gap-1">
+                          <div className="relative aspect-square bg-secondary-100">
+                            <img
+                              src={realisation.image1}
+                              alt={realisation.isBeforeAfter ? `Avant - ${realisation.title}` : realisation.title}
+                              className="w-full h-full object-cover"
+                            />
+                            {realisation.isBeforeAfter && (
+                              <span className="absolute bottom-2 left-2 bg-secondary-900/80 text-white text-xs px-2 py-1 rounded">
+                                Avant
+                              </span>
+                            )}
+                          </div>
+                          <div className="relative aspect-square bg-secondary-100">
+                            <img
+                              src={realisation.image2}
+                              alt={realisation.isBeforeAfter ? `Après - ${realisation.title}` : realisation.title}
+                              className="w-full h-full object-cover"
+                            />
+                            {realisation.isBeforeAfter && (
+                              <span className="absolute bottom-2 right-2 bg-primary-500/90 text-white text-xs px-2 py-1 rounded">
+                                Après
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* 1 seule image */}
+                      {realisation.image1 && !realisation.image2 && (
+                        <div className="relative aspect-video bg-secondary-100">
                           <img
-                            src={realisation.beforeImage}
-                            alt={`Avant - ${realisation.title}`}
+                            src={realisation.image1}
+                            alt={realisation.title}
                             className="w-full h-full object-cover"
                           />
-                          <span className="absolute bottom-2 left-2 bg-secondary-900/80 text-white text-xs px-2 py-1 rounded">
-                            Avant
-                          </span>
                         </div>
                       )}
-                      {realisation.afterImage && (
-                        <div className="relative aspect-square bg-secondary-100">
-                          <img
-                            src={realisation.afterImage}
-                            alt={`Après - ${realisation.title}`}
-                            className="w-full h-full object-cover scale-x-[-1]"
-                          />
-                          <span className="absolute bottom-2 right-2 bg-primary-500/90 text-white text-xs px-2 py-1 rounded">
-                            Après
-                          </span>
-                        </div>
-                      )}
+                      
+                      {/* Texte */}
+                      <div className="p-4">
+                        <h3 className="font-semibold text-secondary-900 mb-1">
+                          {realisation.title}
+                        </h3>
+                        {realisation.description && (
+                          <p className="text-sm text-secondary-600">
+                            {realisation.description}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  )}
-                  
-                  {/* Vidéo YouTube */}
-                  {realisation.videoUrl && (
-                    <div className={realisation.videoUrl.includes('/shorts/') ? 'aspect-[9/16] max-h-[400px] mx-auto' : 'aspect-video'}>
-                      <iframe
-                        src={realisation.videoUrl
-                          .replace('watch?v=', 'embed/')
-                          .replace('/shorts/', '/embed/')
-                        }
-                        title={realisation.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        className="w-full h-full"
-                      />
-                    </div>
-                  )}
-                  
-                  {/* Texte */}
-                  <div className="p-4">
-                    <h3 className="font-semibold text-secondary-900 mb-1">
-                      {realisation.title}
-                    </h3>
-                    {realisation.description && (
-                      <p className="text-sm text-secondary-600">
-                        {realisation.description}
-                      </p>
-                    )}
-                  </div>
+                  ))}
                 </div>
-              ))}
+              )}
+
+              {/* Vidéos - séparées, max 3 */}
+              {videoRealisations.length > 0 && (
+                <div className={`${photoRealisations.length > 0 ? 'mt-8' : ''} ${getGridClasses(Math.min(videoRealisations.length, 3))}`}>
+                  {videoRealisations.slice(0, 3).map((realisation, index) => (
+                    <div
+                      key={`video-${index}`}
+                      className={`bg-white rounded-2xl border border-secondary-100 overflow-hidden shadow-soft ${getItemClasses(Math.min(videoRealisations.length, 3))}`}
+                    >
+                      <div className={realisation.videoUrl?.includes('/shorts/') ? 'aspect-[9/16] max-h-[400px] mx-auto' : 'aspect-video'}>
+                        <iframe
+                          src={realisation.videoUrl
+                            ?.replace('watch?v=', 'embed/')
+                            .replace('/shorts/', '/embed/')
+                          }
+                          title={realisation.title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="w-full h-full"
+                        />
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-semibold text-secondary-900 mb-1">
+                          {realisation.title}
+                        </h3>
+                        {realisation.description && (
+                          <p className="text-sm text-secondary-600">
+                            {realisation.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        );
+      })()}
 
       {/* FAQ Section */}
       <section className="section-padding bg-secondary-50">

@@ -97,25 +97,22 @@ export default function RamonagePage() {
       ]}
       realisations={[
         {
-          title: 'Ramonage en action',
-          description: 'Intervention de ramonage sur un conduit de cheminée',
-          videoUrl: 'https://youtube.com/shorts/6mpAfMtbRa8',
-        },
-        {
           title: 'Ramonage conduit tubé',
           description: 'Avant/après ramonage d\'un conduit avec tubage inox',
-          beforeImage: '/images/ramonage-conduit-avant.webp',
-          afterImage: '/images/ramonage-conduit-apres.webp',
+          image1: '/images/ramonage-conduit-avant.webp',
+          image2: '/images/ramonage-conduit-apres.webp',
+          isBeforeAfter: true,
         },
         {
-          title: 'Ramonage insert',
-          description: 'Nettoyage complet d\'un insert de cheminée',
-          afterImage: '/images/ramonage-insert.webp',
+          title: 'Nos interventions',
+          description: 'Ramonage d\'insert et poêle à bois',
+          image1: '/images/ramonage-insert.webp',
+          image2: '/images/ramonage-poele-bois.webp',
         },
         {
-          title: 'Ramonage poêle à bois',
-          description: 'Intervention sur un poêle à bois encrassé',
-          afterImage: '/images/ramonage-poele-bois.webp',
+          title: 'Ramonage en action',
+          description: 'Intervention de ramonage sur un conduit',
+          videoUrl: 'https://youtube.com/shorts/6mpAfMtbRa8',
         },
       ]}
     />
