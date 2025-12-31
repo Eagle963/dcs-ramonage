@@ -48,6 +48,9 @@ export async function POST(request: NextRequest) {
       postalCode,
       serviceType,
       equipmentType,
+      brand,
+      model,
+      exhaustType,
       message,
     } = body;
 
@@ -67,8 +70,8 @@ export async function POST(request: NextRequest) {
     if (!address?.trim()) errors.push('L\'adresse est requise');
     if (!city?.trim()) errors.push('La ville est requise');
     if (!postalCode?.trim()) errors.push('Le code postal est requis');
-    if (!serviceType || !VALID_SERVICES.includes(serviceType)) {
-      errors.push('Le type de service est requis');
+    if (!equipmentType) {
+      errors.push('Le type d\'équipement est requis');
     }
 
     // Vérification zone d'intervention
@@ -115,8 +118,11 @@ export async function POST(request: NextRequest) {
       address: address.trim(),
       city: city.trim(),
       postalCode: postalCode.trim(),
-      serviceType,
+      serviceType: serviceType || 'RAMONAGE',
       equipmentType: equipmentType || null,
+      brand: brand?.trim() || null,
+      model: model?.trim() || null,
+      exhaustType: exhaustType || null,
       message: message?.trim() || null,
       status: 'PENDING',
       createdAt: new Date().toISOString(),
