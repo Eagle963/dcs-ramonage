@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from 'next';
 import { Outfit, Plus_Jakarta_Sans } from 'next/font/google';
 import '@/styles/globals.css';
 import { siteConfig } from '@/config/site';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { FloatingCTA } from '@/components/layout/FloatingCTA';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 
 // Police display pour les titres - Moderne, bold, caractère
@@ -167,7 +170,19 @@ export default function RootLayout({
           Aller au contenu principal
         </a>
         
-        {children}
+        {/* Header */}
+        <Header />
+        
+        {/* Contenu principal */}
+        <main id="main-content" className="flex-1">
+          {children}
+        </main>
+        
+        {/* Footer */}
+        <Footer />
+        
+        {/* CTA flottant mobile */}
+        <FloatingCTA />
       </body>
     </html>
   );

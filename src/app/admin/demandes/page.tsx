@@ -24,8 +24,8 @@ interface BookingRequest {
   createdAt: string;
 }
 
-const SERVICE_LABELS: Record<string, string> = { 'RAMONAGE': 'Ramonage', 'ENTRETIEN': 'Entretien', 'RAMONAGE_ENTRETIEN': 'Ramonage + Entretien', 'DEPANNAGE': 'Dépannage', 'DEBISTRAGE': 'Débistrage', 'TUBAGE': 'Tubage', 'DIAGNOSTIC': 'Diagnostic', 'DEVIS': 'Devis', 'NETTOYAGE': 'Nettoyage', 'OTHER': 'Autre' };
-const EQUIPMENT_LABELS: Record<string, string> = { 'WOOD_STOVE': 'Poêle à bois', 'PELLET_STOVE': 'Poêle à granulés', 'CHIMNEY_OPEN': 'Cheminée ouverte', 'CHIMNEY_INSERT': 'Insert', 'OIL_BOILER': 'Chaudière fioul', 'GAS_BOILER': 'Chaudière gaz', 'WOOD_BOILER': 'Chaudière bois', 'POLYFLAM': 'Cheminée Polyflam', 'CONDUIT_DIFFICILE': 'Conduit difficile', 'OTHER': 'Autre' };
+const SERVICE_LABELS: Record<string, string> = { 'RAMONAGE': 'Ramonage', 'ENTRETIEN': 'Entretien', 'RAMONAGE_ENTRETIEN': 'Ramonage + Entretien', 'DEPANNAGE': 'Dépannage', 'DEBISTRAGE': 'Débistrage', 'TUBAGE': 'Tubage', 'DIAGNOSTIC': 'Diagnostic', 'OTHER': 'Autre' };
+const EQUIPMENT_LABELS: Record<string, string> = { 'WOOD_STOVE': 'Poêle à bois', 'PELLET_STOVE': 'Poêle à granulés', 'CHIMNEY_OPEN': 'Cheminée ouverte', 'CHIMNEY_INSERT': 'Insert', 'OIL_BOILER': 'Chaudière fioul', 'GAS_BOILER': 'Chaudière gaz', 'WOOD_BOILER': 'Chaudière bois', 'OTHER': 'Autre' };
 const EXHAUST_LABELS: Record<string, string> = { 'VENTOUSE': 'Ventouse', 'TOITURE': 'Toiture' };
 const STATUS_CONFIG = {
   PENDING: { label: 'En attente', color: 'bg-amber-100 text-amber-700', icon: Clock },
@@ -36,7 +36,7 @@ const STATUS_CONFIG = {
 
 const mockBookings: BookingRequest[] = [
   { id: 'br_001', date: new Date().toISOString().split('T')[0], slot: 'MORNING', firstName: 'Jean', lastName: 'Dupont', email: 'jean.dupont@email.fr', phone: '06 12 34 56 78', address: '12 rue de la République', city: 'Beauvais', postalCode: '60000', serviceType: 'RAMONAGE_ENTRETIEN', equipmentType: 'PELLET_STOVE', brand: 'MCZ', model: 'Ego 2.0', exhaustType: 'TOITURE', message: 'Entretien annuel.', status: 'PENDING', createdAt: new Date().toISOString() },
-  { id: 'br_002', date: new Date(Date.now() + 86400000).toISOString().split('T')[0], slot: 'AFTERNOON', firstName: 'Marie', lastName: 'Martin', email: 'marie.martin@email.fr', phone: '06 98 76 54 32', address: '45 avenue Jean Jaurès', city: 'Creil', postalCode: '60100', serviceType: 'RAMONAGE', equipmentType: 'CHIMNEY_INSERT', status: 'CONFIRMED', createdAt: new Date(Date.now() - 86400000).toISOString() },
+  { id: 'br_002', date: new Date(Date.now() + 86400000).toISOString().split('T')[0], slot: 'AFTERNOON', firstName: 'Marie', lastName: 'Martin', email: 'marie.martin@email.fr', phone: '06 98 76 54 32', address: '45 avenue de Paris', city: 'Creil', postalCode: '60100', serviceType: 'RAMONAGE', equipmentType: 'CHIMNEY_INSERT', status: 'CONFIRMED', createdAt: new Date(Date.now() - 86400000).toISOString() },
   { id: 'br_003', date: new Date(Date.now() + 172800000).toISOString().split('T')[0], slot: 'MORNING', firstName: 'Pierre', lastName: 'Bernard', email: 'p.bernard@email.fr', phone: '07 11 22 33 44', address: '8 place Henri IV', city: 'Senlis', postalCode: '60300', serviceType: 'DEPANNAGE', equipmentType: 'PELLET_STOVE', brand: 'Edilkamin', model: 'Nara', exhaustType: 'VENTOUSE', message: 'Erreur E03.', status: 'PENDING', createdAt: new Date(Date.now() - 3600000).toISOString() },
 ];
 
@@ -59,12 +59,8 @@ export default function DemandesPage() {
 
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
   const formatDateTime = (dateStr: string) => new Date(dateStr).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-  
-  const getOpenStreetMapUrl = (b: BookingRequest) => `https://www.openstreetmap.org/search?query=${encodeURIComponent(`${b.address}, ${b.postalCode} ${b.city}, France`)}`;
-  const getOpenStreetMapEmbed = (b: BookingRequest) => {
-    const query = encodeURIComponent(`${b.address}, ${b.postalCode} ${b.city}, France`);
-    return `https://www.openstreetmap.org/export/embed.html?bbox=2.0,49.0,3.0,49.5&layer=mapnik&marker=49.25,2.5`;
-  };
+  const getGoogleMapsUrl = (b: BookingRequest) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${b.address}, ${b.postalCode} ${b.city}, France`)}`;
+  const getGoogleMapsEmbed = (b: BookingRequest) => `https://www.google.com/maps?q=${encodeURIComponent(`${b.address}, ${b.postalCode} ${b.city}, France`)}&output=embed`;
 
   const pendingCount = bookings.filter(b => b.status === 'PENDING').length;
 
@@ -164,21 +160,11 @@ export default function DemandesPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="text-sm text-secondary-500">Localisation</h4>
-                  <a href={getOpenStreetMapUrl(selectedBooking)} target="_blank" rel="noopener noreferrer" className="text-primary-600 text-sm flex items-center gap-1 hover:underline"><ExternalLink className="w-4 h-4" />Ouvrir dans Maps</a>
+                  <a href={getGoogleMapsUrl(selectedBooking)} target="_blank" rel="noopener noreferrer" className="text-primary-600 text-sm flex items-center gap-1 hover:underline"><ExternalLink className="w-4 h-4" />Ouvrir dans Maps</a>
                 </div>
-                <div className="rounded-xl overflow-hidden border border-secondary-200 h-80 bg-secondary-100">
-                  <iframe 
-                    width="100%" 
-                    height="100%" 
-                    frameBorder="0" 
-                    scrolling="no" 
-                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent('1.5,48.5,3.5,50.0')}&layer=mapnik`}
-                    style={{ border: 0 }}
-                  />
+                <div className="rounded-xl overflow-hidden border border-secondary-200 h-80">
+                  <iframe src={getGoogleMapsEmbed(selectedBooking)} width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
                 </div>
-                <p className="text-xs text-secondary-400 mt-2 text-center">
-                  {selectedBooking.address}, {selectedBooking.postalCode} {selectedBooking.city}
-                </p>
               </div>
             </div>
           </div>

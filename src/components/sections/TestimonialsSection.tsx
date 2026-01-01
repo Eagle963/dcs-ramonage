@@ -229,7 +229,7 @@ export function TestimonialsSection() {
 
         <div className="text-center mt-12">
           <p className="text-secondary-600 mb-4">Vous aussi, faites confiance à DCS Ramonage</p>
-          <a href={siteConfig.urls.booking} className="btn-primary btn-md inline-flex">Demander un devis gratuit</a>
+          <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-md inline-flex">Demander un devis gratuit</a>
         </div>
       </div>
     </section>
