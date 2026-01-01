@@ -84,7 +84,13 @@ export default function ParametresPage() {
   const [newPostalCode, setNewPostalCode] = useState('');
   const [newPostalType, setNewPostalType] = useState<'allowed' | 'blocked'>('allowed');
 
-  const [activeTab, setActiveTab] = useState<'general' | 'tarifs' | 'zones'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'tarifs' | 'zones' | 'techniciens'>('general');
+  
+  // Techniciens
+  const [techniciens, setTechniciens] = useState([
+    { id: '1', name: 'DCS RAMONAGE', email: 'dcsramonage@gmail.com', phone: '06 12 34 56 78', color: '#3b82f6', startAddress: '15 Rue de la Gare, 60000 Beauvais', isDefault: true },
+  ]);
+  const [entrepriseAddress, setEntrepriseAddress] = useState('15 Rue de la Gare, 60000 Beauvais');
 
   const handleSave = () => {
     alert('Paramètres sauvegardés ! (simulation)');
@@ -157,6 +163,7 @@ export default function ParametresPage() {
           { id: 'general', label: 'Général', icon: Settings },
           { id: 'tarifs', label: 'Tarifs', icon: Euro },
           { id: 'zones', label: 'Zones', icon: MapPin },
+          { id: 'techniciens', label: 'Techniciens', icon: Settings },
         ].map(({ id, label, icon: Icon }) => (
           <button key={id} onClick={() => setActiveTab(id as any)} className={`flex items-center gap-2 px-4 py-3 border-b-2 -mb-px transition-colors ${activeTab === id ? 'border-primary-500 text-primary-600' : 'border-transparent text-secondary-500 hover:text-secondary-700'}`}>
             <Icon className="w-4 h-4" />{label}
@@ -176,6 +183,18 @@ export default function ParametresPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="block text-sm font-medium mb-1">Matin (max)</label><input type="number" min="1" max="20" value={settings.maxMorning} onChange={(e) => setSettings({ ...settings, maxMorning: parseInt(e.target.value) })} className="w-full px-3 py-2 border border-secondary-200 rounded-lg" /></div>
                 <div><label className="block text-sm font-medium mb-1">Après-midi (max)</label><input type="number" min="1" max="20" value={settings.maxAfternoon} onChange={(e) => setSettings({ ...settings, maxAfternoon: parseInt(e.target.value) })} className="w-full px-3 py-2 border border-secondary-200 rounded-lg" /></div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-secondary-100 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center"><MapPin className="w-5 h-5 text-purple-600" /></div>
+                <div><h2 className="font-semibold">Adresse du siège</h2><p className="text-sm text-secondary-500">Point de départ par défaut</p></div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Adresse complète</label>
+                <input type="text" value={entrepriseAddress} onChange={(e) => setEntrepriseAddress(e.target.value)} placeholder="15 Rue de la Gare, 60000 Beauvais" className="w-full px-3 py-2 border border-secondary-200 rounded-lg" />
+                <p className="text-xs text-secondary-500 mt-1">Cette adresse sera utilisée comme point de départ pour l'optimisation des tournées</p>
               </div>
             </div>
 
@@ -323,6 +342,74 @@ export default function ParametresPage() {
           </div>
 
           <button onClick={handleSave} className="btn-primary flex items-center justify-center gap-2"><Save className="w-5 h-5" />Sauvegarder les zones</button>
+        </div>
+      )}
+
+      {/* Onglet Techniciens */}
+      {activeTab === 'techniciens' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl border border-secondary-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold">Techniciens / Intervenants</h2>
+              <button className="flex items-center gap-1 px-3 py-2 bg-primary-500 text-white text-sm rounded-lg hover:bg-primary-600">
+                <Plus className="w-4 h-4" /> Ajouter
+              </button>
+            </div>
+            <p className="text-sm text-secondary-500 mb-4">Gérez les techniciens et leur adresse de départ pour l'optimisation des tournées.</p>
+
+            <div className="space-y-3">
+              {techniciens.map((tech) => (
+                <div key={tech.id} className="flex items-center gap-4 p-4 bg-secondary-50 rounded-lg">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: tech.color }}>
+                    {tech.name.charAt(0)}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium">{tech.name}</p>
+                      {tech.isDefault && <span className="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded">Par défaut</span>}
+                    </div>
+                    <p className="text-sm text-secondary-500">{tech.email}</p>
+                    <p className="text-xs text-secondary-400 mt-1">📍 {tech.startAddress}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={tech.color} onChange={(e) => setTechniciens(techniciens.map(t => t.id === tech.id ? { ...t, color: e.target.value } : t))} className="w-8 h-8 rounded cursor-pointer" />
+                    <button className="p-2 hover:bg-secondary-200 rounded"><Edit2 className="w-4 h-4" /></button>
+                    <button className="p-2 hover:bg-red-100 text-red-500 rounded"><Trash2 className="w-4 h-4" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-secondary-100 p-6">
+            <h2 className="font-semibold mb-4">Ajouter un technicien</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Nom</label>
+                <input type="text" placeholder="Nom du technicien" className="w-full px-3 py-2 border border-secondary-200 rounded-lg" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <input type="email" placeholder="email@exemple.fr" className="w-full px-3 py-2 border border-secondary-200 rounded-lg" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Téléphone</label>
+                <input type="tel" placeholder="06 12 34 56 78" className="w-full px-3 py-2 border border-secondary-200 rounded-lg" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Couleur</label>
+                <input type="color" defaultValue="#3b82f6" className="w-full h-10 rounded-lg cursor-pointer" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-1">Adresse de départ</label>
+                <input type="text" placeholder="Adresse complète (laisser vide pour utiliser l'adresse du siège)" className="w-full px-3 py-2 border border-secondary-200 rounded-lg" />
+                <p className="text-xs text-secondary-500 mt-1">Si vide, l'adresse du siège sera utilisée comme point de départ</p>
+              </div>
+            </div>
+            <button className="mt-4 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600">Ajouter le technicien</button>
+          </div>
+
+          <button onClick={handleSave} className="btn-primary flex items-center justify-center gap-2"><Save className="w-5 h-5" />Sauvegarder</button>
         </div>
       )}
 
