@@ -369,7 +369,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <>
                   <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Finances</Link>
                   <ChevronRight className="w-4 h-4 text-secondary-400" />
-                  <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Ventes</Link>
+                  <span className="text-secondary-500">Ventes</span>
                   <ChevronRight className="w-4 h-4 text-secondary-400" />
                   <span className="text-secondary-900 font-medium">Devis</span>
                 </>
@@ -378,9 +378,41 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <>
                   <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Finances</Link>
                   <ChevronRight className="w-4 h-4 text-secondary-400" />
-                  <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Ventes</Link>
+                  <span className="text-secondary-500">Ventes</span>
                   <ChevronRight className="w-4 h-4 text-secondary-400" />
                   <span className="text-secondary-900 font-medium">Factures</span>
+                </>
+              )}
+              {pathname === '/admin/avoirs' && (
+                <>
+                  <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Finances</Link>
+                  <ChevronRight className="w-4 h-4 text-secondary-400" />
+                  <span className="text-secondary-500">Ventes</span>
+                  <ChevronRight className="w-4 h-4 text-secondary-400" />
+                  <span className="text-secondary-900 font-medium">Avoirs</span>
+                </>
+              )}
+              {pathname === '/admin/paiements' && (
+                <>
+                  <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Finances</Link>
+                  <ChevronRight className="w-4 h-4 text-secondary-400" />
+                  <span className="text-secondary-500">Ventes</span>
+                  <ChevronRight className="w-4 h-4 text-secondary-400" />
+                  <span className="text-secondary-900 font-medium">Paiements</span>
+                </>
+              )}
+              {pathname === '/admin/depenses' && (
+                <>
+                  <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Finances</Link>
+                  <ChevronRight className="w-4 h-4 text-secondary-400" />
+                  <span className="text-secondary-900 font-medium">Dépenses</span>
+                </>
+              )}
+              {pathname === '/admin/banque' && (
+                <>
+                  <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Finances</Link>
+                  <ChevronRight className="w-4 h-4 text-secondary-400" />
+                  <span className="text-secondary-900 font-medium">Banque</span>
                 </>
               )}
               {pathname === '/admin/entreprise' && (
@@ -392,8 +424,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               )}
               {pathname === '/admin/parametres' && (
                 <>
-                  <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Paramètres</Link>
-                  <ChevronRight className="w-4 h-4 text-secondary-400" />
                   <span className="text-secondary-900 font-medium">Paramètres</span>
                 </>
               )}
