@@ -51,6 +51,14 @@
   "overrides": {
     "md-to-react-email": {
       "react": "^19.0.0"
+    },
+    "react-leaflet": {
+      "react": "^19.0.0",
+      "react-dom": "^19.0.0"
+    },
+    "@react-leaflet/core": {
+      "react": "^19.0.0",
+      "react-dom": "^19.0.0"
     }
   }
 }
