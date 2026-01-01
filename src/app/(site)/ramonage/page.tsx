@@ -53,7 +53,7 @@ export default function RamonagePage() {
         { label: 'Ramonage poêle à bois', price: '80 €', note: 'Poêle à bûches, certificat inclus' },
         { label: 'Ramonage chaudière à fioul', price: '80 €', note: 'Conduit fioul, certificat inclus' },
         { label: 'Ramonage cheminée Polyflam', price: '90 €', note: 'Cheminée Polyflam, certificat inclus' },
-        { label: 'Ramonage conduit difficile', price: '100 €', note: 'Abbaye, château, manoir, accès complexe ou conduit > 10m' },
+        { label: 'Ramonage conduit difficile', price: '110 €', note: 'Abbaye, château, manoir, accès complexe ou conduit > 10m' },
       ]}
       priceNote="* Tarifs TTC, déplacement inclus (Oise 60 et Val-d'Oise 95). Professionnels : tarifs HT."
       faqs={[

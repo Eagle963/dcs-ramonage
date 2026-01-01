@@ -46,7 +46,7 @@ export default function NettoyageDemoussagePage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-start gap-4">
-              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-lg">
+              <a href={siteConfig.urls.booking} className="btn-primary btn-lg">
                 <Calendar className="w-5 h-5" />
                 Demander un devis gratuit
                 <ArrowRight className="w-5 h-5" />
@@ -322,7 +322,7 @@ export default function NettoyageDemoussagePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
+              <a href={siteConfig.urls.booking} className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
                 <Calendar className="w-5 h-5" />
                 Demander un devis
                 <ArrowRight className="w-5 h-5" />

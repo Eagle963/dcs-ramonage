@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { MapPin, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Loader2, Home, Flame, Droplet, Wind, CircleDot, Calendar, List, ArrowRight, Brush, Wrench, FileText, SprayCan, PenTool, CircleOff } from 'lucide-react';
+import { MapPin, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Loader2, Home, Flame, Droplet, Wind, CircleDot, Calendar, List, ArrowRight, Wrench, FileText, SprayCan, PenTool, CircleOff, Sun, Sunset, Building2, Ruler } from 'lucide-react';
 
 interface DayAvailability {
   date: string;
@@ -18,27 +18,29 @@ const PRESTATIONS = [
   { id: 'RAMONAGE_ENTRETIEN', name: 'Ramonage / Entretien', icon: Flame, color: 'bg-orange-500', tarif: 'À partir de 60€' },
   { id: 'DEBISTRAGE', name: 'Débistrage', icon: PenTool, color: 'bg-amber-700', tarif: 'À partir de 90€' },
   { id: 'TUBAGE', name: 'Tubage', icon: CircleOff, color: 'bg-gray-600', tarif: 'Sur devis' },
-  { id: 'DEPANNAGE', name: 'Dépannage', icon: Wrench, color: 'bg-red-500', tarif: 'À partir de 80€' },
+  { id: 'DEPANNAGE', name: 'Dépannage', icon: Wrench, color: 'bg-red-500', tarif: 'À partir de 90€' },
   { id: 'DEVIS', name: 'Devis', icon: FileText, color: 'bg-blue-500', tarif: 'Gratuit' },
   { id: 'NETTOYAGE', name: 'Démoussage / Nettoyage', icon: SprayCan, color: 'bg-green-600', tarif: 'Sur devis' },
 ];
 
-// Équipements pour Ramonage/Entretien
+// Équipements pour Ramonage/Entretien avec tarifs
 const EQUIPMENTS = [
-  { id: 'WOOD_STOVE', name: 'Poêle à bois', icon: Flame, color: 'bg-orange-500', hasOptions: false },
-  { id: 'PELLET_STOVE', name: 'Poêle à granulés', icon: CircleDot, color: 'bg-green-500', hasOptions: true },
-  { id: 'CHIMNEY_OPEN', name: 'Cheminée ouverte', icon: Home, color: 'bg-red-600', hasOptions: false },
-  { id: 'CHIMNEY_INSERT', name: 'Insert', icon: Flame, color: 'bg-gray-500', hasOptions: false },
-  { id: 'OIL_BOILER', name: 'Chaudière fioul', icon: Droplet, color: 'bg-amber-500', hasOptions: false },
-  { id: 'GAS_BOILER', name: 'Chaudière gaz', icon: Wind, color: 'bg-blue-500', hasOptions: false },
-  { id: 'WOOD_BOILER', name: 'Chaudière bois', icon: Flame, color: 'bg-amber-700', hasOptions: false },
+  { id: 'GAS_BOILER', name: 'Chaudière gaz', icon: Wind, color: 'bg-blue-500', tarif: '60€', hasOptions: false },
+  { id: 'CHIMNEY_OPEN', name: 'Cheminée ouverte', icon: Home, color: 'bg-red-600', tarif: '70€', hasOptions: false },
+  { id: 'CHIMNEY_INSERT', name: 'Insert', icon: Flame, color: 'bg-gray-500', tarif: '70€', hasOptions: false },
+  { id: 'WOOD_STOVE', name: 'Poêle à bois', icon: Flame, color: 'bg-orange-500', tarif: '80€', hasOptions: false },
+  { id: 'OIL_BOILER', name: 'Chaudière fioul', icon: Droplet, color: 'bg-amber-500', tarif: '80€', hasOptions: false },
+  { id: 'PELLET_STOVE', name: 'Poêle à granulés', icon: CircleDot, color: 'bg-green-500', tarif: 'Dès 80€', hasOptions: true },
+  { id: 'WOOD_BOILER', name: 'Chaudière bois', icon: Flame, color: 'bg-amber-700', tarif: '80€', hasOptions: false },
+  { id: 'POLYFLAM', name: 'Cheminée Polyflam', icon: Building2, color: 'bg-purple-500', tarif: '90€', hasOptions: false },
+  { id: 'CONDUIT_DIFFICILE', name: 'Conduit difficile', icon: Ruler, color: 'bg-slate-700', tarif: '110€', hasOptions: false },
 ];
 
 // Interventions poêle à granulés
 const PELLET_INTERVENTIONS = [
-  { id: 'RAMONAGE_ENTRETIEN', name: 'Ramonage + Entretien', tarif: '120€' },
-  { id: 'RAMONAGE', name: 'Ramonage seul', tarif: '60€' },
-  { id: 'ENTRETIEN', name: 'Entretien seul', tarif: '90€' },
+  { id: 'RAMONAGE_ENTRETIEN', name: 'Ramonage + Entretien', tarif: '180€' },
+  { id: 'ENTRETIEN', name: 'Entretien seul', tarif: '100€' },
+  { id: 'RAMONAGE', name: 'Ramonage seul', tarif: '80€' },
 ];
 
 // Types de sortie
@@ -115,27 +117,27 @@ export default function ReservationPage() {
   const selectPrestation = (id: string) => {
     setSelectedPrestation(id);
     if (id === 'RAMONAGE_ENTRETIEN') {
-      setStep(3); // Choix équipement
+      setStep(3);
     } else if (id === 'DEPANNAGE') {
-      setStep(3); // Marque/modèle obligatoire
+      setStep(3);
     } else if (id === 'NETTOYAGE') {
-      setStep(3); // Choix zones
+      setStep(3);
     } else {
-      // Devis, Tubage, Débistrage -> directement calendrier
       setStep(4);
       fetchAvailability(currentMonth);
     }
   };
 
-  const continueFromEquipment = () => {
-    if (!selectedEquipment) { alert('Veuillez sélectionner un équipement'); return; }
-    const eq = EQUIPMENTS.find(e => e.id === selectedEquipment);
-    if (eq?.hasOptions) {
-      // Poêle granulés -> options supplémentaires dans même étape
-      return;
+  const selectEquipment = (id: string) => {
+    setSelectedEquipment(id);
+    const eq = EQUIPMENTS.find(e => e.id === id);
+    if (eq && !eq.hasOptions) {
+      // Pas d'options supplémentaires -> passer directement au calendrier
+      setTimeout(() => {
+        setStep(4);
+        fetchAvailability(currentMonth);
+      }, 300);
     }
-    setStep(4);
-    fetchAvailability(currentMonth);
   };
 
   const continueFromOptions = () => {
@@ -221,8 +223,13 @@ export default function ReservationPage() {
   };
 
   const getTarif = () => {
-    if (selectedPrestation === 'RAMONAGE_ENTRETIEN' && selectedEquipment === 'PELLET_STOVE' && selectedIntervention) {
-      return PELLET_INTERVENTIONS.find(i => i.id === selectedIntervention)?.tarif || '';
+    if (selectedPrestation === 'RAMONAGE_ENTRETIEN') {
+      if (selectedEquipment === 'PELLET_STOVE' && selectedIntervention) {
+        return PELLET_INTERVENTIONS.find(i => i.id === selectedIntervention)?.tarif || '';
+      }
+      if (selectedEquipment) {
+        return EQUIPMENTS.find(e => e.id === selectedEquipment)?.tarif || '';
+      }
     }
     return prestation?.tarif || '';
   };
@@ -234,18 +241,18 @@ export default function ReservationPage() {
   // SVG custom pour ventouse et toiture
   const VentouseIcon = () => (
     <svg viewBox="0 0 64 64" className="w-12 h-12">
-      <path d="M10 32 Q10 20 25 20 L50 20 Q55 20 55 25 L55 35 Q55 40 50 40 L25 40 Q10 40 10 32Z" fill="none" stroke="currentColor" strokeWidth="3" className="text-gray-600"/>
-      <path d="M55 28 Q60 28 62 25 M55 32 Q62 32 64 30 M55 36 Q60 36 62 38" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400"/>
-      <rect x="5" y="25" width="8" height="14" rx="2" fill="currentColor" className="text-gray-500"/>
+      <path d="M8 32 Q8 22 20 22 L48 22 Q54 22 56 28 L56 36 Q54 42 48 42 L20 42 Q8 42 8 32Z" fill="none" stroke="currentColor" strokeWidth="3" className="text-gray-600"/>
+      <path d="M56 27 C60 25 63 26 63 28 M56 32 C62 31 65 32 64 34 M56 37 C60 38 63 37 62 40" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400"/>
+      <rect x="2" y="26" width="8" height="12" rx="2" fill="currentColor" className="text-gray-500"/>
     </svg>
   );
 
   const ToitureIcon = () => (
     <svg viewBox="0 0 64 64" className="w-12 h-12">
-      <path d="M32 5 L55 25 L55 55 L9 55 L9 25 Z" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400"/>
-      <rect x="26" y="10" width="12" height="35" rx="2" fill="currentColor" className="text-gray-600"/>
-      <rect x="24" y="8" width="16" height="4" rx="1" fill="currentColor" className="text-gray-500"/>
-      <path d="M32 5 Q34 2 36 5 M30 3 Q32 0 34 3" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400"/>
+      <path d="M32 8 L54 28 L54 56 L10 56 L10 28 Z" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-700"/>
+      <rect x="26" y="12" width="12" height="32" rx="1" fill="currentColor" className="text-gray-600"/>
+      <rect x="24" y="8" width="16" height="6" rx="1" fill="currentColor" className="text-gray-700"/>
+      <path d="M30 6 Q32 2 34 6 M28 4 Q32 0 36 4" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400"/>
     </svg>
   );
 
@@ -291,7 +298,7 @@ export default function ReservationPage() {
           {/* Étape 2: Type de prestation */}
           {step === 2 && (
             <div className="bg-white rounded-2xl shadow-soft p-8">
-              <button onClick={() => setStep(1)} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Modifier ({postalCode})</button>
+              <button onClick={() => setStep(1)} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
               <h2 className="text-xl font-semibold text-center mb-6">Quelle prestation souhaitez-vous ?</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {PRESTATIONS.map((p) => {
@@ -311,19 +318,20 @@ export default function ReservationPage() {
           {/* Étape 3: Sous-sélections */}
           {step === 3 && (
             <div className="bg-white rounded-2xl shadow-soft p-8">
-              <button onClick={() => { setStep(2); setSelectedEquipment(null); setSelectedIntervention(null); }} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Modifier prestation</button>
+              <button onClick={() => { setStep(2); setSelectedEquipment(null); setSelectedIntervention(null); }} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
               
               {/* Ramonage/Entretien -> Choix équipement */}
               {selectedPrestation === 'RAMONAGE_ENTRETIEN' && (
                 <div className="space-y-6">
                   <h2 className="text-xl font-semibold text-center">Quel équipement ?</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {EQUIPMENTS.map((eq) => {
                       const Icon = eq.icon;
                       return (
-                        <button key={eq.id} onClick={() => setSelectedEquipment(eq.id)} className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 hover:border-primary-500 ${selectedEquipment === eq.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
+                        <button key={eq.id} onClick={() => selectEquipment(eq.id)} className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 hover:border-primary-500 ${selectedEquipment === eq.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
                           <div className={`w-12 h-12 ${eq.color} rounded-xl flex items-center justify-center`}><Icon className="w-6 h-6 text-white" /></div>
                           <span className="font-medium text-sm text-center">{eq.name}</span>
+                          <span className="text-xs text-primary-600 font-semibold">{eq.tarif}</span>
                         </button>
                       );
                     })}
@@ -362,10 +370,9 @@ export default function ReservationPage() {
                           </button>
                         </div>
                       </div>
+                      <button onClick={continueFromOptions} className="btn-primary w-full flex items-center justify-center gap-2">Continuer<ArrowRight className="w-4 h-4" /></button>
                     </div>
                   )}
-
-                  <button onClick={selectedEquipment === 'PELLET_STOVE' ? continueFromOptions : continueFromEquipment} className="btn-primary w-full flex items-center justify-center gap-2">Continuer<ArrowRight className="w-4 h-4" /></button>
                 </div>
               )}
 
@@ -413,27 +420,28 @@ export default function ReservationPage() {
 
               <div className="grid lg:grid-cols-2 gap-6">
                 <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-secondary-100 rounded-lg"><ChevronLeft className="w-5 h-5" /></button>
+                    <span className="font-semibold">{MONTHS[month - 1]} {year}</span>
+                    <button onClick={() => changeMonth(1)} className="p-2 hover:bg-secondary-100 rounded-lg"><ChevronRight className="w-5 h-5" /></button>
+                  </div>
+
                   {loading ? (
                     <div className="text-center py-12"><Loader2 className="w-8 h-8 text-primary-500 animate-spin mx-auto" /></div>
                   ) : viewMode === 'list' ? (
-                    <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                      {availableDays.length > 0 ? availableDays.slice(0, 14).map((day) => (
+                    <div className="space-y-2 max-h-[350px] overflow-y-auto">
+                      {availableDays.length > 0 ? availableDays.map((day) => (
                         <button key={day.date} onClick={() => setSelectedDate(day.date)} className={`w-full p-4 rounded-xl border-2 text-left flex items-center justify-between ${selectedDate === day.date ? 'border-primary-500 bg-primary-50' : 'border-secondary-200 hover:border-primary-300'}`}>
                           <span className="font-medium capitalize">{formatDateShort(day.date)}</span>
                           <div className="flex gap-2">
                             {day.morning.available && <span className="text-xs px-2 py-1 bg-sky-100 text-sky-700 rounded">Matin</span>}
-                            {day.afternoon.available && <span className="text-xs px-2 py-1 bg-orange-100 text-orange-700 rounded">Après-midi</span>}
+                            {day.afternoon.available && <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded">Après-midi</span>}
                           </div>
                         </button>
-                      )) : <p className="text-center text-secondary-500 py-8">Aucune disponibilité</p>}
+                      )) : <p className="text-center text-secondary-500 py-8">Aucune disponibilité ce mois</p>}
                     </div>
                   ) : (
                     <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-secondary-100 rounded-lg"><ChevronLeft className="w-5 h-5" /></button>
-                        <span className="font-semibold">{MONTHS[month - 1]} {year}</span>
-                        <button onClick={() => changeMonth(1)} className="p-2 hover:bg-secondary-100 rounded-lg"><ChevronRight className="w-5 h-5" /></button>
-                      </div>
                       <div className="grid grid-cols-7 gap-1 mb-2">
                         {DAYS.map(d => <div key={d} className="text-center text-sm text-secondary-500 py-1">{d}</div>)}
                       </div>
@@ -460,16 +468,16 @@ export default function ReservationPage() {
                       <div className="space-y-3">
                         {availability.find(d => d.date === selectedDate)?.morning.available && (
                           <button onClick={() => selectSlot('MORNING')} className="w-full p-4 rounded-xl border-2 border-sky-200 bg-sky-50 hover:border-sky-400 flex items-center gap-4">
-                            <div className="w-12 h-12 bg-sky-500 rounded-xl flex items-center justify-center">
-                              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                            <div className="w-12 h-12 bg-sky-400 rounded-xl flex items-center justify-center">
+                              <Sun className="w-6 h-6 text-white" />
                             </div>
                             <div className="text-left"><p className="font-semibold">Matin</p><p className="text-sm text-secondary-500">8h - 12h</p></div>
                           </button>
                         )}
                         {availability.find(d => d.date === selectedDate)?.afternoon.available && (
-                          <button onClick={() => selectSlot('AFTERNOON')} className="w-full p-4 rounded-xl border-2 border-orange-200 bg-orange-50 hover:border-orange-400 flex items-center gap-4">
-                            <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
-                              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v1M12 20v1M4.22 4.22l.7.7M18.36 18.36l.7.7M1 12h1M20 12h1M4.22 19.78l.7-.7M18.36 5.64l.7-.7"/><path d="M12 6a6 6 0 0 0 0 12 6 6 0 0 0 0-12z"/><path d="M12 18c-3.31 0-6 2.69-6 6h12c0-3.31-2.69-6-6-6z" opacity=".3"/></svg>
+                          <button onClick={() => selectSlot('AFTERNOON')} className="w-full p-4 rounded-xl border-2 border-amber-200 bg-amber-50 hover:border-amber-400 flex items-center gap-4">
+                            <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
+                              <Sunset className="w-6 h-6 text-white" />
                             </div>
                             <div className="text-left"><p className="font-semibold">Après-midi</p><p className="text-sm text-secondary-500">14h - 18h</p></div>
                           </button>
@@ -490,7 +498,7 @@ export default function ReservationPage() {
           {/* Étape 5: Formulaire */}
           {step === 5 && (
             <div className="bg-white rounded-2xl shadow-soft p-8">
-              <button onClick={() => { setStep(4); setSelectedSlot(null); }} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Modifier créneau</button>
+              <button onClick={() => { setStep(4); setSelectedSlot(null); }} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
               
               <div className="bg-primary-50 border border-primary-100 rounded-xl p-4 mb-6">
                 <div className="flex items-center gap-4">

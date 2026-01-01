@@ -73,7 +73,7 @@ export default function TarifsPage() {
               { label: 'Poêle à bois', price: '80 €', note: 'Poêle à bûches, certificat inclus' },
               { label: 'Chaudière à fioul', price: '80 €', note: 'Conduit fioul, certificat inclus' },
               { label: 'Cheminée Polyflam', price: '90 €', note: 'Cheminée Polyflam, certificat inclus' },
-              { label: 'Conduit difficile', price: '100 €', note: 'Accès complexe ou conduit > 10m' },
+              { label: 'Conduit difficile', price: '110 €', note: 'Accès complexe ou conduit > 10m' },
             ].map((item, index) => (
               <div
                 key={index}
@@ -328,7 +328,7 @@ export default function TarifsPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
+              <a href={siteConfig.urls.booking} className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
                 <Calendar className="w-5 h-5" />
                 Demander un devis
                 <ArrowRight className="w-5 h-5" />
