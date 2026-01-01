@@ -44,5 +44,10 @@
     "prisma": "^6.0.0",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.0.0"
+  },
+  "overrides": {
+    "md-to-react-email": {
+      "react": "^19.0.0"
+    }
   }
 }
