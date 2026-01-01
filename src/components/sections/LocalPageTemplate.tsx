@@ -55,7 +55,7 @@ export function LocalPageTemplate({
             
             {/* CTA */}
             <div className="flex flex-col items-start gap-3">
-              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn-primary btn-lg">
+              <a href={siteConfig.urls.booking} className="btn-primary btn-lg">
                 <Calendar className="w-5 h-5" />
                 Prendre rendez-vous à {city}
                 <ArrowRight className="w-5 h-5" />
@@ -211,7 +211,7 @@ export function LocalPageTemplate({
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a href={siteConfig.urls.booking} target="_blank" rel="noopener noreferrer" className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
+              <a href={siteConfig.urls.booking} className="btn bg-primary-500 hover:bg-primary-600 text-white btn-lg">
                 <Calendar className="w-5 h-5" />
                 Prendre rendez-vous
               </a>
