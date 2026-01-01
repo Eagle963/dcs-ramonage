@@ -2,158 +2,118 @@
 
 import { useState } from 'react';
 import { 
-  Plus, Search, MoreHorizontal, Eye, Edit2, Trash2, 
-  ChevronLeft, ChevronRight, CreditCard, Banknote, Building2,
-  Smartphone, CheckCircle2
+  Search, ChevronDown, ChevronLeft, ChevronRight,
+  User, Calendar, CreditCard, Banknote, Building2,
+  Smartphone, Settings2, Download, XCircle
 } from 'lucide-react';
 
 interface Paiement {
   id: string;
-  reference: string;
-  facture: {
-    numero: string;
-    client: string;
-  };
-  date: string;
+  numero: string;
+  recuLe: string;
   montant: number;
-  mode: 'ESPECES' | 'CHEQUE' | 'VIREMENT' | 'CB' | 'PRELEVEMENT';
-  notes?: string;
+  modeIcone: 'CB' | 'ESPECES' | 'CHEQUE' | 'VIREMENT';
+  factureAssociee: string;
+  statutFacture: 'PAYEE' | 'PARTIEL';
+  commentaire?: string;
+  consignePar: string;
+  consigneLe: string;
 }
 
 const mockPaiements: Paiement[] = [
-  {
-    id: '1',
-    reference: 'P-2026-001',
-    facture: { numero: 'F-2026-001', client: 'Marie Martin' },
-    date: '2026-01-10',
-    montant: 384,
-    mode: 'VIREMENT',
-  },
-  {
-    id: '2',
-    reference: 'P-2026-002',
-    facture: { numero: 'F-2026-004', client: 'Sophie Leroy' },
-    date: '2026-01-12',
-    montant: 300,
-    mode: 'CB',
-    notes: 'Paiement partiel - solde à venir',
-  },
-  {
-    id: '3',
-    reference: 'P-2026-003',
-    facture: { numero: 'F-2025-098', client: 'Luc Petit' },
-    date: '2026-01-08',
-    montant: 150,
-    mode: 'CHEQUE',
-    notes: 'Chèque n°1234567',
-  },
-  {
-    id: '4',
-    reference: 'P-2026-004',
-    facture: { numero: 'F-2025-095', client: 'Emma Roux' },
-    date: '2026-01-05',
-    montant: 95,
-    mode: 'ESPECES',
-  },
-  {
-    id: '5',
-    reference: 'P-2026-005',
-    facture: { numero: 'F-2025-092', client: 'Paul Blanc' },
-    date: '2026-01-03',
-    montant: 220,
-    mode: 'PRELEVEMENT',
-  },
+  { id: '1', numero: 'P0324', recuLe: '31/12/2025', montant: 84, modeIcone: 'ESPECES', factureAssociee: 'F0347 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '01/01/2026 à 09h31' },
+  { id: '2', numero: 'P0323', recuLe: '29/12/2025', montant: 350, modeIcone: 'ESPECES', factureAssociee: 'F0348 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '29/12/2025 à 19h18' },
+  { id: '3', numero: 'P0322', recuLe: '26/12/2025', montant: 130, modeIcone: 'CHEQUE', factureAssociee: 'F0345 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '27/12/2025 à 11h19' },
+  { id: '4', numero: 'P0318', recuLe: '22/12/2025', montant: 150, modeIcone: 'ESPECES', factureAssociee: 'F0343 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '22/12/2025 à 23h22' },
+  { id: '5', numero: 'P0316', recuLe: '22/12/2025', montant: 180, modeIcone: 'CB', factureAssociee: 'F0341 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '22/12/2025 à 13h38' },
+  { id: '6', numero: 'P0317', recuLe: '22/12/2025', montant: 180, modeIcone: 'CB', factureAssociee: 'F0342 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '22/12/2025 à 13h41' },
+  { id: '7', numero: 'P0321', recuLe: '18/12/2025', montant: 80, modeIcone: 'VIREMENT', factureAssociee: 'F0344 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '22/12/2025 à 23h39' },
+  { id: '8', numero: 'P0315', recuLe: '17/12/2025', montant: 180, modeIcone: 'CB', factureAssociee: 'F0340 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '17/12/2025 à 19h53' },
+  { id: '9', numero: 'P0314', recuLe: '17/12/2025', montant: 70, modeIcone: 'CB', factureAssociee: 'F0339 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '17/12/2025 à 19h51' },
+  { id: '10', numero: 'P0320', recuLe: '15/12/2025', montant: 70, modeIcone: 'ESPECES', factureAssociee: 'F0337 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '22/12/2025 à 23h31' },
+  { id: '11', numero: 'P0319', recuLe: '15/12/2025', montant: 70, modeIcone: 'ESPECES', factureAssociee: 'F0335 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '22/12/2025 à 23h31' },
+  { id: '12', numero: 'P0312', recuLe: '12/12/2025', montant: 70, modeIcone: 'ESPECES', factureAssociee: 'F0333 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '13/12/2025 à 06h12' },
+  { id: '13', numero: 'P0311', recuLe: '12/12/2025', montant: 200, modeIcone: 'ESPECES', factureAssociee: 'F0331 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '13/12/2025 à 06h12' },
+  { id: '14', numero: 'P0313', recuLe: '12/12/2025', montant: 70, modeIcone: 'ESPECES', factureAssociee: 'F0332 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '22/12/2025 à 06h13' },
+  { id: '15', numero: 'P0310', recuLe: '11/12/2025', montant: 80, modeIcone: 'ESPECES', factureAssociee: 'F0334 Facture', statutFacture: 'PAYEE', consignePar: 'DCS RAMONAGE', consigneLe: '11/12/2025 à 10h55' },
 ];
 
-const modeConfig = {
-  ESPECES: { label: 'Espèces', icon: Banknote, color: 'bg-green-100 text-green-700' },
-  CHEQUE: { label: 'Chèque', icon: CreditCard, color: 'bg-blue-100 text-blue-700' },
-  VIREMENT: { label: 'Virement', icon: Building2, color: 'bg-purple-100 text-purple-700' },
-  CB: { label: 'Carte bancaire', icon: CreditCard, color: 'bg-amber-100 text-amber-700' },
-  PRELEVEMENT: { label: 'Prélèvement', icon: Smartphone, color: 'bg-cyan-100 text-cyan-700' },
+const modeIcons = {
+  CB: CreditCard,
+  ESPECES: Banknote,
+  CHEQUE: CreditCard,
+  VIREMENT: Building2,
 };
 
 export default function PaiementsPage() {
-  const [paiements, setPaiements] = useState<Paiement[]>(mockPaiements);
+  const [paiements] = useState<Paiement[]>(mockPaiements);
   const [searchQuery, setSearchQuery] = useState('');
-  const [modeFilter, setModeFilter] = useState<string>('ALL');
-  const [showActions, setShowActions] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'consignes' | 'primes'>('consignes');
 
-  const filteredPaiements = paiements.filter(p => {
-    const matchSearch = p.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.facture.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.facture.numero.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchMode = modeFilter === 'ALL' || p.mode === modeFilter;
-    return matchSearch && matchMode;
-  });
+  const filteredPaiements = paiements.filter(p =>
+    p.numero.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.factureAssociee.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  const formatMoney = (amount: number) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
-  const formatDate = (date: string) => new Date(date).toLocaleDateString('fr-FR');
-
-  const totalMois = paiements.reduce((acc, p) => acc + p.montant, 0);
-  const parMode = {
-    especes: paiements.filter(p => p.mode === 'ESPECES').reduce((acc, p) => acc + p.montant, 0),
-    cheque: paiements.filter(p => p.mode === 'CHEQUE').reduce((acc, p) => acc + p.montant, 0),
-    virement: paiements.filter(p => p.mode === 'VIREMENT').reduce((acc, p) => acc + p.montant, 0),
-    cb: paiements.filter(p => p.mode === 'CB').reduce((acc, p) => acc + p.montant, 0),
-  };
+  const formatMoney = (amount: number) => amount.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
   return (
     <div>
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        <div className="bg-white rounded-xl border border-secondary-100 p-4">
-          <p className="text-sm text-secondary-500">Total encaissé</p>
-          <p className="text-2xl font-bold text-green-600">{formatMoney(totalMois)}</p>
-          <p className="text-xs text-secondary-400">Ce mois</p>
-        </div>
-        <div className="bg-white rounded-xl border border-secondary-100 p-4">
-          <p className="text-sm text-secondary-500">Espèces</p>
-          <p className="text-xl font-bold">{formatMoney(parMode.especes)}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-secondary-100 p-4">
-          <p className="text-sm text-secondary-500">Chèques</p>
-          <p className="text-xl font-bold">{formatMoney(parMode.cheque)}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-secondary-100 p-4">
-          <p className="text-sm text-secondary-500">Virements</p>
-          <p className="text-xl font-bold">{formatMoney(parMode.virement)}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-secondary-100 p-4">
-          <p className="text-sm text-secondary-500">CB</p>
-          <p className="text-xl font-bold">{formatMoney(parMode.cb)}</p>
-        </div>
+      {/* Header actions */}
+      <div className="flex items-center justify-end gap-2 mb-4">
+        <button className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50 text-sm">
+          <Download className="w-4 h-4" />
+          Exporter
+        </button>
       </div>
 
-      {/* Actions bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-        <div className="flex items-center gap-2 flex-1">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
-            <input
-              type="text"
-              placeholder="Rechercher..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
-            />
-          </div>
-          <select
-            value={modeFilter}
-            onChange={(e) => setModeFilter(e.target.value)}
-            className="px-3 py-2 border border-secondary-200 rounded-lg text-sm"
-          >
-            <option value="ALL">Tous les modes</option>
-            <option value="ESPECES">Espèces</option>
-            <option value="CHEQUE">Chèque</option>
-            <option value="VIREMENT">Virement</option>
-            <option value="CB">Carte bancaire</option>
-            <option value="PRELEVEMENT">Prélèvement</option>
-          </select>
+      {/* Tabs */}
+      <div className="flex gap-4 mb-6">
+        <button
+          onClick={() => setActiveTab('consignes')}
+          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+            activeTab === 'consignes' 
+              ? 'bg-primary-50 text-primary-700' 
+              : 'text-secondary-600 hover:bg-secondary-50'
+          }`}
+        >
+          Consignés
+        </button>
+        <button
+          onClick={() => setActiveTab('primes')}
+          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+            activeTab === 'primes' 
+              ? 'bg-primary-50 text-primary-700' 
+              : 'text-secondary-600 hover:bg-secondary-50'
+          }`}
+        >
+          Primes
+        </button>
+      </div>
+
+      {/* Filters bar */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
+          <input
+            type="text"
+            placeholder="Filtrer par titre ou numéro de facture"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
+          />
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600">
-          <Plus className="w-4 h-4" />
-          Nouveau paiement
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+          <User className="w-4 h-4" /> Client
+        </button>
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+          <CreditCard className="w-4 h-4" /> Type
+        </button>
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+          <Calendar className="w-4 h-4" /> Date
+        </button>
+        <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
+          <XCircle className="w-4 h-4" /> Réinitialiser
         </button>
       </div>
 
@@ -163,69 +123,46 @@ export default function PaiementsPage() {
           <table className="w-full">
             <thead className="bg-secondary-50 border-b border-secondary-100">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Référence</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Facture</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Client</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Date</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-secondary-500 uppercase">Montant</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-secondary-500 uppercase">Mode</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Notes</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-secondary-500 uppercase">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500">Numéro</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500">Reçu le</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500">Montant reçu</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500">Facture associée</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-secondary-500">Statut de la facture</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500">Commentaire</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500">Consigné par</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500">Consigné le</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-secondary-100">
               {filteredPaiements.map((p) => {
-                const config = modeConfig[p.mode];
-                const ModeIcon = config.icon;
+                const ModeIcon = modeIcons[p.modeIcone];
                 return (
-                  <tr key={p.id} className="hover:bg-secondary-50">
+                  <tr key={p.id} className="hover:bg-secondary-50 cursor-pointer">
+                    <td className="px-4 py-3">
+                      <span className="inline-flex px-2 py-1 bg-secondary-100 text-secondary-700 text-xs font-mono rounded">
+                        {p.numero}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm">{p.recuLe}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        <span className="font-medium">{p.reference}</span>
+                        <ModeIcon className="w-4 h-4 text-secondary-400" />
+                        <span className="text-sm font-medium">{formatMoney(p.montant)}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-primary-600">{p.facture.numero}</span>
+                      <a href="#" className="text-primary-600 hover:underline text-sm">{p.factureAssociee}</a>
                     </td>
-                    <td className="px-4 py-3 font-medium">{p.facture.client}</td>
-                    <td className="px-4 py-3 text-sm">{formatDate(p.date)}</td>
-                    <td className="px-4 py-3 text-right font-bold text-green-600">{formatMoney(p.montant)}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-center">
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
-                          <ModeIcon className="w-3 h-3" />
-                          {config.label}
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                          € Payée
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-secondary-500 max-w-[200px] truncate">
-                      {p.notes || '-'}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-center relative">
-                        <button
-                          onClick={() => setShowActions(showActions === p.id ? null : p.id)}
-                          className="p-1 hover:bg-secondary-100 rounded"
-                        >
-                          <MoreHorizontal className="w-5 h-5 text-secondary-500" />
-                        </button>
-                        {showActions === p.id && (
-                          <div className="absolute right-0 top-8 z-10 bg-white border border-secondary-200 rounded-lg shadow-lg py-1 min-w-[140px]">
-                            <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50">
-                              <Eye className="w-4 h-4" /> Voir
-                            </button>
-                            <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50">
-                              <Edit2 className="w-4 h-4" /> Modifier
-                            </button>
-                            <hr className="my-1" />
-                            <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                              <Trash2 className="w-4 h-4" /> Supprimer
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </td>
+                    <td className="px-4 py-3 text-sm text-secondary-500">{p.commentaire || ''}</td>
+                    <td className="px-4 py-3 text-sm">{p.consignePar}</td>
+                    <td className="px-4 py-3 text-sm text-secondary-600">{p.consigneLe}</td>
                   </tr>
                 );
               })}
@@ -235,15 +172,29 @@ export default function PaiementsPage() {
 
         {/* Pagination */}
         <div className="flex items-center justify-between px-4 py-3 border-t border-secondary-100">
-          <p className="text-sm text-secondary-500">{filteredPaiements.length} paiements</p>
-          <div className="flex items-center gap-2">
-            <button className="p-1 hover:bg-secondary-100 rounded disabled:opacity-50" disabled>
-              <ChevronLeft className="w-5 h-5" />
+          <div></div>
+          <div className="flex items-center gap-4">
+            <button className="flex items-center gap-1 text-sm text-secondary-600 hover:text-secondary-800">
+              <Settings2 className="w-4 h-4" /> Personnaliser
             </button>
-            <span className="text-sm">Page 1 sur 1</span>
-            <button className="p-1 hover:bg-secondary-100 rounded disabled:opacity-50" disabled>
-              <ChevronRight className="w-5 h-5" />
-            </button>
+            <span className="text-secondary-300">|</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-secondary-600">Page 1 sur 2</span>
+              <div className="flex items-center">
+                <button className="p-1 hover:bg-secondary-100 rounded disabled:opacity-30" disabled>
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button className="p-1 hover:bg-secondary-100 rounded disabled:opacity-30" disabled>
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button className="p-1 hover:bg-secondary-100 rounded">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <button className="p-1 hover:bg-secondary-100 rounded">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

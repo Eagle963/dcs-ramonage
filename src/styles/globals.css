@@ -3,6 +3,28 @@
 @tailwind utilities;
 
 /* ============================================
+   LEAFLET MAP STYLES
+   ============================================ */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+}
+
+.leaflet-popup-content {
+  margin: 8px 12px;
+}
+
+/* ============================================
    VARIABLES CSS PERSONNALISÉES
    ============================================ */
 :root {
