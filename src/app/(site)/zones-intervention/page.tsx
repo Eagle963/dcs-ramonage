@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { 
   Calendar, 
@@ -10,6 +10,16 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { siteConfig } from '@/config/site';
+
+// Import dynamique pour éviter les erreurs SSR
+const ZonesMap = dynamic(() => import('@/components/map/ZonesMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[350px] w-full bg-secondary-100 flex items-center justify-center">
+      <p className="text-secondary-500">Chargement de la carte...</p>
+    </div>
+  ),
+});
 
 const zones = [
   {
@@ -42,102 +52,27 @@ const zones = [
   },
 ];
 
+// Villes pour les cartes avec coordonnées
+const villesOise = [
+  { name: 'Beauvais', lat: 49.4295, lng: 2.0807 },
+  { name: 'Creil', lat: 49.2583, lng: 2.4833 },
+  { name: 'Chantilly', lat: 49.1947, lng: 2.4711 },
+  { name: 'Senlis', lat: 49.2069, lng: 2.5864 },
+  { name: 'Méru', lat: 49.2364, lng: 2.1339 },
+  { name: 'Chambly', lat: 49.1656, lng: 2.2478 },
+];
+
+const villesValdoise = [
+  { name: 'Cergy', lat: 49.0364, lng: 2.0633 },
+  { name: 'Pontoise', lat: 49.0500, lng: 2.1000 },
+  { name: "L'Isle-Adam", lat: 49.1081, lng: 2.2283 },
+  { name: 'Argenteuil', lat: 48.9472, lng: 2.2467 },
+  { name: 'Taverny', lat: 49.0264, lng: 2.2258 },
+  { name: 'Ermont', lat: 48.9903, lng: 2.2578 },
+  { name: 'Persan', lat: 49.1531, lng: 2.2728 },
+];
+
 export default function ZonesInterventionPage() {
-  useEffect(() => {
-    // Charger Leaflet CSS
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-    document.head.appendChild(link);
-
-    // Charger Leaflet JS
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    script.onload = () => {
-      initMaps();
-    };
-    document.body.appendChild(script);
-
-    function initMaps() {
-      // @ts-expect-error Leaflet global
-      const L = window.L;
-      if (!L) return;
-
-      // Carte Oise
-      const mapOise = L.map('map-oise', { scrollWheelZoom: false }).setView([49.35, 2.4], 9);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap, © CARTO'
-      }).addTo(mapOise);
-
-      // Carte Val-d'Oise
-      const mapValdoise = L.map('map-valdoise', { scrollWheelZoom: false }).setView([49.05, 2.15], 10);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap, © CARTO'
-      }).addTo(mapValdoise);
-
-      // Charger GeoJSON
-      fetch('https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements-version-simplifiee.geojson')
-        .then(r => r.json())
-        .then(data => {
-          // Oise
-          const oise = data.features.find((f: { properties: { code: string } }) => f.properties.code === '60');
-          if (oise) {
-            L.geoJSON(oise, {
-              style: { fillColor: '#f97316', fillOpacity: 0.4, color: '#ea580c', weight: 2 }
-            }).addTo(mapOise);
-            mapOise.fitBounds(L.geoJSON(oise).getBounds(), { padding: [20, 20] });
-          }
-
-          // Val-d'Oise
-          const valdoise = data.features.find((f: { properties: { code: string } }) => f.properties.code === '95');
-          if (valdoise) {
-            L.geoJSON(valdoise, {
-              style: { fillColor: '#f97316', fillOpacity: 0.4, color: '#ea580c', weight: 2 }
-            }).addTo(mapValdoise);
-            mapValdoise.fitBounds(L.geoJSON(valdoise).getBounds(), { padding: [20, 20] });
-          }
-
-          // Villes Oise
-          const villesOise = [
-            { name: 'Beauvais', lat: 49.4295, lng: 2.0807 },
-            { name: 'Creil', lat: 49.2583, lng: 2.4833 },
-            { name: 'Chantilly', lat: 49.1947, lng: 2.4711 },
-            { name: 'Senlis', lat: 49.2069, lng: 2.5864 },
-            { name: 'Méru', lat: 49.2364, lng: 2.1339 },
-            { name: 'Chambly', lat: 49.1656, lng: 2.2478 }
-          ];
-          villesOise.forEach(v => {
-            L.circleMarker([v.lat, v.lng], {
-              radius: 6, fillColor: '#1e293b', fillOpacity: 1, color: '#fff', weight: 2
-            }).bindTooltip(v.name, { direction: 'top' }).addTo(mapOise);
-          });
-
-          // Villes Val-d'Oise
-          const villesValdoise = [
-            { name: 'Cergy', lat: 49.0364, lng: 2.0633 },
-            { name: 'Vauréal', lat: 49.0308, lng: 2.0297 },
-            { name: 'Pontoise', lat: 49.0500, lng: 2.1000 },
-            { name: "L'Isle-Adam", lat: 49.1081, lng: 2.2283 },
-            { name: 'Argenteuil', lat: 48.9472, lng: 2.2467 },
-            { name: 'Taverny', lat: 49.0264, lng: 2.2258 },
-            { name: 'Ermont', lat: 48.9903, lng: 2.2578 },
-            { name: 'Persan', lat: 49.1531, lng: 2.2728 }
-          ];
-          villesValdoise.forEach(v => {
-            L.circleMarker([v.lat, v.lng], {
-              radius: 6, fillColor: '#1e293b', fillOpacity: 1, color: '#fff', weight: 2
-            }).bindTooltip(v.name, { direction: 'top' }).addTo(mapValdoise);
-          });
-        });
-    }
-
-    return () => {
-      // Cleanup
-      link.remove();
-      script.remove();
-    };
-  }, []);
-
   return (
     <>
       {/* Hero */}
@@ -201,7 +136,12 @@ export default function ZonesInterventionPage() {
                 <h3 className="font-display font-bold text-lg text-secondary-900">Oise (60)</h3>
                 <p className="text-sm text-secondary-500">Sud du département couvert</p>
               </div>
-              <div id="map-oise" className="h-[350px] w-full"></div>
+              <ZonesMap 
+                departmentCode="60" 
+                cities={villesOise} 
+                center={[49.35, 2.4]} 
+                zoom={9} 
+              />
               <div className="p-3 bg-secondary-50 flex justify-center gap-6 text-sm">
                 <div className="flex items-center gap-2">
                   <span className="w-4 h-4 rounded bg-orange-500/70 border border-orange-600"></span>
@@ -220,7 +160,12 @@ export default function ZonesInterventionPage() {
                 <h3 className="font-display font-bold text-lg text-secondary-900">Val-d'Oise (95)</h3>
                 <p className="text-sm text-secondary-500">Tout le département couvert</p>
               </div>
-              <div id="map-valdoise" className="h-[350px] w-full"></div>
+              <ZonesMap 
+                departmentCode="95" 
+                cities={villesValdoise} 
+                center={[49.05, 2.15]} 
+                zoom={10} 
+              />
               <div className="p-3 bg-secondary-50 flex justify-center gap-6 text-sm">
                 <div className="flex items-center gap-2">
                   <span className="w-4 h-4 rounded bg-orange-500/70 border border-orange-600"></span>
