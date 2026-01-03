@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 
 interface Client {
   id: string;
+  reference: string;
   nom: string;
   prenom?: string;
   type: 'PARTICULIER' | 'PROFESSIONNEL';
@@ -19,6 +20,7 @@ interface Client {
   email?: string;
   nbInterventions: number;
   totalFacture: number;
+  archive: boolean;
 }
 
 interface ClientsMapProps {
