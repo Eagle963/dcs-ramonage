@@ -2,174 +2,125 @@
 
 import { useState } from 'react';
 import { 
-  Plus, Search, ArrowUpRight, ArrowDownLeft, Link2, 
-  ChevronLeft, ChevronRight, Building2, RefreshCw,
-  CheckCircle2, AlertCircle, HelpCircle
+  Search, ChevronDown, ChevronLeft, ChevronRight,
+  Calendar, Euro, XCircle, Settings2, RefreshCw
 } from 'lucide-react';
 
 interface Transaction {
   id: string;
   date: string;
+  debiteurCrediteur: string;
   libelle: string;
   montant: number;
-  type: 'CREDIT' | 'DEBIT';
-  rapprochement: 'RAPPROCHE' | 'EN_ATTENTE' | 'IGNORE';
-  documentLie?: string;
+  rapprochee: boolean;
+  documentAssocie?: string;
 }
 
 const mockTransactions: Transaction[] = [
-  {
-    id: '1',
-    date: '2026-01-10',
-    libelle: 'VIR MARIE MARTIN',
-    montant: 384,
-    type: 'CREDIT',
-    rapprochement: 'RAPPROCHE',
-    documentLie: 'F-2026-001',
-  },
-  {
-    id: '2',
-    date: '2026-01-12',
-    libelle: 'CB SOPHIE LEROY',
-    montant: 300,
-    type: 'CREDIT',
-    rapprochement: 'RAPPROCHE',
-    documentLie: 'F-2026-004',
-  },
-  {
-    id: '3',
-    date: '2026-01-05',
-    libelle: 'PRLV TOTALENERGIES',
-    montant: 100,
-    type: 'DEBIT',
-    rapprochement: 'RAPPROCHE',
-    documentLie: 'DEP-2026-001',
-  },
-  {
-    id: '4',
-    date: '2026-01-08',
-    libelle: 'CB BRICO DEPOT',
-    montant: 55,
-    type: 'DEBIT',
-    rapprochement: 'RAPPROCHE',
-    documentLie: 'DEP-2026-002',
-  },
-  {
-    id: '5',
-    date: '2026-01-15',
-    libelle: 'VIR CLIENT INCONNU',
-    montant: 150,
-    type: 'CREDIT',
-    rapprochement: 'EN_ATTENTE',
-  },
-  {
-    id: '6',
-    date: '2026-01-14',
-    libelle: 'FRAIS BANCAIRES',
-    montant: 12.50,
-    type: 'DEBIT',
-    rapprochement: 'IGNORE',
-  },
+  { id: '1', date: '02/01/2026', debiteurCrediteur: 'Google ADS7551779848', libelle: 'Google ADS7551779848 / MCC: 7311', montant: -123.90, rapprochee: false },
+  { id: '2', date: '31/12/2025', debiteurCrediteur: 'AMRTOP.NET', libelle: 'AMRTOP.NET / MCC: 5085', montant: -70.08, rapprochee: false },
+  { id: '3', date: '31/12/2025', debiteurCrediteur: 'SAS ATEMIA', libelle: 'DCS RAMONAGE FACTURE F0347 ATEMIA 291225', montant: 84.00, rapprochee: false },
+  { id: '4', date: '30/12/2025', debiteurCrediteur: 'TOTAL', libelle: 'TOTAL / MCC: 5542', montant: -15.07, rapprochee: false },
+  { id: '5', date: '30/12/2025', debiteurCrediteur: 'KARTHAGE', libelle: 'HONORAIRES KARTHAGE', montant: -210.00, rapprochee: false },
+  { id: '6', date: '26/12/2025', debiteurCrediteur: 'MME MOUTELIERE VERONIQUE OU M. MOUTELIERE ALAIN', libelle: '', montant: 130.00, rapprochee: false },
+  { id: '7', date: '24/12/2025', debiteurCrediteur: 'AUCHAN 0565C', libelle: 'AUCHAN 0565C / MCC: 5541', montant: -30.13, rapprochee: false },
+  { id: '8', date: '22/12/2025', debiteurCrediteur: 'M STEPHANE SANDERS', libelle: 'Nettoyage vitre veranda', montant: 330.00, rapprochee: false },
+  { id: '9', date: '19/12/2025', debiteurCrediteur: 'NORAUTO 219 PSC', libelle: 'NORAUTO 219 PSC / MCC: 5533', montant: -27.98, rapprochee: false },
+  { id: '10', date: '19/12/2025', debiteurCrediteur: 'WESTAFLEX-BATIMENT', libelle: '500057068', montant: -312.07, rapprochee: false },
+  { id: '11', date: '18/12/2025', debiteurCrediteur: 'CC GOINCOURT', libelle: 'CC GOINCOURT / MCC: 5542', montant: -70.39, rapprochee: false },
+  { id: '12', date: '18/12/2025', debiteurCrediteur: 'CO DEPOT', libelle: 'BRICO DEPOT / MCC: 5231', montant: -8.90, rapprochee: false },
+  { id: '13', date: '15/12/2025', debiteurCrediteur: 'M. DUPONT JEAN', libelle: 'FACTURE F0340', montant: 180.00, rapprochee: true, documentAssocie: 'F0340' },
+  { id: '14', date: '14/12/2025', debiteurCrediteur: 'MME MARTIN MARIE', libelle: 'FACTURE F0339', montant: 70.00, rapprochee: true, documentAssocie: 'F0339' },
+  { id: '15', date: '12/12/2025', debiteurCrediteur: 'AMAZON', libelle: 'AMAZON / MCC: 5999', montant: -45.99, rapprochee: true, documentAssocie: 'E00065' },
 ];
 
 export default function BanquePage() {
   const [transactions] = useState<Transaction[]>(mockTransactions);
   const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState<string>('ALL');
+  const [activeTab, setActiveTab] = useState<'rapprochees' | 'a_rapprocher'>('a_rapprocher');
 
   const filteredTransactions = transactions.filter(t => {
-    const matchSearch = t.libelle.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchType = typeFilter === 'ALL' || t.type === typeFilter;
-    return matchSearch && matchType;
+    const matchSearch = t.debiteurCrediteur.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.libelle.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchTab = activeTab === 'rapprochees' ? t.rapprochee : !t.rapprochee;
+    return matchSearch && matchTab;
   });
 
-  const formatMoney = (amount: number) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
-  const formatDate = (date: string) => new Date(date).toLocaleDateString('fr-FR');
-
-  const solde = transactions.reduce((acc, t) => t.type === 'CREDIT' ? acc + t.montant : acc - t.montant, 0);
-  const entrees = transactions.filter(t => t.type === 'CREDIT').reduce((acc, t) => acc + t.montant, 0);
-  const sorties = transactions.filter(t => t.type === 'DEBIT').reduce((acc, t) => acc + t.montant, 0);
-  const nonRapproche = transactions.filter(t => t.rapprochement === 'EN_ATTENTE').length;
-
-  const rapprochementConfig = {
-    RAPPROCHE: { icon: CheckCircle2, color: 'text-green-500', label: 'Rapproché' },
-    EN_ATTENTE: { icon: AlertCircle, color: 'text-amber-500', label: 'En attente' },
-    IGNORE: { icon: HelpCircle, color: 'text-secondary-400', label: 'Ignoré' },
+  const formatMoney = (amount: number) => {
+    const formatted = Math.abs(amount).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return amount >= 0 ? `${formatted} €` : `-${formatted} €`;
   };
+
+  // Calcul du solde
+  const solde = transactions.reduce((acc, t) => acc + t.montant, 2500); // Solde initial fictif
 
   return (
     <div>
-      {/* Compte bancaire */}
-      <div className="bg-white rounded-xl border border-secondary-100 p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-primary-600" />
-            </div>
-            <div>
-              <h2 className="font-semibold">Compte principal</h2>
-              <p className="text-sm text-secondary-500">FR76 1234 5678 9012 3456 7890 123</p>
-            </div>
+      {/* Carte compte bancaire */}
+      <div className="bg-white rounded-xl border border-secondary-100 p-6 mb-6 max-w-md">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-3xl font-bold text-secondary-900">
+              {solde.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+            </p>
+            <p className="text-sm text-secondary-500 mt-1 font-mono">
+              FR7630833830000045099424622
+            </p>
           </div>
-          <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
-            <RefreshCw className="w-4 h-4" />
-            Synchroniser
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">FINOM</span>
+            <button className="p-2 hover:bg-secondary-100 rounded-lg" title="Rafraîchir">
+              <RefreshCw className="w-4 h-4 text-secondary-500" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Filtres */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
+          <input
+            type="text"
+            placeholder="Filtrer par débiteur / créditeur ou libellé"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
+          />
+        </div>
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+          <Calendar className="w-4 h-4" /> Date de l'opération
+        </button>
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+          <Euro className="w-4 h-4" /> Montant
+        </button>
+        <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
+          <XCircle className="w-4 h-4" /> Réinitialiser
+        </button>
+
+        {/* Onglets à droite */}
+        <div className="ml-auto flex">
+          <button
+            onClick={() => setActiveTab('rapprochees')}
+            className={`px-4 py-2 text-sm font-medium rounded-l-lg border transition-colors ${
+              activeTab === 'rapprochees'
+                ? 'bg-primary-50 border-primary-500 text-primary-700 z-10'
+                : 'bg-white border-secondary-200 text-secondary-600 hover:bg-secondary-50'
+            }`}
+          >
+            Rapprochées
+          </button>
+          <button
+            onClick={() => setActiveTab('a_rapprocher')}
+            className={`px-4 py-2 text-sm font-medium rounded-r-lg border -ml-px transition-colors ${
+              activeTab === 'a_rapprocher'
+                ? 'bg-primary-50 border-primary-500 text-primary-700 z-10'
+                : 'bg-white border-secondary-200 text-secondary-600 hover:bg-secondary-50'
+            }`}
+          >
+            À rapprocher
           </button>
         </div>
-        <p className="text-sm text-secondary-500 mb-1">Solde actuel</p>
-        <p className="text-3xl font-bold text-secondary-900">{formatMoney(solde + 10000)}</p>
-        <p className="text-xs text-secondary-400 mt-1">Dernière sync: il y a 2 heures</p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl border border-secondary-100 p-4">
-          <p className="text-sm text-secondary-500">Entrées</p>
-          <p className="text-xl font-bold text-green-600">+{formatMoney(entrees)}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-secondary-100 p-4">
-          <p className="text-sm text-secondary-500">Sorties</p>
-          <p className="text-xl font-bold text-red-600">-{formatMoney(sorties)}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-secondary-100 p-4">
-          <p className="text-sm text-secondary-500">Balance</p>
-          <p className={`text-xl font-bold ${solde >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {formatMoney(solde)}
-          </p>
-        </div>
-        <div className="bg-white rounded-xl border border-secondary-100 p-4">
-          <p className="text-sm text-secondary-500">À rapprocher</p>
-          <p className="text-xl font-bold text-amber-600">{nonRapproche}</p>
-        </div>
-      </div>
-
-      {/* Actions bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-        <div className="flex items-center gap-2 flex-1">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
-            <input
-              type="text"
-              placeholder="Rechercher..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
-            />
-          </div>
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-2 border border-secondary-200 rounded-lg text-sm"
-          >
-            <option value="ALL">Tous</option>
-            <option value="CREDIT">Entrées</option>
-            <option value="DEBIT">Sorties</option>
-          </select>
-        </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600">
-          <Plus className="w-4 h-4" />
-          Ajouter manuellement
-        </button>
       </div>
 
       {/* Table */}
@@ -178,59 +129,71 @@ export default function BanquePage() {
           <table className="w-full">
             <thead className="bg-secondary-50 border-b border-secondary-100">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Date</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Libellé</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-secondary-500 uppercase">Montant</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-secondary-500 uppercase">Rapprochement</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-secondary-500 uppercase">Document</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500">Date</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500">Débiteur / créditeur</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500">Libellé</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-secondary-500">Montant</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-secondary-500">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-secondary-100">
-              {filteredTransactions.map((t) => {
-                const config = rapprochementConfig[t.rapprochement];
-                const StatusIcon = config.icon;
-                return (
+              {filteredTransactions.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-12 text-center text-secondary-500">
+                    Aucune transaction trouvée
+                  </td>
+                </tr>
+              ) : (
+                filteredTransactions.map((t) => (
                   <tr key={t.id} className="hover:bg-secondary-50">
-                    <td className="px-4 py-3 text-sm">{formatDate(t.date)}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        {t.type === 'CREDIT' ? (
-                          <ArrowDownLeft className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <ArrowUpRight className="w-4 h-4 text-red-500" />
-                        )}
-                        <span className="font-medium">{t.libelle}</span>
-                      </div>
-                    </td>
-                    <td className={`px-4 py-3 text-right font-bold ${t.type === 'CREDIT' ? 'text-green-600' : 'text-red-600'}`}>
-                      {t.type === 'CREDIT' ? '+' : '-'}{formatMoney(t.montant)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-center items-center gap-1">
-                        <StatusIcon className={`w-4 h-4 ${config.color}`} />
-                        <span className="text-sm text-secondary-500">{config.label}</span>
-                      </div>
+                    <td className="px-4 py-3 text-sm text-secondary-600">{t.date}</td>
+                    <td className="px-4 py-3 text-sm font-medium text-secondary-900">{t.debiteurCrediteur}</td>
+                    <td className="px-4 py-3 text-sm text-secondary-600 max-w-[300px] truncate">{t.libelle}</td>
+                    <td className={`px-4 py-3 text-sm font-medium text-right ${t.montant >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatMoney(t.montant)}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {t.documentLie ? (
-                        <span className="text-primary-600 text-sm flex items-center justify-center gap-1">
-                          <Link2 className="w-3 h-3" />
-                          {t.documentLie}
-                        </span>
-                      ) : t.rapprochement === 'EN_ATTENTE' ? (
-                        <button className="text-xs text-primary-600 hover:underline">Associer</button>
+                      {t.rapprochee ? (
+                        <span className="text-xs text-secondary-500">{t.documentAssocie}</span>
                       ) : (
-                        <span className="text-secondary-400">-</span>
+                        <button className="px-3 py-1.5 text-xs font-medium text-secondary-700 bg-secondary-100 hover:bg-secondary-200 rounded-lg transition-colors">
+                          Rapprocher...
+                        </button>
                       )}
                     </td>
                   </tr>
-                );
-              })}
+                ))
+              )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
         <div className="flex items-center justify-between px-4 py-3 border-t border-secondary-100">
-          <p className="text-sm text-secondary-500">{filteredTransactions.length} transactions</p>
+          <div></div>
+          <div className="flex items-center gap-4">
+            <button className="flex items-center gap-1 text-sm text-secondary-600 hover:text-secondary-800">
+              <Settings2 className="w-4 h-4" /> Personnaliser
+            </button>
+            <span className="text-secondary-300">|</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-secondary-600">Page 1 sur 1</span>
+              <div className="flex items-center">
+                <button className="p-1 hover:bg-secondary-100 rounded disabled:opacity-30" disabled>
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button className="p-1 hover:bg-secondary-100 rounded disabled:opacity-30" disabled>
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button className="p-1 hover:bg-secondary-100 rounded disabled:opacity-30" disabled>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <button className="p-1 hover:bg-secondary-100 rounded disabled:opacity-30" disabled>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

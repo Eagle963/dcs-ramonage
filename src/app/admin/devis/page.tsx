@@ -6,6 +6,8 @@ import {
   User, Calendar, Clock, CheckCircle2, XCircle, FileText,
   Send, Settings2, AlertTriangle, CalendarClock
 } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
+import DevisForm from '@/components/forms/DevisForm';
 
 interface Devis {
   id: string;
@@ -51,6 +53,12 @@ export default function DevisPage() {
   const [devis] = useState<Devis[]>(mockDevis);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('tous');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCreateDevis = (data: any) => {
+    console.log('Nouveau devis:', data);
+    setIsModalOpen(false);
+  };
 
   const filteredDevis = devis.filter(d => {
     const matchSearch = (d.numero?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
@@ -139,7 +147,10 @@ export default function DevisPage() {
     <div>
       {/* Header actions */}
       <div className="flex items-center justify-end gap-2 mb-4">
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium"
+        >
           <Plus className="w-4 h-4" />
           Nouveau devis
         </button>
@@ -335,6 +346,19 @@ export default function DevisPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal Nouveau Devis */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Nouveau devis"
+        size="xl"
+      >
+        <DevisForm
+          onSubmit={handleCreateDevis}
+          onCancel={() => setIsModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }

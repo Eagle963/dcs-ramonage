@@ -7,6 +7,8 @@ import {
   ChevronLeft, ChevronRight, ChevronDown, User, Calendar,
   FileText, RefreshCw, Settings2
 } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
+import FactureForm from '@/components/forms/FactureForm';
 
 interface Facture {
   id: string;
@@ -51,6 +53,12 @@ export default function FacturesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('toutes');
   const [showActions, setShowActions] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCreateFacture = (data: any) => {
+    console.log('Nouvelle facture:', data);
+    setIsModalOpen(false);
+  };
 
   const filteredFactures = factures.filter(f => {
     const matchSearch = f.numero.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -126,7 +134,10 @@ export default function FacturesPage() {
     <div>
       {/* Header actions */}
       <div className="flex items-center justify-end gap-2 mb-4">
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium"
+        >
           <Plus className="w-4 h-4" />
           Nouvelle facture
         </button>
@@ -298,6 +309,19 @@ export default function FacturesPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal Nouvelle Facture */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Nouvelle facture"
+        size="xl"
+      >
+        <FactureForm
+          onSubmit={handleCreateFacture}
+          onCancel={() => setIsModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }
