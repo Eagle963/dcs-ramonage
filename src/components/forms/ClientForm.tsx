@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { User, Building2, Home, Mail, Phone, Save, MapPin } from 'lucide-react';
 import AddressAutocomplete from './AddressAutocomplete';
-import CompanySearch from './CompanySearch';
+import CompanySearchInput from './CompanySearchInput';
 
 type ClientType = 'PARTICULIER' | 'PROFESSIONNEL' | 'SYNDIC';
+type Civilite = 'Mme' | 'M.' | 'M. et Mme.';
 
 interface ContactInfo {
-  prenom: string;
   nom: string;
+  prenom: string;
   email: string;
   telephone: string;
 }
@@ -33,9 +34,9 @@ interface EntrepriseInfo {
 interface ClientFormData {
   type: ClientType;
   // Particulier
-  civilite?: string;
-  prenom?: string;
+  civilite?: Civilite;
   nom?: string;
+  prenom?: string;
   email?: string;
   telephone?: string;
   // Adresse principale
@@ -54,48 +55,59 @@ interface ClientFormProps {
   isLoading?: boolean;
 }
 
-const defaultAddress: AddressInfo = {
+const defaultAddress = (): AddressInfo => ({
   adresse: '',
   complement: '',
   codePostal: '',
   ville: '',
-};
+});
 
-const defaultContact: ContactInfo = {
-  prenom: '',
+const defaultContact = (): ContactInfo => ({
   nom: '',
+  prenom: '',
   email: '',
   telephone: '',
-};
+});
 
-const defaultEntreprise: EntrepriseInfo = {
+const defaultEntreprise = (): EntrepriseInfo => ({
   raisonSociale: '',
   siret: '',
   tvaIntra: '',
   codeAPE: '',
-};
+});
 
 export default function ClientForm({ initialData, onSubmit, onCancel, isLoading }: ClientFormProps) {
   const [formData, setFormData] = useState<ClientFormData>({
     type: initialData?.type || 'PARTICULIER',
-    civilite: initialData?.civilite || '',
-    prenom: initialData?.prenom || '',
+    civilite: initialData?.civilite,
     nom: initialData?.nom || '',
+    prenom: initialData?.prenom || '',
     email: initialData?.email || '',
     telephone: initialData?.telephone || '',
-    adresse: initialData?.adresse || { ...defaultAddress },
-    entreprise: initialData?.entreprise || { ...defaultEntreprise },
-    contact: initialData?.contact || { ...defaultContact },
+    adresse: initialData?.adresse || defaultAddress(),
+    entreprise: initialData?.entreprise || defaultEntreprise(),
+    contact: initialData?.contact || defaultContact(),
     notes: initialData?.notes || '',
   });
 
   const handleTypeChange = (type: ClientType) => {
-    setFormData(prev => ({ ...prev, type }));
+    setFormData(prev => ({ 
+      ...prev, 
+      type,
+      // Reset les champs spécifiques
+      adresse: defaultAddress(),
+      entreprise: defaultEntreprise(),
+      contact: defaultContact(),
+    }));
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCiviliteChange = (civilite: Civilite) => {
+    setFormData(prev => ({ ...prev, civilite }));
   };
 
   const handleAddressSelect = (address: any) => {
@@ -134,6 +146,13 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
     }));
   };
 
+  const handleRaisonSocialeChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      entreprise: { ...prev.entreprise!, raisonSociale: value },
+    }));
+  };
+
   const handleContactChange = (field: keyof ContactInfo, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -159,6 +178,12 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
     e.preventDefault();
     onSubmit(formData);
   };
+
+  const civiliteOptions: { value: Civilite; label: string }[] = [
+    { value: 'Mme', label: 'Madame' },
+    { value: 'M.', label: 'Monsieur' },
+    { value: 'M. et Mme.', label: 'M. et Mme.' },
+  ];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -205,7 +230,7 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
         </div>
       </div>
 
-      {/* Formulaire Particulier */}
+      {/* ============ FORMULAIRE PARTICULIER ============ */}
       {formData.type === 'PARTICULIER' && (
         <>
           <div className="bg-secondary-50 rounded-xl p-4 space-y-4">
@@ -213,19 +238,38 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
               <User className="w-4 h-4" /> Informations personnelles
             </h3>
             
-            <div className="grid grid-cols-4 gap-4">
+            {/* Civilité - Boutons radio */}
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 mb-2">Civilité</label>
+              <div className="flex gap-4">
+                {civiliteOptions.map((option) => (
+                  <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="civilite"
+                      checked={formData.civilite === option.value}
+                      onChange={() => handleCiviliteChange(option.value)}
+                      className="w-4 h-4 text-primary-500 border-secondary-300 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-secondary-700">{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Nom puis Prénom */}
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Civilité</label>
-                <select
-                  name="civilite"
-                  value={formData.civilite}
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Nom *</label>
+                <input
+                  type="text"
+                  name="nom"
+                  value={formData.nom}
                   onChange={handleChange}
-                  className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg bg-white"
-                >
-                  <option value="">-</option>
-                  <option value="M.">M.</option>
-                  <option value="Mme">Mme</option>
-                </select>
+                  required
+                  className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg"
+                  placeholder="Nom de famille"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Prénom</label>
@@ -238,20 +282,9 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
                   placeholder="Prénom"
                 />
               </div>
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Nom *</label>
-                <input
-                  type="text"
-                  name="nom"
-                  value={formData.nom}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg"
-                  placeholder="Nom de famille"
-                />
-              </div>
             </div>
 
+            {/* Email & Téléphone */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">
@@ -337,7 +370,7 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
         </>
       )}
 
-      {/* Formulaire Professionnel */}
+      {/* ============ FORMULAIRE PROFESSIONNEL ============ */}
       {formData.type === 'PROFESSIONNEL' && (
         <>
           <div className="bg-purple-50 rounded-xl p-4 space-y-4">
@@ -345,25 +378,15 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
               <Building2 className="w-4 h-4" /> Entreprise
             </h3>
             
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">Rechercher une entreprise</label>
-              <CompanySearch onSelect={handleCompanySelect} />
-              <p className="text-xs text-secondary-500 mt-1">Recherchez par nom ou SIRET pour remplir automatiquement</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Raison sociale *</label>
-                <input
-                  type="text"
-                  value={formData.entreprise?.raisonSociale}
-                  onChange={(e) => handleEntrepriseChange('raisonSociale', e.target.value)}
-                  required
-                  className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg"
-                  placeholder="Nom de l'entreprise"
-                />
-              </div>
-            </div>
+            {/* Raison sociale avec recherche intégrée */}
+            <CompanySearchInput
+              value={formData.entreprise?.raisonSociale || ''}
+              onChange={handleRaisonSocialeChange}
+              onCompanySelect={handleCompanySelect}
+              label="Raison sociale"
+              required
+              placeholder="Tapez le nom ou SIRET de l'entreprise..."
+            />
           </div>
 
           {/* Adresse entreprise */}
@@ -426,20 +449,20 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Prénom du contact</label>
-                <input
-                  type="text"
-                  value={formData.contact?.prenom}
-                  onChange={(e) => handleContactChange('prenom', e.target.value)}
-                  className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg"
-                />
-              </div>
-              <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Nom du contact</label>
                 <input
                   type="text"
                   value={formData.contact?.nom}
                   onChange={(e) => handleContactChange('nom', e.target.value)}
+                  className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Prénom du contact</label>
+                <input
+                  type="text"
+                  value={formData.contact?.prenom}
+                  onChange={(e) => handleContactChange('prenom', e.target.value)}
                   className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg"
                 />
               </div>
@@ -505,7 +528,7 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
         </>
       )}
 
-      {/* Formulaire Syndic */}
+      {/* ============ FORMULAIRE SYNDIC ============ */}
       {formData.type === 'SYNDIC' && (
         <>
           <div className="bg-amber-50 rounded-xl p-4 space-y-4">
@@ -513,25 +536,15 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
               <Home className="w-4 h-4" /> Syndicat de copropriété
             </h3>
             
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">Rechercher le syndic</label>
-              <CompanySearch 
-                onSelect={handleCompanySelect}
-                placeholder="Rechercher le syndic (nom ou SIRET)..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-1">Nom du syndicat de copropriété *</label>
-              <input
-                type="text"
-                value={formData.entreprise?.raisonSociale}
-                onChange={(e) => handleEntrepriseChange('raisonSociale', e.target.value)}
-                required
-                className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg"
-                placeholder="Ex: Syndic Foncia, Nexity..."
-              />
-            </div>
+            {/* Nom du syndic avec recherche intégrée */}
+            <CompanySearchInput
+              value={formData.entreprise?.raisonSociale || ''}
+              onChange={handleRaisonSocialeChange}
+              onCompanySelect={handleCompanySelect}
+              label="Nom du syndicat de copropriété"
+              required
+              placeholder="Tapez le nom ou SIRET du syndic..."
+            />
           </div>
 
           {/* Adresse syndic */}
@@ -593,20 +606,20 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-secondary-700 mb-1">Prénom du contact</label>
-                <input
-                  type="text"
-                  value={formData.contact?.prenom}
-                  onChange={(e) => handleContactChange('prenom', e.target.value)}
-                  className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg"
-                />
-              </div>
-              <div>
                 <label className="block text-sm font-medium text-secondary-700 mb-1">Nom du contact</label>
                 <input
                   type="text"
                   value={formData.contact?.nom}
                   onChange={(e) => handleContactChange('nom', e.target.value)}
+                  className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">Prénom du contact</label>
+                <input
+                  type="text"
+                  value={formData.contact?.prenom}
+                  onChange={(e) => handleContactChange('prenom', e.target.value)}
                   className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg"
                 />
               </div>
