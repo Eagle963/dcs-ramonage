@@ -85,7 +85,7 @@ export default function DepensesPage() {
     <div>
       {/* Header actions */}
       <div className="flex items-center justify-end gap-2 mb-4">
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium">
+        <button className="btn-primary">
           <Plus className="w-4 h-4" />
           Ajouter
           <ChevronDown className="w-4 h-4" />
@@ -136,19 +136,19 @@ export default function DepensesPage() {
             className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
           />
         </div>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <Building2 className="w-4 h-4" /> Fournisseur
         </button>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <Calendar className="w-4 h-4" /> Date
         </button>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <Euro className="w-4 h-4" /> Montant TTC
         </button>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <Filter className="w-4 h-4" /> Catégorie
         </button>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <Filter className="w-4 h-4" /> Tous les filtres
         </button>
         <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">

@@ -149,12 +149,12 @@ export default function DevisPage() {
       <div className="flex items-center justify-end gap-2 mb-4">
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium"
+          className="btn-primary"
         >
           <Plus className="w-4 h-4" />
           Nouveau devis
         </button>
-        <button className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50 text-sm">
+        <button className="btn-outline">
           Actions
           <ChevronDown className="w-4 h-4" />
         </button>
@@ -224,19 +224,19 @@ export default function DevisPage() {
             className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
           />
         </div>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <User className="w-4 h-4" /> Client
         </button>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <Calendar className="w-4 h-4" /> Date
         </button>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <Clock className="w-4 h-4" /> Expiré
         </button>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <CalendarClock className="w-4 h-4" /> À planifier
         </button>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <Filter className="w-4 h-4" /> Tous les filtres
         </button>
         <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">

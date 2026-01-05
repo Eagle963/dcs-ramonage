@@ -88,10 +88,10 @@ export default function BanquePage() {
             className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
           />
         </div>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <Calendar className="w-4 h-4" /> Date de l'opération
         </button>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+        <button className="btn-outline btn-sm">
           <Euro className="w-4 h-4" /> Montant
         </button>
         <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">

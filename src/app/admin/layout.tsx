@@ -50,9 +50,11 @@ const menuSections: { title: string; items: MenuItem[] }[] = [
     title: 'OPÉRATIONS',
     items: [
       { label: 'Tableau de bord', href: '/admin', icon: LayoutDashboard },
-      { label: 'Planning', href: '/admin/planning', icon: Calendar },
+      { label: 'Calendrier', href: '/admin/calendrier', icon: Calendar },
+      { label: 'Tâches', href: '/admin/taches', icon: ClipboardList },
+      { label: 'Chantiers', href: '/admin/chantiers', icon: Wrench },
+      { label: 'Maintenances', href: '/admin/maintenances', icon: Settings },
       { label: 'Demandes', href: '/admin/demandes', icon: ClipboardList, badge: 3 },
-      { label: 'Clients', href: '/admin/clients', icon: Users },
     ],
   },
   {
@@ -102,11 +104,7 @@ const menuSections: { title: string; items: MenuItem[] }[] = [
   {
     title: 'PARAMÈTRES',
     items: [
-      { label: 'Personnalisation', href: '/admin/parametres?tab=personnalisation', icon: Settings },
-      { label: 'Chantiers', href: '/admin/parametres?tab=chantiers', icon: Wrench },
-      { label: 'Calendrier', href: '/admin/parametres?tab=calendrier', icon: Calendar },
-      { label: 'Devis et factures', href: '/admin/parametres?tab=devis-factures', icon: FileText },
-      { label: 'Paiements', href: '/admin/parametres?tab=paiements', icon: CreditCard },
+      { label: 'Paramètres', href: '/admin/parametres', icon: Settings },
     ],
   },
 ];
@@ -358,11 +356,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {pathname === '/admin' && (
                 <span className="text-secondary-900 font-medium">Tableau de bord</span>
               )}
-              {pathname === '/admin/planning' && (
+              {pathname === '/admin/calendrier' && (
                 <>
                   <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Opérations</Link>
                   <ChevronRight className="w-4 h-4 text-secondary-400" />
-                  <span className="text-secondary-900 font-medium">Planning</span>
+                  <span className="text-secondary-900 font-medium">Calendrier</span>
                 </>
               )}
               {pathname === '/admin/demandes' && (
@@ -372,9 +370,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <span className="text-secondary-900 font-medium">Demandes</span>
                 </>
               )}
-              {pathname === '/admin/clients' && (
+              {pathname === '/admin/maintenances' && (
                 <>
                   <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Opérations</Link>
+                  <ChevronRight className="w-4 h-4 text-secondary-400" />
+                  <span className="text-secondary-900 font-medium">Maintenances</span>
+                </>
+              )}
+              {pathname === '/admin/taches' && (
+                <>
+                  <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Opérations</Link>
+                  <ChevronRight className="w-4 h-4 text-secondary-400" />
+                  <span className="text-secondary-900 font-medium">Tâches</span>
+                </>
+              )}
+              {pathname === '/admin/chantiers' && (
+                <>
+                  <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Opérations</Link>
+                  <ChevronRight className="w-4 h-4 text-secondary-400" />
+                  <span className="text-secondary-900 font-medium">Chantiers</span>
+                </>
+              )}
+              {pathname === '/admin/crm/clients' && (
+                <>
+                  <Link href="/admin" className="text-secondary-500 hover:text-primary-600">Outils</Link>
+                  <ChevronRight className="w-4 h-4 text-secondary-400" />
+                  <span className="text-secondary-500">CRM</span>
                   <ChevronRight className="w-4 h-4 text-secondary-400" />
                   <span className="text-secondary-900 font-medium">Clients</span>
                 </>
