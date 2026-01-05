@@ -359,6 +359,7 @@ export default function ClientsPage() {
             <div className="h-[calc(100vh-280px)] min-h-[500px]">
               <ClientsMap 
                 clients={filteredClients}
+                selectedClientId={selectedClient?.id}
                 onClientClick={(client) => setSelectedClient(client)}
               />
             </div>
@@ -372,6 +373,10 @@ export default function ClientsPage() {
               <div className="flex items-center gap-1">
                 <div className="w-4 h-4 rounded-full bg-purple-500 flex items-center justify-center text-[8px] text-white">🏢</div>
                 <span>Professionnel</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 rounded-full bg-orange-500 flex items-center justify-center text-[8px] text-white">●</div>
+                <span>Sélectionné</span>
               </div>
             </div>
           </div>

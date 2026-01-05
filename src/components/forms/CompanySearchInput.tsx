@@ -38,6 +38,7 @@ export default function CompanySearchInput({
   const [results, setResults] = useState<CompanyResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [hasSelected, setHasSelected] = useState(false); // Flag pour bloquer la recherche après sélection
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -46,16 +47,22 @@ export default function CompanySearchInput({
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setResults([]);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Recherche avec debounce
+  // Recherche avec debounce - seulement si pas de sélection récente
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
+    }
+
+    // Si on vient de sélectionner, ne pas relancer la recherche
+    if (hasSelected) {
+      return;
     }
 
     if (value.length < 3) {
@@ -76,7 +83,6 @@ export default function CompanySearchInput({
           const siege = item.siege;
           const siren = item.siren || '';
           
-          // Calculer le numéro TVA intracommunautaire
           const tvaKey = (12 + 3 * (parseInt(siren) % 97)) % 97;
           const tvaIntra = siren ? `FR${tvaKey.toString().padStart(2, '0')}${siren}` : '';
           
@@ -111,17 +117,26 @@ export default function CompanySearchInput({
         clearTimeout(debounceRef.current);
       }
     };
-  }, [value]);
+  }, [value, hasSelected]);
 
   const handleSelect = (company: CompanyResult) => {
-    onChange(company.nom);
+    setHasSelected(true); // Bloquer la recherche
     setIsOpen(false);
     setResults([]);
+    onChange(company.nom);
     onCompanySelect(company);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHasSelected(false); // Réactiver la recherche quand l'utilisateur tape
     onChange(e.target.value);
+  };
+
+  const handleFocus = () => {
+    // Ne réouvrir que si pas de sélection récente et qu'il y a des résultats
+    if (!hasSelected && results.length > 0) {
+      setIsOpen(true);
+    }
   };
 
   return (
@@ -134,7 +149,7 @@ export default function CompanySearchInput({
           type="text"
           value={value}
           onChange={handleInputChange}
-          onFocus={() => results.length > 0 && setIsOpen(true)}
+          onFocus={handleFocus}
           placeholder={placeholder}
           required={required}
           className="w-full px-3 py-2.5 border border-secondary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"

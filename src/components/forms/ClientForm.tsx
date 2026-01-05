@@ -127,6 +127,11 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
   };
 
   const handleCompanySelect = (company: any) => {
+    // Construire l'adresse complète pour l'affichage
+    const adresseComplete = [company.adresse, company.codePostal, company.ville]
+      .filter(Boolean)
+      .join(', ');
+    
     setFormData(prev => ({
       ...prev,
       entreprise: {
@@ -137,7 +142,7 @@ export default function ClientForm({ initialData, onSubmit, onCancel, isLoading 
       },
       adresse: {
         ...prev.adresse,
-        adresse: company.adresse,
+        adresse: adresseComplete, // Adresse complète pour l'affichage
         codePostal: company.codePostal,
         ville: company.ville,
         lat: company.lat,

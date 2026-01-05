@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -96,15 +96,17 @@ const menuSections: { title: string; items: MenuItem[] }[] = [
         ],
       },
       { label: 'Tableaux de bord', href: '/admin/tableaux-de-bord', icon: BarChart3 },
+      { label: 'Mon entreprise', href: '/admin/entreprise', icon: Building2 },
     ],
   },
   {
     title: 'PARAMÈTRES',
     items: [
-      { label: 'Mon entreprise', href: '/admin/entreprise', icon: Building2 },
-      { label: 'Tarifs', href: '/admin/parametres?tab=tarifs', icon: Euro },
-      { label: 'Zones', href: '/admin/parametres?tab=zones', icon: MapPin },
-      { label: 'Paramètres', href: '/admin/parametres', icon: Settings },
+      { label: 'Personnalisation', href: '/admin/parametres?tab=personnalisation', icon: Settings },
+      { label: 'Chantiers', href: '/admin/parametres?tab=chantiers', icon: Wrench },
+      { label: 'Calendrier', href: '/admin/parametres?tab=calendrier', icon: Calendar },
+      { label: 'Devis et factures', href: '/admin/parametres?tab=devis-factures', icon: FileText },
+      { label: 'Paiements', href: '/admin/parametres?tab=paiements', icon: CreditCard },
     ],
   },
 ];
@@ -115,6 +117,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['Ventes']);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Fermer le menu profil au clic extérieur
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toggleMenu = (label: string) => {
     setExpandedMenus(prev => 
@@ -279,7 +293,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           )}
           
           {/* User */}
-          <div className="relative">
+          <div className="relative" ref={userMenuRef}>
             <button 
               onClick={() => setShowUserMenu(!showUserMenu)}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary-50"

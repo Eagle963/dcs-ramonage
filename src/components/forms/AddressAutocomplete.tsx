@@ -30,24 +30,38 @@ export default function AddressAutocomplete({
   const [results, setResults] = useState<AddressResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [hasSelected, setHasSelected] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Synchroniser query avec value externe (quand on sélectionne une entreprise)
+  useEffect(() => {
+    if (value !== query) {
+      setQuery(value);
+      setHasSelected(true); // Bloquer la recherche quand la valeur vient de l'extérieur
+    }
+  }, [value]);
 
   // Fermer le dropdown quand on clique ailleurs
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setResults([]);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Recherche avec debounce
+  // Recherche avec debounce - seulement si pas de sélection récente
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
+    }
+
+    if (hasSelected) {
+      return;
     }
 
     if (query.length < 3) {
@@ -89,18 +103,27 @@ export default function AddressAutocomplete({
         clearTimeout(debounceRef.current);
       }
     };
-  }, [query]);
+  }, [query, hasSelected]);
 
   const handleSelect = (address: AddressResult) => {
+    setHasSelected(true);
     setQuery(address.label);
     setIsOpen(false);
+    setResults([]);
     onChange(address);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHasSelected(false); // Réactiver la recherche
     setQuery(e.target.value);
     if (e.target.value === '') {
       onChange(null);
+    }
+  };
+
+  const handleFocus = () => {
+    if (!hasSelected && results.length > 0) {
+      setIsOpen(true);
     }
   };
 
@@ -112,7 +135,7 @@ export default function AddressAutocomplete({
           type="text"
           value={query}
           onChange={handleInputChange}
-          onFocus={() => results.length > 0 && setIsOpen(true)}
+          onFocus={handleFocus}
           placeholder={placeholder}
           required={required}
           className="w-full pl-10 pr-10 py-2.5 border border-secondary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"

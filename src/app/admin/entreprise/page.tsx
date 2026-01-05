@@ -113,6 +113,7 @@ export default function EntreprisePage() {
   });
 
   const [modules, setModules] = useState<Module[]>([
+    { id: 'rdv-en-ligne', name: 'RDV en ligne', description: 'Permettez à vos clients de prendre rendez-vous directement depuis votre site web. Widget intégrable avec lien externe.', enabled: true, link: 'Configurer' },
     { id: 'devis-factures', name: 'Devis / Factures', description: 'Conçu avec l\'expérience du terrain, vous éditez vos devis en quelques clics puis les facturez depuis le WEB ou sur le terrain avec l\'application mobile.', enabled: true, link: 'En savoir plus' },
     { id: 'depenses', name: 'Dépenses & bons de commande', description: 'Suivez vos dépenses, générez vos bons de commandes fournisseurs et pilotez votre marge.', enabled: true },
     { id: 'chantiers', name: 'Suivi de chantiers', description: 'Pour les chefs d\'entreprises qui veulent en finir avec les problèmes d\'organisation et de suivi sur les chantiers.', enabled: false },
