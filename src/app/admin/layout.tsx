@@ -55,6 +55,7 @@ const menuSections: { title: string; items: MenuItem[] }[] = [
       { label: 'Chantiers', href: '/admin/chantiers', icon: Wrench },
       { label: 'Maintenances', href: '/admin/maintenances', icon: Settings },
       { label: 'Demandes', href: '/admin/demandes', icon: ClipboardList, badge: 3 },
+      { label: 'RDV en ligne', href: '/admin/rdv-en-ligne', icon: Calendar },
     ],
   },
   {
@@ -366,6 +367,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <Link href="/admin/calendrier" className="text-secondary-500 hover:text-primary-600">Opérations</Link>
                   <ChevronRight className="w-4 h-4 text-secondary-400" />
                   <span className="text-secondary-900 font-medium">Chantiers</span>
+                </>
+              )}
+              {pathname === '/admin/rdv-en-ligne' && (
+                <>
+                  <Link href="/admin/calendrier" className="text-secondary-500 hover:text-primary-600">Opérations</Link>
+                  <ChevronRight className="w-4 h-4 text-secondary-400" />
+                  <span className="text-secondary-900 font-medium">RDV en ligne</span>
                 </>
               )}
               {pathname === '/admin/tableaux-de-bord' && (

@@ -15,11 +15,14 @@ interface DateRangePickerProps {
 }
 
 const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+const DAYS = ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di'];
 
 export default function DateRangePicker({ value, onChange, placeholder = "Sélectionner une période" }: DateRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [leftMonth, setLeftMonth] = useState(new Date(2026, 0, 1)); // Janvier 2026
+  const [leftMonth, setLeftMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
   const [selecting, setSelecting] = useState<'start' | 'end'>('start');
   const [tempRange, setTempRange] = useState<DateRange>(value);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -58,12 +61,13 @@ export default function DateRangePicker({ value, onChange, placeholder = "Sélec
     setLeftMonth(new Date(leftMonth.getFullYear(), leftMonth.getMonth() + direction, 1));
   };
 
-  const getMonthDays = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
+  const getMonthDays = (monthDate: Date) => {
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     
+    // Lundi = 0, Dimanche = 6
     let startDayOfWeek = firstDay.getDay() - 1;
     if (startDayOfWeek < 0) startDayOfWeek = 6;
     
@@ -98,24 +102,30 @@ export default function DateRangePicker({ value, onChange, placeholder = "Sélec
     return days;
   };
 
+  const isSameDay = (d1: Date, d2: Date) => {
+    return d1.getDate() === d2.getDate() && 
+           d1.getMonth() === d2.getMonth() && 
+           d1.getFullYear() === d2.getFullYear();
+  };
+
   const isInRange = (date: Date) => {
     if (!tempRange.start || !tempRange.end) return false;
-    return date >= tempRange.start && date <= tempRange.end;
+    const time = date.getTime();
+    return time > tempRange.start.getTime() && time < tempRange.end.getTime();
   };
 
   const isRangeStart = (date: Date) => {
     if (!tempRange.start) return false;
-    return date.toDateString() === tempRange.start.toDateString();
+    return isSameDay(date, tempRange.start);
   };
 
   const isRangeEnd = (date: Date) => {
     if (!tempRange.end) return false;
-    return date.toDateString() === tempRange.end.toDateString();
+    return isSameDay(date, tempRange.end);
   };
 
   const isToday = (date: Date) => {
-    const today = new Date();
-    return date.toDateString() === today.toDateString();
+    return isSameDay(date, new Date());
   };
 
   const handleDateClick = (date: Date) => {
@@ -125,15 +135,12 @@ export default function DateRangePicker({ value, onChange, placeholder = "Sélec
     } else {
       if (tempRange.start && date < tempRange.start) {
         setTempRange({ start: date, end: tempRange.start });
+        onChange({ start: date, end: tempRange.start });
       } else {
-        setTempRange({ ...tempRange, end: date });
+        setTempRange({ start: tempRange.start, end: date });
+        onChange({ start: tempRange.start, end: date });
       }
       setSelecting('start');
-      // Appliquer la sélection
-      const newRange = date < (tempRange.start || date) 
-        ? { start: date, end: tempRange.start }
-        : { start: tempRange.start, end: date };
-      onChange(newRange);
     }
   };
 
@@ -145,7 +152,8 @@ export default function DateRangePicker({ value, onChange, placeholder = "Sélec
 
     switch (preset) {
       case 'today':
-        start = end = new Date(today);
+        start = new Date(today);
+        end = new Date(today);
         break;
       case 'thisWeek':
         start = new Date(today);
@@ -180,7 +188,6 @@ export default function DateRangePicker({ value, onChange, placeholder = "Sélec
         end = new Date(today.getFullYear() - 1, 11, 31);
         break;
       case 'fiscalYear':
-        // Exercice comptable actuel (1er janvier au 31 décembre)
         start = new Date(today.getFullYear(), 0, 1);
         end = new Date(today.getFullYear(), 11, 31);
         break;
@@ -220,47 +227,73 @@ export default function DateRangePicker({ value, onChange, placeholder = "Sélec
     const days = getMonthDays(monthDate);
     
     return (
-      <div>
-        <div className="text-center font-medium text-secondary-900 mb-3">
-          {MONTHS[monthDate.getMonth()]}, {monthDate.getFullYear()}
+      <div style={{ width: '224px' }}>
+        {/* Titre du mois */}
+        <div className="text-center font-medium text-secondary-900 mb-3 text-sm">
+          {MONTHS[monthDate.getMonth()]} {monthDate.getFullYear()}
         </div>
         
         {/* En-têtes jours */}
-        <div className="grid grid-cols-7 gap-1 mb-1">
-          {DAYS.map(day => (
-            <div key={day} className="text-center text-xs font-medium text-secondary-500 py-1">
-              {day}
-            </div>
-          ))}
-        </div>
-        
-        {/* Grille des jours */}
-        <div className="grid grid-cols-7 gap-1">
-          {days.map((day, index) => {
-            const inRange = isInRange(day.date);
-            const rangeStart = isRangeStart(day.date);
-            const rangeEnd = isRangeEnd(day.date);
-            const today = isToday(day.date);
-            
-            return (
-              <button
-                key={index}
-                type="button"
-                onClick={() => handleDateClick(day.date)}
-                className={`
-                  relative w-8 h-8 text-sm rounded-full flex items-center justify-center transition-colors
-                  ${!day.isCurrentMonth ? 'text-secondary-300' : 'text-secondary-700'}
-                  ${inRange && !rangeStart && !rangeEnd ? 'bg-primary-100' : ''}
-                  ${rangeStart || rangeEnd ? 'bg-primary-500 text-white' : ''}
-                  ${today && !rangeStart && !rangeEnd ? 'ring-2 ring-primary-500 ring-offset-1' : ''}
-                  ${day.isCurrentMonth && !inRange && !rangeStart && !rangeEnd ? 'hover:bg-secondary-100' : ''}
-                `}
-              >
-                {day.date.getDate()}
-              </button>
-            );
-          })}
-        </div>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr>
+              {DAYS.map(day => (
+                <th key={day} className="w-8 h-8 text-xs font-medium text-secondary-500 text-center">
+                  {day}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {/* Diviser days en semaines de 7 jours */}
+            {Array.from({ length: 6 }).map((_, weekIndex) => (
+              <tr key={weekIndex}>
+                {days.slice(weekIndex * 7, weekIndex * 7 + 7).map((day, dayIndex) => {
+                  const inRange = isInRange(day.date);
+                  const rangeStart = isRangeStart(day.date);
+                  const rangeEnd = isRangeEnd(day.date);
+                  const todayDate = isToday(day.date);
+                  
+                  let bgClass = '';
+                  let textClass = day.isCurrentMonth ? 'text-secondary-700' : 'text-secondary-300';
+                  let roundedClass = '';
+                  
+                  if (rangeStart && rangeEnd) {
+                    bgClass = 'bg-primary-500';
+                    textClass = 'text-white';
+                    roundedClass = 'rounded-full';
+                  } else if (rangeStart) {
+                    bgClass = 'bg-primary-500';
+                    textClass = 'text-white';
+                    roundedClass = 'rounded-l-full';
+                  } else if (rangeEnd) {
+                    bgClass = 'bg-primary-500';
+                    textClass = 'text-white';
+                    roundedClass = 'rounded-r-full';
+                  } else if (inRange) {
+                    bgClass = 'bg-primary-50';
+                  }
+                  
+                  if (todayDate && !rangeStart && !rangeEnd) {
+                    textClass = 'text-primary-600 font-bold';
+                  }
+                  
+                  return (
+                    <td key={dayIndex} className="p-0">
+                      <button
+                        type="button"
+                        onClick={() => handleDateClick(day.date)}
+                        className={`w-8 h-8 text-xs flex items-center justify-center transition-colors hover:bg-secondary-100 ${bgClass} ${textClass} ${roundedClass}`}
+                      >
+                        {day.date.getDate()}
+                      </button>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   };
@@ -281,7 +314,7 @@ export default function DateRangePicker({ value, onChange, placeholder = "Sélec
       {isOpen && (
         <div className="absolute right-0 top-full mt-2 bg-white border border-secondary-200 rounded-xl shadow-xl z-50 flex">
           {/* Raccourcis */}
-          <div className="border-r border-secondary-200 py-2 min-w-[180px]">
+          <div className="border-r border-secondary-200 py-2" style={{ width: '200px' }}>
             {presets.map(preset => (
               <button
                 key={preset.id}
@@ -298,7 +331,8 @@ export default function DateRangePicker({ value, onChange, placeholder = "Sélec
 
           {/* Calendriers */}
           <div className="p-4">
-            <div className="flex items-center justify-between mb-4">
+            {/* Navigation */}
+            <div className="flex items-center justify-between mb-4 px-2">
               <button
                 type="button"
                 onClick={() => navigateMonth(-1)}
@@ -315,7 +349,8 @@ export default function DateRangePicker({ value, onChange, placeholder = "Sélec
               </button>
             </div>
             
-            <div className="flex gap-8">
+            {/* 2 calendriers côte à côte */}
+            <div className="flex gap-6">
               {renderCalendar(leftMonth)}
               {renderCalendar(rightMonth)}
             </div>
