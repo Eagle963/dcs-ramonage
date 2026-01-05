@@ -5,39 +5,118 @@ import {
   ChevronLeft, 
   ChevronRight, 
   ChevronDown,
-  Check
+  Check,
+  Lock,
+  Unlock,
+  Sun,
+  Sunset,
+  CheckCircle2,
+  Clock,
+  X,
+  Calendar
 } from 'lucide-react';
 
 type ViewType = 'mois' | 'semaine' | 'jour' | 'liste';
 
-interface Booking {
-  id: string;
+interface DayData {
   date: string;
-  time: string;
-  title: string;
-  client: string;
-  address: string;
-  status: 'confirmed' | 'pending' | 'completed' | 'canceled';
-  color: string;
+  dayOfWeek: number;
+  morning: { available: boolean; remaining: number; bookings: number };
+  afternoon: { available: boolean; remaining: number; bookings: number };
+  isPast: boolean;
+  isToday: boolean;
+  isBlocked: boolean;
+  blockedSlot?: 'MORNING' | 'AFTERNOON' | null;
 }
 
-const MOCK_BOOKINGS: Booking[] = [
-  { id: '1', date: '2026-01-05', time: '09:03', title: 'Ramonage Cheminée Insert', client: 'Martin Dupont', address: '12 Rue de Paris, 60000 Beauvais', status: 'confirmed', color: '#22c55e' },
-  { id: '2', date: '2026-01-05', time: '10:00', title: 'Ramonage Cheminée Ouverte', client: 'Sophie Bernard', address: '45 Avenue Victor Hugo, 60200 Compiègne', status: 'confirmed', color: '#22c55e' },
-  { id: '3', date: '2026-01-05', time: '12:30', title: 'Débistrage cheminée poêle', client: 'Jean Leroy', address: '8 Rue du Château, 60300 Senlis', status: 'pending', color: '#22c55e' },
-  { id: '4', date: '2026-01-02', time: '09:06', title: 'Entretien + Ramonage Poêle', client: 'Marie Petit', address: '23 Rue de la Gare, 95000 Cergy', status: 'completed', color: '#22c55e' },
-  { id: '5', date: '2026-01-02', time: '11:33', title: 'Ramonage & Entretien Poêle', client: 'Pierre Moreau', address: '56 Boulevard Gambetta, 60100 Creil', status: 'completed', color: '#22c55e' },
-  { id: '6', date: '2026-01-08', time: '10:00', title: 'Ramonage Poêle à bois', client: 'Lucie Durand', address: '15 Rue des Fleurs, 60500 Chantilly', status: 'confirmed', color: '#22c55e' },
+interface BookingRequest {
+  id: string;
+  date: string;
+  slot: 'MORNING' | 'AFTERNOON';
+  firstName: string;
+  lastName: string;
+  phone: string;
+  city: string;
+  serviceType: string;
+  status: string;
+  createdAt: string;
+}
+
+const DAYS = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+const MONTHS = [
+  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
 ];
 
-const DAYS_SHORT = ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.'];
-const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+const SERVICE_LABELS: Record<string, string> = {
+  'RAMONAGE': 'Ramonage',
+  'ENTRETIEN': 'Entretien poêle',
+  'DEBISTRAGE': 'Débistrage',
+  'TUBAGE': 'Tubage',
+  'DIAGNOSTIC': 'Diagnostic',
+  'FUMISTERIE': 'Fumisterie',
+  'DEPANNAGE': 'Dépannage',
+  'OTHER': 'Autre',
+};
+
+// Simulation de données
+const mockBookings: BookingRequest[] = [
+  {
+    id: 'br_001',
+    date: new Date().toISOString().split('T')[0],
+    slot: 'MORNING',
+    firstName: 'Jean',
+    lastName: 'Dupont',
+    phone: '06 12 34 56 78',
+    city: 'Beauvais',
+    serviceType: 'RAMONAGE',
+    status: 'PENDING',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'br_002',
+    date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+    slot: 'AFTERNOON',
+    firstName: 'Marie',
+    lastName: 'Martin',
+    phone: '06 98 76 54 32',
+    city: 'Creil',
+    serviceType: 'ENTRETIEN',
+    status: 'CONFIRMED',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'br_003',
+    date: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0],
+    slot: 'MORNING',
+    firstName: 'Pierre',
+    lastName: 'Bernard',
+    phone: '06 11 22 33 44',
+    city: 'Senlis',
+    serviceType: 'DEBISTRAGE',
+    status: 'CONFIRMED',
+    createdAt: new Date().toISOString(),
+  },
+];
+
+const mockBlockedDays: { date: string; slot: 'MORNING' | 'AFTERNOON' | null; reason?: string }[] = [];
 
 export default function CalendrierPage() {
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 0, 5)); // 5 janvier 2026
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
   const [selectedView, setSelectedView] = useState<ViewType>('mois');
   const [showViewDropdown, setShowViewDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  const [calendar, setCalendar] = useState<DayData[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [bookings, setBookings] = useState<BookingRequest[]>(mockBookings);
+  const [blockedDays, setBlockedDays] = useState(mockBlockedDays);
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [blockReason, setBlockReason] = useState('');
+  const [blockSlot, setBlockSlot] = useState<'ALL' | 'MORNING' | 'AFTERNOON'>('ALL');
 
   // Fermer dropdown au clic extérieur
   useEffect(() => {
@@ -50,91 +129,125 @@ export default function CalendrierPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const today = new Date(2026, 0, 5);
+  // Générer le calendrier
+  useEffect(() => {
+    generateCalendar();
+  }, [currentMonth, bookings, blockedDays]);
 
-  const goToToday = () => setCurrentDate(today);
-  
-  const navigate = (direction: number) => {
-    const newDate = new Date(currentDate);
-    if (selectedView === 'mois') {
-      newDate.setMonth(newDate.getMonth() + direction);
-    } else if (selectedView === 'semaine') {
-      newDate.setDate(newDate.getDate() + (direction * 7));
-    } else if (selectedView === 'jour') {
-      newDate.setDate(newDate.getDate() + direction);
-    }
-    setCurrentDate(newDate);
-  };
-
-  const getMonthDays = () => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
+  const generateCalendar = () => {
+    const [year, month] = currentMonth.split('-').map(Number);
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+    const now = new Date();
     
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
+    const days: DayData[] = [];
     
-    // Jour de la semaine du 1er (0=dim, 1=lun, ...) - on veut que lundi = 0
-    let startDayOfWeek = firstDay.getDay() - 1;
-    if (startDayOfWeek < 0) startDayOfWeek = 6;
-    
-    const days: { date: Date; isCurrentMonth: boolean }[] = [];
-    
-    // Jours du mois précédent
-    const prevMonthLastDay = new Date(year, month, 0).getDate();
-    for (let i = startDayOfWeek - 1; i >= 0; i--) {
+    for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0];
+      const dayOfWeek = d.getDay();
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      const isPast = d < new Date(now.toDateString());
+      const isToday = d.toDateString() === now.toDateString();
+      
+      const morningBookings = bookings.filter(
+        b => b.date === dateStr && b.slot === 'MORNING' && b.status !== 'CANCELED'
+      ).length;
+      const afternoonBookings = bookings.filter(
+        b => b.date === dateStr && b.slot === 'AFTERNOON' && b.status !== 'CANCELED'
+      ).length;
+      
+      const dayBlock = blockedDays.find(b => b.date === dateStr);
+      const isBlocked = !!dayBlock;
+      const blockedSlot = dayBlock?.slot || null;
+      
+      const morningAvailable = !isWeekend && !isPast && !isBlocked && blockedSlot !== 'MORNING' && (5 - morningBookings) > 0;
+      const afternoonAvailable = !isWeekend && !isPast && !isBlocked && blockedSlot !== 'AFTERNOON' && (5 - afternoonBookings) > 0;
+      
       days.push({
-        date: new Date(year, month - 1, prevMonthLastDay - i),
-        isCurrentMonth: false,
+        date: dateStr,
+        dayOfWeek,
+        morning: {
+          available: morningAvailable,
+          remaining: Math.max(0, 5 - morningBookings),
+          bookings: morningBookings,
+        },
+        afternoon: {
+          available: afternoonAvailable,
+          remaining: Math.max(0, 5 - afternoonBookings),
+          bookings: afternoonBookings,
+        },
+        isPast,
+        isToday,
+        isBlocked: isBlocked && blockedSlot === null,
+        blockedSlot,
       });
     }
     
-    // Jours du mois courant
-    for (let i = 1; i <= lastDay.getDate(); i++) {
-      days.push({
-        date: new Date(year, month, i),
-        isCurrentMonth: true,
-      });
-    }
+    setCalendar(days);
+  };
+
+  const [year, month] = currentMonth.split('-').map(Number);
+  const firstDayOfMonth = new Date(year, month - 1, 1).getDay();
+
+  const changeMonth = (delta: number) => {
+    const newDate = new Date(year, month - 1 + delta, 1);
+    setCurrentMonth(`${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, '0')}`);
+    setSelectedDate(null);
+  };
+
+  const goToToday = () => {
+    const now = new Date();
+    setCurrentMonth(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
+    setSelectedDate(now.toISOString().split('T')[0]);
+  };
+
+  const selectDay = (day: DayData) => {
+    setSelectedDate(day.date);
+  };
+
+  const toggleBlockDay = () => {
+    if (!selectedDate) return;
     
-    // Jours du mois suivant pour compléter la grille
-    const remainingDays = 42 - days.length; // 6 semaines * 7 jours
-    for (let i = 1; i <= remainingDays; i++) {
-      days.push({
-        date: new Date(year, month + 1, i),
-        isCurrentMonth: false,
-      });
-    }
+    const existingBlock = blockedDays.findIndex(b => b.date === selectedDate);
     
-    return days;
-  };
-
-  const getBookingsForDate = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
-    return MOCK_BOOKINGS.filter(b => b.date === dateStr);
-  };
-
-  const isToday = (date: Date) => {
-    return date.getDate() === today.getDate() &&
-           date.getMonth() === today.getMonth() &&
-           date.getFullYear() === today.getFullYear();
-  };
-
-  const formatDateHeader = () => {
-    if (selectedView === 'mois') {
-      return `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-    } else if (selectedView === 'semaine') {
-      const startOfWeek = new Date(currentDate);
-      const day = startOfWeek.getDay();
-      const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
-      startOfWeek.setDate(diff);
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(startOfWeek.getDate() + 6);
-      return `${startOfWeek.getDate()} - ${endOfWeek.getDate()} ${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-    } else if (selectedView === 'jour') {
-      return `${currentDate.getDate()} ${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    if (existingBlock >= 0) {
+      setBlockedDays(blockedDays.filter((_, i) => i !== existingBlock));
+    } else {
+      setShowBlockModal(true);
     }
-    return `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
   };
+
+  const confirmBlock = () => {
+    if (!selectedDate) return;
+    
+    const slot = blockSlot === 'ALL' ? null : blockSlot;
+    setBlockedDays([...blockedDays, { date: selectedDate, slot, reason: blockReason }]);
+    setShowBlockModal(false);
+    setBlockReason('');
+    setBlockSlot('ALL');
+  };
+
+  const updateBookingStatus = (bookingId: string, newStatus: string) => {
+    setBookings(bookings.map(b => 
+      b.id === bookingId ? { ...b, status: newStatus } : b
+    ));
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('fr-FR', { 
+      weekday: 'long', 
+      day: 'numeric', 
+      month: 'long' 
+    });
+  };
+
+  const selectedDayData = calendar.find(d => d.date === selectedDate);
+  const selectedDayBookings = bookings.filter(b => b.date === selectedDate);
+
+  // Stats
+  const pendingCount = bookings.filter(b => b.status === 'PENDING').length;
+  const confirmedCount = bookings.filter(b => b.status === 'CONFIRMED').length;
 
   const viewOptions: { id: ViewType; label: string }[] = [
     { id: 'mois', label: 'Mois' },
@@ -143,33 +256,29 @@ export default function CalendrierPage() {
     { id: 'liste', label: 'Liste' },
   ];
 
-  const monthDays = getMonthDays();
-
   return (
-    <div className="h-[calc(100vh-120px)]">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+    <div>
+      {/* Header avec navigation et dropdown */}
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          {/* Navigation */}
           <div className="flex items-center gap-2">
             <button 
-              onClick={() => navigate(-1)}
-              className="p-1 hover:bg-secondary-100 rounded"
+              onClick={() => changeMonth(-1)}
+              className="p-2 hover:bg-secondary-100 rounded-lg transition-colors"
             >
               <ChevronLeft className="w-5 h-5 text-secondary-600" />
             </button>
-            <span className="text-lg font-medium text-secondary-900 min-w-[180px]">
-              {formatDateHeader()}
-            </span>
+            <h2 className="text-lg font-semibold text-secondary-900 min-w-[180px] text-center">
+              {MONTHS[month - 1]} {year}
+            </h2>
             <button 
-              onClick={() => navigate(1)}
-              className="p-1 hover:bg-secondary-100 rounded"
+              onClick={() => changeMonth(1)}
+              className="p-2 hover:bg-secondary-100 rounded-lg transition-colors"
             >
               <ChevronRight className="w-5 h-5 text-secondary-600" />
             </button>
           </div>
           
-          {/* Aujourd'hui */}
           <button 
             onClick={goToToday}
             className="text-sm text-primary-600 hover:text-primary-700 font-medium"
@@ -178,7 +287,7 @@ export default function CalendrierPage() {
           </button>
         </div>
 
-        {/* View selector dropdown */}
+        {/* Dropdown vue */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setShowViewDropdown(!showViewDropdown)}
@@ -210,67 +319,277 @@ export default function CalendrierPage() {
         </div>
       </div>
 
+      {/* Stats rapides */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl p-4 border border-secondary-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+              <Clock className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-secondary-900">{pendingCount}</p>
+              <p className="text-sm text-secondary-500">En attente</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 border border-secondary-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-secondary-900">{confirmedCount}</p>
+              <p className="text-sm text-secondary-500">Confirmés</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 border border-secondary-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+              <Lock className="w-5 h-5 text-red-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-secondary-900">{blockedDays.length}</p>
+              <p className="text-sm text-secondary-500">Jours bloqués</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 border border-secondary-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-primary-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-secondary-900">{bookings.length}</p>
+              <p className="text-sm text-secondary-500">Total RDV</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Vue Mois */}
       {selectedView === 'mois' && (
-        <div className="bg-white rounded-xl border border-secondary-200 overflow-hidden h-[calc(100%-60px)]">
-          {/* En-têtes jours */}
-          <div className="grid grid-cols-7 border-b border-secondary-200">
-            {DAYS_SHORT.map((day) => (
-              <div key={day} className="px-2 py-3 text-center text-sm font-medium text-secondary-500 border-r border-secondary-100 last:border-r-0">
-                {day}
-              </div>
-            ))}
-          </div>
-          
-          {/* Grille des jours */}
-          <div className="grid grid-cols-7 grid-rows-6 h-[calc(100%-45px)]">
-            {monthDays.map((day, index) => {
-              const bookings = getBookingsForDate(day.date);
-              const dayIsToday = isToday(day.date);
-              
-              return (
-                <div 
-                  key={index}
-                  className={`border-r border-b border-secondary-100 last:border-r-0 p-1 overflow-hidden ${
-                    !day.isCurrentMonth ? 'bg-secondary-50' : ''
-                  }`}
-                >
-                  <div className="flex justify-start mb-1">
-                    <span className={`text-sm w-7 h-7 flex items-center justify-center ${
-                      dayIsToday 
-                        ? 'bg-primary-500 text-white rounded-full font-medium' 
-                        : day.isCurrentMonth 
-                          ? 'text-secondary-900' 
-                          : 'text-secondary-400'
-                    }`}>
-                      {day.date.getDate()}
-                    </span>
-                  </div>
-                  
-                  {/* Bookings */}
-                  <div className="space-y-0.5 overflow-hidden">
-                    {bookings.slice(0, 3).map((booking) => (
-                      <div 
-                        key={booking.id}
-                        className="flex items-center gap-1 text-xs truncate cursor-pointer hover:bg-secondary-100 rounded px-1"
-                      >
-                        <span 
-                          className="w-2 h-2 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: booking.color }}
-                        />
-                        <span className="text-secondary-600">{booking.time}</span>
-                        <span className="text-secondary-900 truncate">{booking.title}</span>
-                      </div>
-                    ))}
-                    {bookings.length > 3 && (
-                      <div className="text-xs text-secondary-500 px-1">
-                        +{bookings.length - 3} autres
-                      </div>
-                    )}
-                  </div>
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Calendrier */}
+          <div className="lg:col-span-2 bg-white rounded-xl border border-secondary-100 p-6">
+            {/* Jours de la semaine */}
+            <div className="grid grid-cols-7 gap-1 mb-2">
+              {DAYS.map(day => (
+                <div key={day} className="text-center text-sm font-medium text-secondary-500 py-2">
+                  {day}
                 </div>
-              );
-            })}
+              ))}
+            </div>
+
+            {/* Grille des jours */}
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+                <div key={`empty-${i}`} className="aspect-square" />
+              ))}
+              
+              {calendar.map((day) => {
+                const isSelected = selectedDate === day.date;
+                const isWeekend = day.dayOfWeek === 0 || day.dayOfWeek === 6;
+                const totalBookings = day.morning.bookings + day.afternoon.bookings;
+
+                return (
+                  <button
+                    key={day.date}
+                    onClick={() => selectDay(day)}
+                    className={`
+                      aspect-square rounded-lg text-sm transition-all relative
+                      flex flex-col items-center justify-center
+                      ${isSelected 
+                        ? 'bg-primary-500 text-white ring-2 ring-primary-500 ring-offset-2' 
+                        : day.isBlocked
+                          ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                          : day.isPast || isWeekend
+                            ? 'bg-secondary-50 text-secondary-300'
+                            : totalBookings > 0
+                              ? 'bg-green-50 text-green-700 hover:bg-green-100'
+                              : 'bg-white text-secondary-700 hover:bg-secondary-50 border border-secondary-100'
+                      }
+                    `}
+                  >
+                    <span className="font-medium">{new Date(day.date).getDate()}</span>
+                    {totalBookings > 0 && !isSelected && (
+                      <span className="text-[10px] font-semibold">{totalBookings} RDV</span>
+                    )}
+                    {day.isBlocked && !isSelected && (
+                      <Lock className="w-3 h-3 absolute top-1 right-1" />
+                    )}
+                    {day.isToday && !isSelected && (
+                      <div className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-primary-500" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Légende */}
+            <div className="flex flex-wrap items-center justify-center gap-4 mt-6 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-green-50 border border-green-200" />
+                <span className="text-secondary-600">RDV</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-red-100 border border-red-200" />
+                <span className="text-secondary-600">Bloqué</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-secondary-50 border border-secondary-200" />
+                <span className="text-secondary-600">Passé/Weekend</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Panneau détails jour */}
+          <div className="bg-white rounded-xl border border-secondary-100 p-6">
+            {selectedDate ? (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-secondary-900 capitalize">
+                    {formatDate(selectedDate)}
+                  </h3>
+                  <button
+                    onClick={() => setSelectedDate(null)}
+                    className="p-1 hover:bg-secondary-100 rounded"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 mb-6">
+                  <button
+                    onClick={toggleBlockDay}
+                    className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors
+                      ${selectedDayData?.isBlocked 
+                        ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                        : 'bg-red-100 text-red-700 hover:bg-red-200'
+                      }`}
+                  >
+                    {selectedDayData?.isBlocked ? (
+                      <>
+                        <Unlock className="w-4 h-4" />
+                        Débloquer
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-4 h-4" />
+                        Bloquer
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Créneaux */}
+                {selectedDayData && (
+                  <div className="space-y-3 mb-6">
+                    <div className={`p-3 rounded-lg border ${
+                      selectedDayData.morning.available 
+                        ? 'border-green-200 bg-green-50' 
+                        : 'border-secondary-200 bg-secondary-50'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Sun className="w-4 h-4 text-amber-500" />
+                          <span className="font-medium">Matin</span>
+                        </div>
+                        <span className="text-sm">
+                          {selectedDayData.morning.bookings}/5 RDV
+                        </span>
+                      </div>
+                    </div>
+                    <div className={`p-3 rounded-lg border ${
+                      selectedDayData.afternoon.available 
+                        ? 'border-green-200 bg-green-50' 
+                        : 'border-secondary-200 bg-secondary-50'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Sunset className="w-4 h-4 text-orange-500" />
+                          <span className="font-medium">Après-midi</span>
+                        </div>
+                        <span className="text-sm">
+                          {selectedDayData.afternoon.bookings}/5 RDV
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Liste des RDV */}
+                <div>
+                  <h4 className="text-sm font-medium text-secondary-500 mb-3">
+                    Rendez-vous ({selectedDayBookings.length})
+                  </h4>
+                  {selectedDayBookings.length > 0 ? (
+                    <div className="space-y-2">
+                      {selectedDayBookings.map((booking) => (
+                        <div 
+                          key={booking.id}
+                          className="p-3 bg-secondary-50 rounded-lg"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="font-medium text-secondary-900">
+                                {booking.firstName} {booking.lastName}
+                              </p>
+                              <p className="text-sm text-secondary-500">
+                                {booking.slot === 'MORNING' ? 'Matin' : 'Après-midi'} • {booking.city}
+                              </p>
+                              <p className="text-sm text-secondary-500">
+                                {SERVICE_LABELS[booking.serviceType]}
+                              </p>
+                            </div>
+                            <span className={`text-xs px-2 py-1 rounded-full font-medium
+                              ${booking.status === 'PENDING' 
+                                ? 'bg-amber-100 text-amber-700'
+                                : booking.status === 'CONFIRMED'
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-secondary-200 text-secondary-600'
+                              }`}
+                            >
+                              {booking.status === 'PENDING' ? 'En attente' : 
+                               booking.status === 'CONFIRMED' ? 'Confirmé' : booking.status}
+                            </span>
+                          </div>
+                          <p className="text-sm text-secondary-600 mt-1">
+                            📞 {booking.phone}
+                          </p>
+                          {booking.status === 'PENDING' && (
+                            <div className="flex gap-2 mt-2">
+                              <button
+                                onClick={() => updateBookingStatus(booking.id, 'CONFIRMED')}
+                                className="flex-1 text-xs bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                              >
+                                Confirmer
+                              </button>
+                              <button
+                                onClick={() => updateBookingStatus(booking.id, 'REJECTED')}
+                                className="flex-1 text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                              >
+                                Refuser
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-secondary-400 text-center py-4">
+                      Aucun rendez-vous ce jour
+                    </p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-12 text-secondary-400">
+                <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>Sélectionnez un jour pour voir les détails</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -293,19 +612,97 @@ export default function CalendrierPage() {
       {selectedView === 'liste' && (
         <div className="bg-white rounded-xl border border-secondary-200 overflow-hidden">
           <div className="divide-y divide-secondary-100">
-            {MOCK_BOOKINGS.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time)).map((booking) => (
+            {bookings.sort((a, b) => a.date.localeCompare(b.date)).map((booking) => (
               <div key={booking.id} className="flex items-center gap-4 p-4 hover:bg-secondary-50">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: booking.color }} />
+                <div className="w-2 h-2 rounded-full bg-green-500" />
                 <div className="w-24 text-sm text-secondary-500">
                   {new Date(booking.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                 </div>
-                <div className="w-16 text-sm font-medium text-secondary-900">{booking.time}</div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-secondary-900">{booking.title}</p>
-                  <p className="text-xs text-secondary-500">{booking.client} - {booking.address}</p>
+                <div className="w-20 text-sm font-medium text-secondary-900">
+                  {booking.slot === 'MORNING' ? 'Matin' : 'Après-midi'}
                 </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-secondary-900">{booking.firstName} {booking.lastName}</p>
+                  <p className="text-xs text-secondary-500">{SERVICE_LABELS[booking.serviceType]} - {booking.city}</p>
+                </div>
+                <span className={`text-xs px-2 py-1 rounded-full font-medium
+                  ${booking.status === 'PENDING' 
+                    ? 'bg-amber-100 text-amber-700'
+                    : booking.status === 'CONFIRMED'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-secondary-200 text-secondary-600'
+                  }`}
+                >
+                  {booking.status === 'PENDING' ? 'En attente' : 
+                   booking.status === 'CONFIRMED' ? 'Confirmé' : booking.status}
+                </span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Modal blocage */}
+      {showBlockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowBlockModal(false)} />
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm relative z-10">
+            <h3 className="text-lg font-semibold mb-4">Bloquer le {formatDate(selectedDate!)}</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-2">
+                  Créneau à bloquer
+                </label>
+                <div className="space-y-2">
+                  {[
+                    { value: 'ALL', label: 'Journée entière' },
+                    { value: 'MORNING', label: 'Matin uniquement' },
+                    { value: 'AFTERNOON', label: 'Après-midi uniquement' },
+                  ].map((option) => (
+                    <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="blockSlot"
+                        value={option.value}
+                        checked={blockSlot === option.value}
+                        onChange={(e) => setBlockSlot(e.target.value as 'ALL' | 'MORNING' | 'AFTERNOON')}
+                        className="text-primary-500"
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-1">
+                  Raison (optionnel)
+                </label>
+                <input
+                  type="text"
+                  value={blockReason}
+                  onChange={(e) => setBlockReason(e.target.value)}
+                  placeholder="Ex: Congés, Formation..."
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-6">
+              <button
+                onClick={() => setShowBlockModal(false)}
+                className="flex-1 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={confirmBlock}
+                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              >
+                Bloquer
+              </button>
+            </div>
           </div>
         </div>
       )}
