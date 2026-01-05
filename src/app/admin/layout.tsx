@@ -119,7 +119,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   
   // État pour le DateRangePicker du tableau de bord (année courante)
   const currentYear = new Date().getFullYear();
-  const [dashboardDateRange, setDashboardDateRange] = useState({
+  const [dashboardDateRange, setDashboardDateRange] = useState<{start: Date | null; end: Date | null}>({
     start: new Date(currentYear, 0, 1),
     end: new Date(currentYear, 11, 31)
   });
