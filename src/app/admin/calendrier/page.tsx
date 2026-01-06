@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { 
   ChevronLeft, ChevronRight, Calendar, List, Map, Clock, 
   Search, Filter, User, CheckCircle2, XCircle, LayoutGrid,
-  MapPin, Phone, Navigation, Plus, MoreVertical
+  MapPin, Phone, Navigation, Plus, MoreVertical, ChevronDown
 } from 'lucide-react';
 
 const PlanningMap = dynamic(() => import('@/components/map/PlanningMap'), {
@@ -58,19 +58,23 @@ const mockBookings: Booking[] = [
   { id: 'br_006', date: '2026-01-05', slot: 'MORNING', startTime: '08:00', endTime: '09:00', clientName: 'HYBA LA MAMMA', clientPhone: '03 44 12 34 56', address: '8 place du Marché', city: 'Senlis', postalCode: '60300', lat: 49.2069, lng: 2.5856, serviceType: 'Entretien professionnel', status: 'CONFIRMED', technicianId: '1' },
 ];
 
-type ViewType = 'calendar' | 'list' | 'map' | 'timeline' | 'toplan';
+type ViewMode = 'month' | 'week' | 'day' | 'list';
+type ViewType = 'calendar' | 'map' | 'timeline' | 'toplan';
 
 export default function PlanningPage() {
+  const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [viewType, setViewType] = useState<ViewType>('calendar');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>('1');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
     const day = today.getDay();
     const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     return new Date(today.setDate(diff));
   });
+  const [showViewDropdown, setShowViewDropdown] = useState(false);
 
   const selectedTechnician = technicians.find(t => t.id === selectedTechnicianId) || technicians[0];
 
@@ -156,12 +160,39 @@ export default function PlanningPage() {
     setCurrentWeekStart(newDate);
   };
 
+  const changeMonth = (months: number) => {
+    const newDate = new Date(currentMonth);
+    newDate.setMonth(newDate.getMonth() + months);
+    setCurrentMonth(newDate);
+  };
+
   const getWeekDays = () => {
     const days = [];
     for (let i = 0; i < 7; i++) {
       const date = new Date(currentWeekStart);
       date.setDate(date.getDate() + i);
       days.push(date.toISOString().split('T')[0]);
+    }
+    return days;
+  };
+
+  const getMonthDays = () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    const day = startDate.getDay();
+    startDate.setDate(startDate.getDate() - (day === 0 ? 6 : day - 1));
+    
+    const days = [];
+    for (let i = 0; i < 42; i++) {
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + i);
+      days.push({
+        date: date.toISOString().split('T')[0],
+        isCurrentMonth: date.getMonth() === month,
+      });
     }
     return days;
   };
@@ -179,10 +210,16 @@ export default function PlanningPage() {
 
   const views = [
     { id: 'calendar', label: 'Calendrier', icon: Calendar },
-    { id: 'list', label: 'Liste', icon: List },
     { id: 'map', label: 'Carte', icon: Map },
     { id: 'timeline', label: 'Timeline', icon: Clock },
     { id: 'toplan', label: 'À planifier', icon: LayoutGrid },
+  ];
+
+  const calendarViews = [
+    { id: 'month', label: 'Mois' },
+    { id: 'week', label: 'Semaine' },
+    { id: 'day', label: 'Jour' },
+    { id: 'list', label: 'Liste' },
   ];
 
   const timeSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
@@ -229,29 +266,129 @@ export default function PlanningPage() {
         </button>
       </div>
 
-      {/* Onglets */}
-      <div className="flex gap-1 mb-4 border-b border-secondary-200">
-        {views.map((view) => {
-          const Icon = view.icon;
-          return (
+      {/* Onglets avec dropdown pour vue Calendrier */}
+      <div className="flex items-center justify-between gap-1 mb-4 border-b border-secondary-200">
+        <div className="flex gap-1">
+          {views.map((view) => {
+            const Icon = view.icon;
+            return (
+              <button
+                key={view.id}
+                onClick={() => setViewType(view.id as ViewType)}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                  viewType === view.id
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-secondary-500 hover:text-secondary-700'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {view.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Dropdown de sélection de vue (uniquement pour Calendrier) */}
+        {viewType === 'calendar' && (
+          <div className="relative mr-4">
             <button
-              key={view.id}
-              onClick={() => setViewType(view.id as ViewType)}
-              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                viewType === view.id
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-secondary-500 hover:text-secondary-700'
-              }`}
+              onClick={() => setShowViewDropdown(!showViewDropdown)}
+              className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg text-sm font-medium bg-white hover:bg-secondary-50"
             >
-              <Icon className="w-4 h-4" />
-              {view.label}
+              {calendarViews.find(v => v.id === viewMode)?.label}
+              <ChevronDown className="w-4 h-4" />
             </button>
-          );
-        })}
+            {showViewDropdown && (
+              <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-secondary-200 rounded-lg shadow-lg z-10">
+                {calendarViews.map((view) => (
+                  <button
+                    key={view.id}
+                    onClick={() => {
+                      setViewMode(view.id as ViewMode);
+                      setShowViewDropdown(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-secondary-50 first:rounded-t-lg last:rounded-b-lg ${
+                      viewMode === view.id ? 'text-primary-600 font-medium bg-primary-50' : 'text-secondary-700'
+                    }`}
+                  >
+                    {view.id === viewMode && '✓ '}{view.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Vue Calendrier */}
-      {viewType === 'calendar' && (
+      {/* Vue Calendrier - Mois */}
+      {viewType === 'calendar' && viewMode === 'month' && (
+        <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
+          {/* Navigation mois */}
+          <div className="flex items-center justify-between p-4 border-b border-secondary-100">
+            <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-secondary-100 rounded-lg">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <div className="text-center">
+              <span className="font-semibold text-secondary-900 capitalize">
+                {currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+              </span>
+            </div>
+            <button onClick={() => changeMonth(1)} className="p-2 hover:bg-secondary-100 rounded-lg">
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* En-têtes jours */}
+          <div className="grid grid-cols-7 border-b border-secondary-100">
+            {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day) => (
+              <div key={day} className="p-2 text-center text-xs font-medium text-secondary-500 uppercase">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Grille mois */}
+          <div className="grid grid-cols-7">
+            {getMonthDays().map(({ date, isCurrentMonth }) => {
+              const isToday = date === new Date().toISOString().split('T')[0];
+              const isSelected = date === selectedDate;
+              const dayBookings = getBookingsForDate(date);
+              
+              return (
+                <div 
+                  key={date} 
+                  className={`border-r border-b border-secondary-100 min-h-[120px] cursor-pointer transition-colors ${
+                    !isCurrentMonth ? 'bg-secondary-50' : ''
+                  } ${isSelected ? 'bg-primary-50' : 'hover:bg-secondary-50'}`}
+                  onClick={() => setSelectedDate(date)}
+                >
+                  <div className={`p-2 ${isToday ? 'bg-primary-500 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto mt-1' : 'text-center'}`}>
+                    <span className={`text-sm font-medium ${!isCurrentMonth && !isToday ? 'text-secondary-400' : isToday ? '' : 'text-secondary-900'}`}>
+                      {new Date(date).getDate()}
+                    </span>
+                  </div>
+                  <div className="px-1 space-y-1 mt-1">
+                    {dayBookings.slice(0, 3).map((booking) => (
+                      <div 
+                        key={booking.id}
+                        className={`px-1.5 py-0.5 rounded text-xs truncate ${statusConfig[booking.status].color}`}
+                      >
+                        {booking.startTime} - {booking.clientName}
+                      </div>
+                    ))}
+                    {dayBookings.length > 3 && (
+                      <p className="text-xs text-secondary-500 text-center">+{dayBookings.length - 3}</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Vue Calendrier - Semaine */}
+      {viewType === 'calendar' && viewMode === 'week' && (
         <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
           {/* Navigation semaine */}
           <div className="flex items-center justify-between p-4 border-b border-secondary-100">
@@ -312,8 +449,105 @@ export default function PlanningPage() {
         </div>
       )}
 
-      {/* Vue Liste */}
-      {viewType === 'list' && (
+      {/* Vue Calendrier - Jour */}
+      {viewType === 'calendar' && viewMode === 'day' && (
+        <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
+          <div className="flex items-center justify-between p-4 border-b border-secondary-100">
+            <button onClick={() => changeDate(-1)} className="p-2 hover:bg-secondary-100 rounded-lg">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <span className="font-semibold capitalize">{formatDate(selectedDate)}</span>
+            <button onClick={() => changeDate(1)} className="p-2 hover:bg-secondary-100 rounded-lg">
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="p-4">
+            <div className="grid grid-cols-2 gap-4">
+              {/* Matin */}
+              <div>
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-secondary-200">
+                  <div className="w-2 h-2 rounded-full bg-amber-400"></div>
+                  <h3 className="font-medium text-secondary-900">Matin (8h - 12h)</h3>
+                </div>
+                <div className="space-y-2">
+                  {filteredBookings.filter(b => b.slot === 'MORNING').length === 0 ? (
+                    <p className="text-sm text-secondary-500 text-center py-8">Aucune intervention</p>
+                  ) : (
+                    filteredBookings.filter(b => b.slot === 'MORNING').map((booking) => {
+                      const status = statusConfig[booking.status];
+                      return (
+                        <div key={booking.id} className="p-3 border border-secondary-200 rounded-lg hover:bg-secondary-50">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-sm">{booking.startTime} - {booking.endTime}</span>
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${status.color}`}>
+                              {status.label}
+                            </span>
+                          </div>
+                          <p className="font-medium text-secondary-900 mb-1">{booking.clientName}</p>
+                          <p className="text-sm text-secondary-600 mb-2">{booking.serviceType}</p>
+                          <div className="flex items-center gap-3 text-xs text-secondary-500">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              {booking.city}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Phone className="w-3 h-3" />
+                              {booking.clientPhone}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Après-midi */}
+              <div>
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-secondary-200">
+                  <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                  <h3 className="font-medium text-secondary-900">Après-midi (13h - 19h)</h3>
+                </div>
+                <div className="space-y-2">
+                  {filteredBookings.filter(b => b.slot === 'AFTERNOON').length === 0 ? (
+                    <p className="text-sm text-secondary-500 text-center py-8">Aucune intervention</p>
+                  ) : (
+                    filteredBookings.filter(b => b.slot === 'AFTERNOON').map((booking) => {
+                      const status = statusConfig[booking.status];
+                      return (
+                        <div key={booking.id} className="p-3 border border-secondary-200 rounded-lg hover:bg-secondary-50">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-sm">{booking.startTime} - {booking.endTime}</span>
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${status.color}`}>
+                              {status.label}
+                            </span>
+                          </div>
+                          <p className="font-medium text-secondary-900 mb-1">{booking.clientName}</p>
+                          <p className="text-sm text-secondary-600 mb-2">{booking.serviceType}</p>
+                          <div className="flex items-center gap-3 text-xs text-secondary-500">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              {booking.city}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Phone className="w-3 h-3" />
+                              {booking.clientPhone}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Vue Calendrier - Liste */}
+      {viewType === 'calendar' && viewMode === 'list' && (
         <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b border-secondary-100">
             <button onClick={() => changeDate(-1)} className="p-2 hover:bg-secondary-100 rounded-lg">
@@ -547,50 +781,3 @@ export default function PlanningPage() {
     </div>
   );
 }
-      {/* Vue Semaine */}
-      {selectedView === 'semaine' && (
-        <div className="bg-white rounded-xl border border-secondary-200 p-6">
-          <p className="text-secondary-500 text-center">Vue Semaine - À implémenter</p>
-        </div>
-      )}
-
-      {/* Vue Jour */}
-      {selectedView === 'jour' && (
-        <div className="bg-white rounded-xl border border-secondary-200 p-6">
-          <p className="text-secondary-500 text-center">Vue Jour - À implémenter</p>
-        </div>
-      )}
-
-      {/* Vue Liste */}
-      {selectedView === 'liste' && (
-        <div className="bg-white rounded-xl border border-secondary-200 overflow-hidden">
-          <div className="divide-y divide-secondary-100">
-            {bookings.sort((a, b) => a.date.localeCompare(b.date)).map((booking) => (
-              <div key={booking.id} className="flex items-center gap-4 p-4 hover:bg-secondary-50">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <div className="w-24 text-sm text-secondary-500">
-                  {new Date(booking.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
-                </div>
-                <div className="w-20 text-sm font-medium text-secondary-900">
-                  {booking.slot === 'MORNING' ? 'Matin' : 'Après-midi'}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-secondary-900">{booking.firstName} {booking.lastName}</p>
-                  <p className="text-xs text-secondary-500">{SERVICE_LABELS[booking.serviceType]} - {booking.city}</p>
-                </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium
-                  ${booking.status === 'PENDING' 
-                    ? 'bg-amber-100 text-amber-700'
-                    : booking.status === 'CONFIRMED'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-secondary-200 text-secondary-600'
-                  }`}
-                >
-                  {booking.status === 'PENDING' ? 'En attente' : 
-                   booking.status === 'CONFIRMED' ? 'Confirmé' : booking.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
