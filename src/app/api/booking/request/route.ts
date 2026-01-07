@@ -1,4 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Resend } from 'resend';
+import {
+  generateAdminNotificationHtml,
+  generateAdminNotificationText,
+  generateCustomerConfirmationHtml,
+  generateCustomerConfirmationText,
+  type BookingRequestData,
+} from '@/lib/email/booking-templates';
+
+// Initialize Resend only if API key exists
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
+
+// Email configuration
+const ADMIN_EMAIL = process.env.CONTACT_EMAIL || 'contact@dcs-ramonage.fr';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@dcs-ramonage.fr';
 
 // Codes postaux desservis (Oise 60 + Val-d'Oise 95)
 const isValidPostalCode = (postalCode: string): boolean => {
@@ -29,8 +46,15 @@ const VALID_EQUIPMENT = [
   'OTHER',
 ];
 
+// Extended booking type for storage (includes status and timestamps)
+interface StoredBookingRequest extends BookingRequestData {
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Simulation stockage (à remplacer par Prisma)
-const bookingRequests: any[] = [];
+const bookingRequests: StoredBookingRequest[] = [];
 
 export async function POST(request: NextRequest) {
   try {
@@ -107,7 +131,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Créer la demande de réservation
-    const bookingRequest = {
+    const bookingRequest: BookingRequestData = {
       id: `br_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       date,
       slot,
@@ -124,16 +148,50 @@ export async function POST(request: NextRequest) {
       model: model?.trim() || null,
       exhaustType: exhaustType || null,
       message: message?.trim() || null,
+    };
+
+    // Create stored version with status and timestamps
+    const storedBooking: StoredBookingRequest = {
+      ...bookingRequest,
       status: 'PENDING',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     // Sauvegarder (simulation - à remplacer par Prisma)
-    bookingRequests.push(bookingRequest);
+    bookingRequests.push(storedBooking);
 
-    // TODO: Envoyer email de notification à l'admin
-    // TODO: Envoyer email de confirmation au client
+    // Send email notifications (non-blocking - we don't want email errors to fail the booking)
+    if (resend) {
+      // Send admin notification email
+      try {
+        await resend.emails.send({
+          from: `DCS Ramonage <${FROM_EMAIL}>`,
+          to: [ADMIN_EMAIL],
+          replyTo: bookingRequest.email,
+          subject: `[Nouvelle Réservation] ${bookingRequest.firstName} ${bookingRequest.lastName} - ${new Date(bookingRequest.date).toLocaleDateString('fr-FR')}`,
+          html: generateAdminNotificationHtml(bookingRequest),
+          text: generateAdminNotificationText(bookingRequest),
+        });
+      } catch (emailError) {
+        // Log error but don't fail the request
+        console.error('Erreur envoi email admin:', emailError);
+      }
+
+      // Send customer confirmation email
+      try {
+        await resend.emails.send({
+          from: `DCS Ramonage <${FROM_EMAIL}>`,
+          to: [bookingRequest.email],
+          subject: `Confirmation de votre demande de rendez-vous - DCS Ramonage`,
+          html: generateCustomerConfirmationHtml(bookingRequest),
+          text: generateCustomerConfirmationText(bookingRequest),
+        });
+      } catch (emailError) {
+        // Log error but don't fail the request
+        console.error('Erreur envoi email client:', emailError);
+      }
+    }
 
     return NextResponse.json({
       success: true,
