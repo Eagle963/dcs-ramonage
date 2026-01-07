@@ -13,33 +13,99 @@ interface DayAvailability {
   isToday: boolean;
 }
 
-// TODO: Ces données seront chargées depuis la config admin via API
-// Pour l'instant on garde les données en dur
+interface ServiceConfig {
+  id: string;
+  name: string;
+  tarif: string;
+}
 
-// Prestations principales avec tarifs
-const PRESTATIONS = [
-  { id: 'RAMONAGE_ENTRETIEN', name: 'Ramonage / Entretien', icon: Flame, color: 'bg-orange-500', tarif: 'À partir de 60€' },
-  { id: 'DEBISTRAGE', name: 'Débistrage', icon: PenTool, color: 'bg-amber-700', tarif: 'À partir de 90€' },
-  { id: 'TUBAGE', name: 'Tubage', icon: CircleOff, color: 'bg-gray-600', tarif: 'Sur devis' },
-  { id: 'DEPANNAGE', name: 'Dépannage', icon: Wrench, color: 'bg-red-500', tarif: 'À partir de 90€' },
-  { id: 'DEVIS', name: 'Devis', icon: FileText, color: 'bg-blue-500', tarif: 'Gratuit' },
-  { id: 'NETTOYAGE', name: 'Démoussage / Nettoyage', icon: SprayCan, color: 'bg-green-600', tarif: 'Sur devis' },
-];
+interface EquipmentConfig {
+  id: string;
+  name: string;
+  tarif: string;
+}
 
-// Équipements pour Ramonage/Entretien avec tarifs
-const EQUIPMENTS = [
-  { id: 'GAS_BOILER', name: 'Chaudière gaz', icon: Wind, color: 'bg-blue-500', tarif: '60€', hasOptions: false },
-  { id: 'CHIMNEY_OPEN', name: 'Cheminée ouverte', icon: Home, color: 'bg-red-600', tarif: '70€', hasOptions: false },
-  { id: 'CHIMNEY_INSERT', name: 'Insert', icon: Flame, color: 'bg-gray-500', tarif: '70€', hasOptions: false },
-  { id: 'WOOD_STOVE', name: 'Poêle à bois', icon: Flame, color: 'bg-orange-500', tarif: '80€', hasOptions: false },
-  { id: 'OIL_BOILER', name: 'Chaudière fioul', icon: Droplet, color: 'bg-amber-500', tarif: '80€', hasOptions: false },
-  { id: 'PELLET_STOVE', name: 'Poêle à granulés', icon: CircleDot, color: 'bg-green-500', tarif: 'Dès 80€', hasOptions: true },
-  { id: 'WOOD_BOILER', name: 'Chaudière bois', icon: Flame, color: 'bg-amber-700', tarif: '80€', hasOptions: false },
-  { id: 'POLYFLAM', name: 'Cheminée Polyflam', icon: Building2, color: 'bg-purple-500', tarif: '90€', hasOptions: false },
-  { id: 'CONDUIT_DIFFICILE', name: 'Conduit difficile', icon: Ruler, color: 'bg-slate-700', tarif: '110€', hasOptions: false },
-];
+interface ZoneConfig {
+  id: string;
+  code: string;
+  name: string;
+}
 
-// Interventions poêle à granulés
+interface WidgetConfig {
+  organization: {
+    slug: string;
+    name: string;
+    email: string;
+    phone: string;
+    website: string;
+    address: string;
+    city: string;
+    postalCode: string;
+  };
+  booking: {
+    mode: 'creneaux' | 'horaires';
+    morningStart: string;
+    morningEnd: string;
+    afternoonStart: string;
+    afternoonEnd: string;
+    workDays: { [key: string]: boolean };
+    minDelayHours: number | null;
+    maxDelayDays: number | null;
+  };
+  services: ServiceConfig[];
+  equipments: EquipmentConfig[];
+  zones: ZoneConfig[];
+  widget: {
+    color: string;
+    showLogo: boolean;
+  };
+}
+
+// Icônes par ID de service (mapping statique)
+const SERVICE_ICONS: { [key: string]: any } = {
+  'ramonage': Flame,
+  'debistrage': PenTool,
+  'tubage': CircleOff,
+  'depannage': Wrench,
+  'devis': FileText,
+  'nettoyage': SprayCan,
+};
+
+const SERVICE_COLORS: { [key: string]: string } = {
+  'ramonage': 'bg-orange-500',
+  'debistrage': 'bg-amber-700',
+  'tubage': 'bg-gray-600',
+  'depannage': 'bg-red-500',
+  'devis': 'bg-blue-500',
+  'nettoyage': 'bg-green-600',
+};
+
+// Icônes par ID d'équipement
+const EQUIPMENT_ICONS: { [key: string]: any } = {
+  'gas_boiler': Wind,
+  'chimney_open': Home,
+  'chimney_insert': Flame,
+  'wood_stove': Flame,
+  'oil_boiler': Droplet,
+  'pellet_stove': CircleDot,
+  'wood_boiler': Flame,
+  'polyflam': Building2,
+  'conduit_difficile': Ruler,
+};
+
+const EQUIPMENT_COLORS: { [key: string]: string } = {
+  'gas_boiler': 'bg-blue-500',
+  'chimney_open': 'bg-red-600',
+  'chimney_insert': 'bg-gray-500',
+  'wood_stove': 'bg-orange-500',
+  'oil_boiler': 'bg-amber-500',
+  'pellet_stove': 'bg-green-500',
+  'wood_boiler': 'bg-amber-700',
+  'polyflam': 'bg-purple-500',
+  'conduit_difficile': 'bg-slate-700',
+};
+
+// Interventions poêle à granulés (statique pour l'instant)
 const PELLET_INTERVENTIONS = [
   { id: 'RAMONAGE_ENTRETIEN', name: 'Ramonage + Entretien', tarif: '180€' },
   { id: 'ENTRETIEN', name: 'Entretien seul', tarif: '100€' },
@@ -67,15 +133,17 @@ const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet'
 
 export default function ReservationWidgetPage() {
   const params = useParams();
-  const slug = params.slug as string; // Ex: "dcs-ramonage"
+  const slug = params.slug as string;
 
-  // TODO: Charger la config de l'organisation via API
-  // const { data: orgConfig } = useOrganizationConfig(slug);
+  // Configuration chargée depuis l'API
+  const [config, setConfig] = useState<WidgetConfig | null>(null);
+  const [configLoading, setConfigLoading] = useState(true);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   const [step, setStep] = useState(1);
   const [postalCode, setPostalCode] = useState('');
   const [postalCodeError, setPostalCodeError] = useState('');
-  
+
   // Sélections
   const [selectedPrestation, setSelectedPrestation] = useState<string | null>(null);
   const [selectedEquipment, setSelectedEquipment] = useState<string | null>(null);
@@ -84,7 +152,7 @@ export default function ReservationWidgetPage() {
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
   const [exhaustType, setExhaustType] = useState<string | null>(null);
-  
+
   // Calendrier
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [currentMonth, setCurrentMonth] = useState(() => {
@@ -95,15 +163,47 @@ export default function ReservationWidgetPage() {
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<'MORNING' | 'AFTERNOON' | null>(null);
-  
+
   // Formulaire
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [formData, setFormData] = useState({ lastName: '', firstName: '', email: '', phone: '', address: '', city: '', message: '' });
   const [addressSuggestions, setAddressSuggestions] = useState<any[]>([]);
 
-  const prestation = PRESTATIONS.find(p => p.id === selectedPrestation);
-  const equipment = EQUIPMENTS.find(e => e.id === selectedEquipment);
+  // Charger la config au montage
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch(`/api/widget/${slug}/config`);
+        if (!res.ok) {
+          if (res.status === 404) {
+            setConfigError('Organisation non trouvée');
+          } else {
+            setConfigError('Erreur de chargement');
+          }
+          return;
+        }
+        const data = await res.json();
+        setConfig(data);
+      } catch (error) {
+        setConfigError('Erreur de connexion');
+      } finally {
+        setConfigLoading(false);
+      }
+    };
+
+    if (slug) {
+      fetchConfig();
+    }
+  }, [slug]);
+
+  // Données dérivées de la config
+  const services = config?.services || [];
+  const equipments = config?.equipments || [];
+  const zones = config?.zones || [];
+
+  const prestation = services.find(p => p.id === selectedPrestation);
+  const equipment = equipments.find(e => e.id === selectedEquipment);
 
   const fetchAvailability = async (month: string) => {
     setLoading(true);
@@ -111,25 +211,41 @@ export default function ReservationWidgetPage() {
       const res = await fetch(`/api/booking/availability?month=${month}&postalCode=${postalCode}`);
       const data = await res.json();
       if (data.success) setAvailability(data.availability);
-    } catch (error) { console.error('Erreur:', error); }
+    } catch (error) {
+      // Silently fail
+    }
     setLoading(false);
   };
 
   const checkPostalCode = () => {
     const cp = postalCode.trim();
-    if (cp.length !== 5) { setPostalCodeError('Le code postal doit contenir 5 chiffres'); return; }
-    if (!cp.startsWith('60') && !cp.startsWith('95')) { setPostalCodeError('Nous intervenons uniquement dans l\'Oise (60) et le Val-d\'Oise (95)'); return; }
+    if (cp.length !== 5) {
+      setPostalCodeError('Le code postal doit contenir 5 chiffres');
+      return;
+    }
+
+    // Vérifier si le code postal correspond à une zone d'intervention
+    const validZones = zones.map(z => z.code);
+    const matchesZone = validZones.some(code => cp.startsWith(code));
+
+    if (!matchesZone) {
+      const zoneNames = zones.map(z => `${z.name} (${z.code})`).join(', ');
+      setPostalCodeError(`Nous intervenons uniquement dans : ${zoneNames}`);
+      return;
+    }
+
     setPostalCodeError('');
     setStep(2);
   };
 
   const selectPrestation = (id: string) => {
     setSelectedPrestation(id);
-    if (id === 'RAMONAGE_ENTRETIEN') {
+    // Déterminer si on a besoin d'options supplémentaires
+    if (id === 'ramonage') {
       setStep(3);
-    } else if (id === 'DEPANNAGE') {
+    } else if (id === 'depannage') {
       setStep(3);
-    } else if (id === 'NETTOYAGE') {
+    } else if (id === 'nettoyage') {
       setStep(3);
     } else {
       setStep(4);
@@ -139,8 +255,7 @@ export default function ReservationWidgetPage() {
 
   const selectEquipment = (id: string) => {
     setSelectedEquipment(id);
-    const eq = EQUIPMENTS.find(e => e.id === id);
-    if (eq && !eq.hasOptions) {
+    if (id !== 'pellet_stove') {
       // Pas d'options supplémentaires -> passer directement au calendrier
       setTimeout(() => {
         setStep(4);
@@ -150,15 +265,15 @@ export default function ReservationWidgetPage() {
   };
 
   const continueFromOptions = () => {
-    if (selectedPrestation === 'RAMONAGE_ENTRETIEN' && selectedEquipment === 'PELLET_STOVE') {
+    if (selectedPrestation === 'ramonage' && selectedEquipment === 'pellet_stove') {
       if (!selectedIntervention) { alert('Veuillez sélectionner le type d\'intervention'); return; }
       if (!brand.trim() || !model.trim()) { alert('Veuillez renseigner la marque et le modèle'); return; }
       if (!exhaustType) { alert('Veuillez sélectionner le type de sortie'); return; }
     }
-    if (selectedPrestation === 'DEPANNAGE') {
+    if (selectedPrestation === 'depannage') {
       if (!brand.trim() || !model.trim()) { alert('Veuillez renseigner la marque et le modèle du poêle'); return; }
     }
-    if (selectedPrestation === 'NETTOYAGE' && selectedNettoyage.length === 0) {
+    if (selectedPrestation === 'nettoyage' && selectedNettoyage.length === 0) {
       alert('Veuillez sélectionner au moins une zone'); return;
     }
     setStep(4);
@@ -184,7 +299,9 @@ export default function ReservationWidgetPage() {
       const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&postcode=${postalCode}&limit=5`);
       const data = await res.json();
       setAddressSuggestions(data.features || []);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      // Silently fail
+    }
   };
 
   const selectAddress = (feature: any) => {
@@ -206,6 +323,7 @@ export default function ReservationWidgetPage() {
           serviceType: selectedIntervention || selectedPrestation,
           brand, model, exhaustType,
           nettoyageZones: selectedNettoyage,
+          organizationSlug: slug,
         }),
       });
       const data = await res.json();
@@ -232,12 +350,12 @@ export default function ReservationWidgetPage() {
   };
 
   const getTarif = () => {
-    if (selectedPrestation === 'RAMONAGE_ENTRETIEN') {
-      if (selectedEquipment === 'PELLET_STOVE' && selectedIntervention) {
+    if (selectedPrestation === 'ramonage') {
+      if (selectedEquipment === 'pellet_stove' && selectedIntervention) {
         return PELLET_INTERVENTIONS.find(i => i.id === selectedIntervention)?.tarif || '';
       }
       if (selectedEquipment) {
-        return EQUIPMENTS.find(e => e.id === selectedEquipment)?.tarif || '';
+        return equipments.find(e => e.id === selectedEquipment)?.tarif || '';
       }
     }
     return prestation?.tarif || '';
@@ -265,13 +383,40 @@ export default function ReservationWidgetPage() {
     </svg>
   );
 
+  // Affichage pendant le chargement
+  if (configLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-primary-500 animate-spin mx-auto mb-4" />
+          <p className="text-secondary-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Affichage en cas d'erreur
+  if (configError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h1 className="text-xl font-semibold mb-2">Erreur</h1>
+          <p className="text-secondary-600">{configError}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <section className="pt-32 pb-12 bg-mesh">
         <div className="container-site">
           <div className="text-center max-w-2xl mx-auto">
             <span className="badge-primary mb-4">Réservation en ligne</span>
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-secondary-900 mb-4">Prenez rendez-vous</h1>
+            <h1 className="text-3xl md:text-4xl font-display font-bold text-secondary-900 mb-4">
+              {config?.organization.name || 'Prenez rendez-vous'}
+            </h1>
             <p className="text-secondary-600">Choisissez votre créneau et nous vous recontactons pour confirmer.</p>
           </div>
         </div>
@@ -286,20 +431,26 @@ export default function ReservationWidgetPage() {
               <span className="text-sm text-secondary-400">Étape {step}/6</span>
             </div>
             <div className="h-2 bg-secondary-100 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-primary-500 to-primary-400 rounded-full transition-all duration-500" style={{ width: `${(step / 6) * 100}%` }} />
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${(step / 6) * 100}%`,
+                  backgroundColor: config?.widget.color || '#f97316'
+                }}
+              />
             </div>
           </div>
 
           {/* Étape 1: Code postal */}
           {step === 1 && (
             <div className="bg-white rounded-2xl shadow-soft p-8 text-center">
-              <MapPin className="w-12 h-12 text-primary-500 mx-auto mb-4" />
+              <MapPin className="w-12 h-12 mx-auto mb-4" style={{ color: config?.widget.color || '#f97316' }} />
               <h2 className="text-xl font-semibold mb-2">Vérification zone d'intervention</h2>
               <p className="text-secondary-600 mb-6">Entrez votre code postal</p>
               <div className="max-w-xs mx-auto">
                 <input type="text" value={postalCode} onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Ex: 60000" className="w-full px-4 py-3 border border-secondary-200 rounded-xl text-center text-lg focus:ring-2 focus:ring-primary-500" onKeyDown={(e) => e.key === 'Enter' && checkPostalCode()} />
                 {postalCodeError && <p className="text-red-500 text-sm mt-2 flex items-center justify-center gap-1"><AlertCircle className="w-4 h-4" />{postalCodeError}</p>}
-                <button onClick={checkPostalCode} className="btn-primary w-full mt-4">Vérifier</button>
+                <button onClick={checkPostalCode} className="btn-primary w-full mt-4" style={{ backgroundColor: config?.widget.color || '#f97316' }}>Vérifier</button>
               </div>
             </div>
           )}
@@ -310,13 +461,14 @@ export default function ReservationWidgetPage() {
               <button onClick={() => setStep(1)} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
               <h2 className="text-xl font-semibold text-center mb-6">Quelle prestation souhaitez-vous ?</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {PRESTATIONS.map((p) => {
-                  const Icon = p.icon;
+                {services.map((service) => {
+                  const Icon = SERVICE_ICONS[service.id] || Flame;
+                  const color = SERVICE_COLORS[service.id] || 'bg-gray-500';
                   return (
-                    <button key={p.id} onClick={() => selectPrestation(p.id)} className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 hover:border-primary-500 ${selectedPrestation === p.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
-                      <div className={`w-14 h-14 ${p.color} rounded-xl flex items-center justify-center`}><Icon className="w-7 h-7 text-white" /></div>
-                      <span className="font-medium text-sm text-center">{p.name}</span>
-                      <span className="text-xs text-primary-600 font-semibold">{p.tarif}</span>
+                    <button key={service.id} onClick={() => selectPrestation(service.id)} className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 hover:border-primary-500 ${selectedPrestation === service.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
+                      <div className={`w-14 h-14 ${color} rounded-xl flex items-center justify-center`}><Icon className="w-7 h-7 text-white" /></div>
+                      <span className="font-medium text-sm text-center">{service.name}</span>
+                      <span className="text-xs font-semibold" style={{ color: config?.widget.color || '#f97316' }}>{service.tarif}</span>
                     </button>
                   );
                 })}
@@ -328,26 +480,27 @@ export default function ReservationWidgetPage() {
           {step === 3 && (
             <div className="bg-white rounded-2xl shadow-soft p-8">
               <button onClick={() => { setStep(2); setSelectedEquipment(null); setSelectedIntervention(null); }} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
-              
+
               {/* Ramonage/Entretien -> Choix équipement */}
-              {selectedPrestation === 'RAMONAGE_ENTRETIEN' && (
+              {selectedPrestation === 'ramonage' && (
                 <div className="space-y-6">
                   <h2 className="text-xl font-semibold text-center">Quel équipement ?</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {EQUIPMENTS.map((eq) => {
-                      const Icon = eq.icon;
+                    {equipments.map((eq) => {
+                      const Icon = EQUIPMENT_ICONS[eq.id] || Flame;
+                      const color = EQUIPMENT_COLORS[eq.id] || 'bg-gray-500';
                       return (
                         <button key={eq.id} onClick={() => selectEquipment(eq.id)} className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 hover:border-primary-500 ${selectedEquipment === eq.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
-                          <div className={`w-12 h-12 ${eq.color} rounded-xl flex items-center justify-center`}><Icon className="w-6 h-6 text-white" /></div>
+                          <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center`}><Icon className="w-6 h-6 text-white" /></div>
                           <span className="font-medium text-sm text-center">{eq.name}</span>
-                          <span className="text-xs text-primary-600 font-semibold">{eq.tarif}</span>
+                          <span className="text-xs font-semibold" style={{ color: config?.widget.color || '#f97316' }}>{eq.tarif}</span>
                         </button>
                       );
                     })}
                   </div>
 
                   {/* Options poêle granulés */}
-                  {selectedEquipment === 'PELLET_STOVE' && (
+                  {selectedEquipment === 'pellet_stove' && (
                     <div className="space-y-6 pt-6 border-t border-secondary-100">
                       <div>
                         <h3 className="font-medium mb-3">Type d'intervention</h3>
@@ -355,7 +508,7 @@ export default function ReservationWidgetPage() {
                           {PELLET_INTERVENTIONS.map((int) => (
                             <button key={int.id} onClick={() => setSelectedIntervention(int.id)} className={`p-3 rounded-xl border-2 text-center ${selectedIntervention === int.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
                               <span className="block font-medium text-sm">{int.name}</span>
-                              <span className="text-xs text-primary-600">{int.tarif}</span>
+                              <span className="text-xs" style={{ color: config?.widget.color || '#f97316' }}>{int.tarif}</span>
                             </button>
                           ))}
                         </div>
@@ -379,26 +532,26 @@ export default function ReservationWidgetPage() {
                           </button>
                         </div>
                       </div>
-                      <button onClick={continueFromOptions} className="btn-primary w-full flex items-center justify-center gap-2">Continuer<ArrowRight className="w-4 h-4" /></button>
+                      <button onClick={continueFromOptions} className="btn-primary w-full flex items-center justify-center gap-2" style={{ backgroundColor: config?.widget.color || '#f97316' }}>Continuer<ArrowRight className="w-4 h-4" /></button>
                     </div>
                   )}
                 </div>
               )}
 
               {/* Dépannage -> Marque/Modèle */}
-              {selectedPrestation === 'DEPANNAGE' && (
+              {selectedPrestation === 'depannage' && (
                 <div className="space-y-6">
                   <h2 className="text-xl font-semibold text-center">Informations sur votre poêle</h2>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div><label className="block text-sm font-medium mb-1">Marque du poêle *</label><input type="text" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Ex: MCZ, Edilkamin, Ravelli..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
                     <div><label className="block text-sm font-medium mb-1">Modèle *</label><input type="text" value={model} onChange={(e) => setModel(e.target.value)} placeholder="Ex: Ego 2.0, Nara..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
                   </div>
-                  <button onClick={continueFromOptions} className="btn-primary w-full flex items-center justify-center gap-2">Continuer<ArrowRight className="w-4 h-4" /></button>
+                  <button onClick={continueFromOptions} className="btn-primary w-full flex items-center justify-center gap-2" style={{ backgroundColor: config?.widget.color || '#f97316' }}>Continuer<ArrowRight className="w-4 h-4" /></button>
                 </div>
               )}
 
               {/* Nettoyage -> Zones */}
-              {selectedPrestation === 'NETTOYAGE' && (
+              {selectedPrestation === 'nettoyage' && (
                 <div className="space-y-6">
                   <h2 className="text-xl font-semibold text-center">Que souhaitez-vous nettoyer ?</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -408,7 +561,7 @@ export default function ReservationWidgetPage() {
                       </button>
                     ))}
                   </div>
-                  <button onClick={continueFromOptions} className="btn-primary w-full flex items-center justify-center gap-2">Continuer<ArrowRight className="w-4 h-4" /></button>
+                  <button onClick={continueFromOptions} className="btn-primary w-full flex items-center justify-center gap-2" style={{ backgroundColor: config?.widget.color || '#f97316' }}>Continuer<ArrowRight className="w-4 h-4" /></button>
                 </div>
               )}
             </div>
@@ -417,8 +570,8 @@ export default function ReservationWidgetPage() {
           {/* Étape 4: Date et créneau */}
           {step === 4 && (
             <div className="bg-white rounded-2xl shadow-soft p-8">
-              <button onClick={() => setStep(selectedPrestation === 'RAMONAGE_ENTRETIEN' || selectedPrestation === 'DEPANNAGE' || selectedPrestation === 'NETTOYAGE' ? 3 : 2)} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
-              
+              <button onClick={() => setStep(selectedPrestation === 'ramonage' || selectedPrestation === 'depannage' || selectedPrestation === 'nettoyage' ? 3 : 2)} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
+
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold">Choisissez votre créneau</h2>
                 <div className="flex bg-secondary-100 rounded-lg p-1">
@@ -436,7 +589,7 @@ export default function ReservationWidgetPage() {
                   </div>
 
                   {loading ? (
-                    <div className="text-center py-12"><Loader2 className="w-8 h-8 text-primary-500 animate-spin mx-auto" /></div>
+                    <div className="text-center py-12"><Loader2 className="w-8 h-8 animate-spin mx-auto" style={{ color: config?.widget.color || '#f97316' }} /></div>
                   ) : viewMode === 'list' ? (
                     <div className="space-y-2 max-h-[350px] overflow-y-auto">
                       {availableDays.length > 0 ? availableDays.map((day) => (
@@ -460,7 +613,7 @@ export default function ReservationWidgetPage() {
                           const hasAvail = day.morning.available || day.afternoon.available;
                           const isSelected = selectedDate === day.date;
                           return (
-                            <button key={day.date} onClick={() => hasAvail && !day.isPast && setSelectedDate(day.date)} disabled={!hasAvail || day.isPast} className={`aspect-square rounded-lg text-sm flex items-center justify-center ${isSelected ? 'bg-primary-500 text-white' : hasAvail && !day.isPast ? 'bg-green-50 text-green-700 hover:bg-green-100' : 'bg-secondary-50 text-secondary-300'}`}>
+                            <button key={day.date} onClick={() => hasAvail && !day.isPast && setSelectedDate(day.date)} disabled={!hasAvail || day.isPast} className={`aspect-square rounded-lg text-sm flex items-center justify-center ${isSelected ? 'bg-primary-500 text-white' : hasAvail && !day.isPast ? 'bg-green-50 text-green-700 hover:bg-green-100' : 'bg-secondary-50 text-secondary-300'}`} style={isSelected ? { backgroundColor: config?.widget.color || '#f97316' } : {}}>
                               {new Date(day.date).getDate()}
                             </button>
                           );
@@ -480,7 +633,10 @@ export default function ReservationWidgetPage() {
                             <div className="w-12 h-12 bg-sky-400 rounded-xl flex items-center justify-center">
                               <Sun className="w-6 h-6 text-white" />
                             </div>
-                            <div className="text-left"><p className="font-semibold">Matin</p><p className="text-sm text-secondary-500">8h - 12h</p></div>
+                            <div className="text-left">
+                              <p className="font-semibold">Matin</p>
+                              <p className="text-sm text-secondary-500">{config?.booking.morningStart || '8h'} - {config?.booking.morningEnd || '12h'}</p>
+                            </div>
                           </button>
                         )}
                         {availability.find(d => d.date === selectedDate)?.afternoon.available && (
@@ -488,7 +644,10 @@ export default function ReservationWidgetPage() {
                             <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
                               <Sunset className="w-6 h-6 text-white" />
                             </div>
-                            <div className="text-left"><p className="font-semibold">Après-midi</p><p className="text-sm text-secondary-500">14h - 18h</p></div>
+                            <div className="text-left">
+                              <p className="font-semibold">Après-midi</p>
+                              <p className="text-sm text-secondary-500">{config?.booking.afternoonStart || '14h'} - {config?.booking.afternoonEnd || '18h'}</p>
+                            </div>
                           </button>
                         )}
                       </div>
@@ -508,13 +667,13 @@ export default function ReservationWidgetPage() {
           {step === 5 && (
             <div className="bg-white rounded-2xl shadow-soft p-8">
               <button onClick={() => { setStep(4); setSelectedSlot(null); }} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
-              
-              <div className="bg-primary-50 border border-primary-100 rounded-xl p-4 mb-6">
+
+              <div className="rounded-xl p-4 mb-6" style={{ backgroundColor: `${config?.widget.color}15` || '#f9731615', borderColor: `${config?.widget.color}30` || '#f9731630', borderWidth: 1 }}>
                 <div className="flex items-center gap-4">
-                  <Calendar className="w-10 h-10 text-primary-500" />
+                  <Calendar className="w-10 h-10" style={{ color: config?.widget.color || '#f97316' }} />
                   <div>
                     <p className="font-semibold capitalize">{formatDate(selectedDate!)}</p>
-                    <p className="text-secondary-600">{selectedSlot === 'MORNING' ? 'Matin (8h-12h)' : 'Après-midi (14h-18h)'}</p>
+                    <p className="text-secondary-600">{selectedSlot === 'MORNING' ? `Matin (${config?.booking.morningStart || '8h'}-${config?.booking.morningEnd || '12h'})` : `Après-midi (${config?.booking.afternoonStart || '14h'}-${config?.booking.afternoonEnd || '18h'})`}</p>
                   </div>
                 </div>
               </div>
@@ -546,7 +705,7 @@ export default function ReservationWidgetPage() {
                 </div>
                 <div><label className="block text-sm font-medium mb-1">Message</label><textarea rows={3} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} placeholder="Informations complémentaires..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
                 {submitError && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2"><AlertCircle className="w-5 h-5" />{submitError}</div>}
-                <button type="submit" disabled={submitting} className="btn-primary w-full flex items-center justify-center gap-2">{submitting ? <><Loader2 className="w-5 h-5 animate-spin" />Envoi...</> : 'Envoyer ma demande'}</button>
+                <button type="submit" disabled={submitting} className="btn-primary w-full flex items-center justify-center gap-2" style={{ backgroundColor: config?.widget.color || '#f97316' }}>{submitting ? <><Loader2 className="w-5 h-5 animate-spin" />Envoi...</> : 'Envoyer ma demande'}</button>
               </form>
             </div>
           )}
@@ -557,16 +716,16 @@ export default function ReservationWidgetPage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"><CheckCircle2 className="w-10 h-10 text-green-500" /></div>
               <h2 className="text-2xl font-bold mb-2">Demande envoyée !</h2>
               <p className="text-secondary-600 mb-6">Nous vous recontactons rapidement pour confirmer.</p>
-              
+
               <div className="bg-secondary-50 rounded-xl p-6 mb-6 max-w-md mx-auto text-left space-y-3">
                 <div className="flex justify-between"><span className="text-secondary-500">Nom</span><span className="font-medium">{formData.lastName} {formData.firstName}</span></div>
                 <div className="flex justify-between"><span className="text-secondary-500">Prestation</span><span className="font-medium">{prestation?.name}{equipment ? ` - ${equipment.name}` : ''}</span></div>
                 <div className="flex justify-between"><span className="text-secondary-500">Date</span><span className="font-medium capitalize">{formatDate(selectedDate!)}</span></div>
                 <div className="flex justify-between"><span className="text-secondary-500">Créneau</span><span className="font-medium">{selectedSlot === 'MORNING' ? 'Matin' : 'Après-midi'}</span></div>
                 <div className="flex justify-between"><span className="text-secondary-500">Adresse</span><span className="font-medium text-right">{formData.address}<br/>{postalCode} {formData.city}</span></div>
-                <div className="flex justify-between border-t border-secondary-200 pt-3"><span className="text-secondary-500">Tarif indicatif</span><span className="font-bold text-primary-600">{getTarif()}</span></div>
+                <div className="flex justify-between border-t border-secondary-200 pt-3"><span className="text-secondary-500">Tarif indicatif</span><span className="font-bold" style={{ color: config?.widget.color || '#f97316' }}>{getTarif()}</span></div>
               </div>
-              
+
               <button
                 onClick={() => {
                   // Reset all states
@@ -584,6 +743,7 @@ export default function ReservationWidgetPage() {
                   setFormData({ lastName: '', firstName: '', email: '', phone: '', address: '', city: '', message: '' });
                 }}
                 className="btn-primary inline-flex items-center gap-2"
+                style={{ backgroundColor: config?.widget.color || '#f97316' }}
               >
                 Nouvelle réservation
               </button>
