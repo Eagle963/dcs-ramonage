@@ -153,6 +153,7 @@ export default function ReservationWidgetPage() {
   const [selectedNettoyage, setSelectedNettoyage] = useState<string[]>([]);
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
+  const [comment, setComment] = useState('');
   const [exhaustType, setExhaustType] = useState<string | null>(null);
 
   // Calendrier
@@ -257,7 +258,12 @@ export default function ReservationWidgetPage() {
 
   const selectEquipment = (id: string) => {
     setSelectedEquipment(id);
-    if (id !== 'pellet_stove') {
+    if (id === 'pellet_stove') {
+      // Options supplémentaires sur une étape dédiée
+      setTimeout(() => {
+        setStep(3.5);
+      }, 300);
+    } else {
       // Pas d'options supplémentaires -> passer directement au calendrier
       setTimeout(() => {
         setStep(4);
@@ -323,7 +329,7 @@ export default function ReservationWidgetPage() {
           date: selectedDate, slot: selectedSlot, ...formData, postalCode,
           equipmentType: selectedEquipment || selectedPrestation,
           serviceType: selectedIntervention || selectedPrestation,
-          brand, model, exhaustType,
+          brand, model, comment, exhaustType,
           nettoyageZones: selectedNettoyage,
           organizationSlug: slug,
         }),
@@ -345,10 +351,18 @@ export default function ReservationWidgetPage() {
   const getStepName = () => {
     if (step === 1) return 'Zone d\'intervention';
     if (step === 2) return 'Type de prestation';
-    if (step === 3) return 'Détails';
+    if (step === 3) return 'Équipement';
+    if (step === 3.5) return 'Options poêle à granulés';
     if (step === 4) return 'Date et créneau';
     if (step === 5) return 'Vos coordonnées';
     return 'Confirmation';
+  };
+
+  // Calcul du numéro d'étape pour l'affichage (max 6)
+  const getDisplayStep = () => {
+    if (step <= 3) return step;
+    if (step === 3.5) return 4;
+    return step === 4 ? 4 : step === 5 ? 5 : 6;
   };
 
   const getTarif = () => {
@@ -433,13 +447,13 @@ export default function ReservationWidgetPage() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-secondary-600">{getStepName()}</span>
-              <span className="text-sm text-secondary-400">Étape {step}/6</span>
+              <span className="text-sm text-secondary-400">Étape {getDisplayStep()}/6</span>
             </div>
             <div className="h-2 bg-secondary-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
-                  width: `${(step / 6) * 100}%`,
+                  width: `${(getDisplayStep() / 6) * 100}%`,
                   backgroundColor: config?.widget.color || '#f97316'
                 }}
               />
@@ -503,53 +517,20 @@ export default function ReservationWidgetPage() {
                       );
                     })}
                   </div>
-
-                  {/* Options poêle granulés */}
-                  {selectedEquipment === 'pellet_stove' && (
-                    <div className="space-y-6 pt-6 border-t border-secondary-100">
-                      <div>
-                        <h3 className="font-medium mb-3">Type d'intervention</h3>
-                        <div className="grid grid-cols-3 gap-3">
-                          {PELLET_INTERVENTIONS.map((int) => (
-                            <button key={int.id} onClick={() => setSelectedIntervention(int.id)} className={`p-3 rounded-xl border-2 text-center ${selectedIntervention === int.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
-                              <span className="block font-medium text-sm">{int.name}</span>
-                              <span className="text-xs" style={{ color: config?.widget.color || '#f97316' }}>{int.tarif}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div><label className="block text-sm font-medium mb-1">Marque *</label><input type="text" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Ex: MCZ, Edilkamin..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
-                        <div><label className="block text-sm font-medium mb-1">Modèle *</label><input type="text" value={model} onChange={(e) => setModel(e.target.value)} placeholder="Ex: Ego 2.0" className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
-                      </div>
-                      <div>
-                        <h3 className="font-medium mb-3">Type de sortie</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                          <button onClick={() => setExhaustType('VENTOUSE')} className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 ${exhaustType === 'VENTOUSE' ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
-                            <VentouseIcon />
-                            <span className="font-medium">Ventouse</span>
-                            <span className="text-xs text-secondary-500">Sortie horizontale</span>
-                          </button>
-                          <button onClick={() => setExhaustType('TOITURE')} className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 ${exhaustType === 'TOITURE' ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
-                            <ToitureIcon />
-                            <span className="font-medium">Toiture</span>
-                            <span className="text-xs text-secondary-500">Sortie verticale</span>
-                          </button>
-                        </div>
-                      </div>
-                      <button onClick={continueFromOptions} className="btn-primary w-full flex items-center justify-center gap-2" style={{ backgroundColor: config?.widget.color || '#f97316' }}>Continuer<ArrowRight className="w-4 h-4" /></button>
-                    </div>
-                  )}
                 </div>
               )}
 
-              {/* Dépannage -> Marque/Modèle */}
+              {/* Dépannage -> Marque/Modèle + Commentaire */}
               {selectedPrestation === 'depannage' && (
                 <div className="space-y-6">
                   <h2 className="text-xl font-semibold text-center">Informations sur votre poêle</h2>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div><label className="block text-sm font-medium mb-1">Marque du poêle *</label><input type="text" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Ex: MCZ, Edilkamin, Ravelli..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
                     <div><label className="block text-sm font-medium mb-1">Modèle *</label><input type="text" value={model} onChange={(e) => setModel(e.target.value)} placeholder="Ex: Ego 2.0, Nara..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Commentaire <span className="text-secondary-400 font-normal">(optionnel)</span></label>
+                    <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={3} placeholder="Décrivez le problème rencontré..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" />
                   </div>
                   <button onClick={continueFromOptions} className="btn-primary w-full flex items-center justify-center gap-2" style={{ backgroundColor: config?.widget.color || '#f97316' }}>Continuer<ArrowRight className="w-4 h-4" /></button>
                 </div>
@@ -572,10 +553,61 @@ export default function ReservationWidgetPage() {
             </div>
           )}
 
+          {/* Étape 3.5: Options poêle à granulés */}
+          {step === 3.5 && (
+            <div className="bg-white rounded-2xl shadow-soft p-8">
+              <button onClick={() => { setStep(3); setSelectedIntervention(null); setBrand(''); setModel(''); setComment(''); setExhaustType(null); }} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
+
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-center">Options poêle à granulés</h2>
+
+                <div>
+                  <h3 className="font-medium mb-3">Type d'intervention</h3>
+                  <div className="grid grid-cols-3 gap-3">
+                    {PELLET_INTERVENTIONS.map((int) => (
+                      <button key={int.id} onClick={() => setSelectedIntervention(int.id)} className={`p-3 rounded-xl border-2 text-center ${selectedIntervention === int.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
+                        <span className="block font-medium text-sm">{int.name}</span>
+                        <span className="text-xs" style={{ color: config?.widget.color || '#f97316' }}>{int.tarif}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div><label className="block text-sm font-medium mb-1">Marque *</label><input type="text" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Ex: MCZ, Edilkamin..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
+                  <div><label className="block text-sm font-medium mb-1">Modèle *</label><input type="text" value={model} onChange={(e) => setModel(e.target.value)} placeholder="Ex: Ego 2.0" className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Commentaire <span className="text-secondary-400 font-normal">(optionnel)</span></label>
+                  <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={3} placeholder="Informations complémentaires sur votre poêle..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" />
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-3">Type de sortie</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button onClick={() => setExhaustType('VENTOUSE')} className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 ${exhaustType === 'VENTOUSE' ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
+                      <VentouseIcon />
+                      <span className="font-medium">Ventouse</span>
+                      <span className="text-xs text-secondary-500">Sortie horizontale</span>
+                    </button>
+                    <button onClick={() => setExhaustType('TOITURE')} className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 ${exhaustType === 'TOITURE' ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
+                      <ToitureIcon />
+                      <span className="font-medium">Toiture</span>
+                      <span className="text-xs text-secondary-500">Sortie verticale</span>
+                    </button>
+                  </div>
+                </div>
+
+                <button onClick={continueFromOptions} className="btn-primary w-full flex items-center justify-center gap-2" style={{ backgroundColor: config?.widget.color || '#f97316' }}>Continuer<ArrowRight className="w-4 h-4" /></button>
+              </div>
+            </div>
+          )}
+
           {/* Étape 4: Date et créneau */}
           {step === 4 && (
             <div className="bg-white rounded-2xl shadow-soft p-8">
-              <button onClick={() => setStep(selectedPrestation === 'ramonage' || selectedPrestation === 'depannage' || selectedPrestation === 'nettoyage' ? 3 : 2)} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
+              <button onClick={() => setStep(selectedEquipment === 'pellet_stove' ? 3.5 : (selectedPrestation === 'ramonage' || selectedPrestation === 'depannage' || selectedPrestation === 'nettoyage' ? 3 : 2))} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
 
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold">Choisissez votre créneau</h2>
@@ -585,7 +617,7 @@ export default function ReservationWidgetPage() {
                 </div>
               </div>
 
-              <div className="grid lg:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-secondary-100 rounded-lg"><ChevronLeft className="w-5 h-5" /></button>
@@ -742,6 +774,7 @@ export default function ReservationWidgetPage() {
                   setSelectedNettoyage([]);
                   setBrand('');
                   setModel('');
+                  setComment('');
                   setExhaustType(null);
                   setSelectedDate(null);
                   setSelectedSlot(null);
