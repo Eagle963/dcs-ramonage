@@ -1,15 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  Building2, Globe, Mail, Phone, MapPin, Camera, 
+import {
+  Building2, Globe, Mail, Phone, MapPin, Camera,
   FileText, CreditCard, Hash, FileSpreadsheet,
   Receipt, TrendingUp, Banknote,
   Calendar, ClipboardList, Palette, Wrench, MessageSquare,
   Package, Clock, Box,
   Type, FileCheck, ScrollText, Award, Send,
   Puzzle, Download, QrCode,
-  Check, Info, Save, X, Copy, ExternalLink
+  Check, Info, Save, X, Copy, ExternalLink,
+  Plus, Pencil, Trash2, GripVertical, ChevronDown, ChevronUp
 } from 'lucide-react';
 
 type MainTab = 'general' | 'documents' | 'parametres' | 'abonnement' | 'parrainage' | 'avantages';
@@ -31,10 +32,34 @@ interface Module {
   link?: string;
 }
 
+// Service avec tarif et ordre
+interface ServiceItem {
+  id: string;
+  name: string;
+  tarif: string;
+  enabled: boolean;
+  order: number;
+}
+
+// Équipement avec tarif et ordre
+interface EquipmentItem {
+  id: string;
+  name: string;
+  tarif: string;
+  order: number;
+}
+
+// Zone d'intervention
+interface ZoneItem {
+  id: string;
+  code: string;
+  name: string;
+}
+
 interface RdvConfig {
   // Mode
   mode: 'creneaux' | 'horaires';
-  
+
   // Mode Créneaux
   maxMorning: number;
   maxAfternoon: number;
@@ -42,7 +67,7 @@ interface RdvConfig {
   morningEnd: string;
   afternoonStart: string;
   afternoonEnd: string;
-  
+
   // Mode Horaires
   slotDuration: number;
   slotInterval: number;
@@ -52,27 +77,30 @@ interface RdvConfig {
   lunchBreak: boolean;
   lunchStart: string;
   lunchEnd: string;
-  
+
   // Disponibilités
   workDays: { [key: string]: boolean };
   minDelayEnabled: boolean;
   minDelayHours: number;
   maxDelayEnabled: boolean;
   maxDelayDays: number;
-  
+
   // Services
-  services: { id: string; name: string; enabled: boolean }[];
-  
+  services: ServiceItem[];
+
+  // Équipements
+  equipments: EquipmentItem[];
+
   // Zones
-  departments: string[];
-  
+  zones: ZoneItem[];
+
   // Notifications
   emailNotify: boolean;
   smsNotify: boolean;
   validationMode: 'auto' | 'manual';
   clientEmailConfirm: boolean;
   confirmMessage: string;
-  
+
   // Widget
   widgetColor: string;
   showLogo: boolean;
@@ -191,16 +219,28 @@ export default function EntreprisePage() {
     maxDelayEnabled: true,
     maxDelayDays: 60,
     services: [
-      { id: 'ramonage', name: 'Ramonage', enabled: true },
-      { id: 'entretien', name: 'Entretien poêle', enabled: true },
-      { id: 'debistrage', name: 'Débistrage', enabled: true },
-      { id: 'tubage', name: 'Tubage', enabled: true },
-      { id: 'diagnostic', name: 'Diagnostic', enabled: true },
-      { id: 'fumisterie', name: 'Fumisterie', enabled: false },
-      { id: 'depannage', name: 'Dépannage', enabled: false },
-      { id: 'autre', name: 'Autre', enabled: true },
+      { id: 'ramonage', name: 'Ramonage / Entretien', tarif: 'À partir de 60€', enabled: true, order: 0 },
+      { id: 'debistrage', name: 'Débistrage', tarif: 'À partir de 90€', enabled: true, order: 1 },
+      { id: 'tubage', name: 'Tubage', tarif: 'Sur devis', enabled: true, order: 2 },
+      { id: 'depannage', name: 'Dépannage', tarif: 'À partir de 90€', enabled: true, order: 3 },
+      { id: 'devis', name: 'Devis', tarif: 'Gratuit', enabled: true, order: 4 },
+      { id: 'nettoyage', name: 'Démoussage / Nettoyage', tarif: 'Sur devis', enabled: false, order: 5 },
     ],
-    departments: ['60', '95'],
+    equipments: [
+      { id: 'gas_boiler', name: 'Chaudière gaz', tarif: '60€', order: 0 },
+      { id: 'chimney_open', name: 'Cheminée ouverte', tarif: '70€', order: 1 },
+      { id: 'chimney_insert', name: 'Insert', tarif: '70€', order: 2 },
+      { id: 'wood_stove', name: 'Poêle à bois', tarif: '80€', order: 3 },
+      { id: 'oil_boiler', name: 'Chaudière fioul', tarif: '80€', order: 4 },
+      { id: 'pellet_stove', name: 'Poêle à granulés', tarif: 'Dès 80€', order: 5 },
+      { id: 'wood_boiler', name: 'Chaudière bois', tarif: '80€', order: 6 },
+      { id: 'polyflam', name: 'Cheminée Polyflam', tarif: '90€', order: 7 },
+      { id: 'conduit_difficile', name: 'Conduit difficile', tarif: '110€', order: 8 },
+    ],
+    zones: [
+      { id: 'zone_60', code: '60', name: 'Oise' },
+      { id: 'zone_95', code: '95', name: 'Val-d\'Oise' },
+    ],
     emailNotify: true,
     smsNotify: false,
     validationMode: 'manual',
@@ -222,6 +262,17 @@ export default function EntreprisePage() {
     { id: 'automatisations', name: 'Automatisations', description: 'Gagnez du temps en automatisant vos actions.', enabled: true },
   ]);
 
+  // États pour les modales d'édition
+  const [editingService, setEditingService] = useState<ServiceItem | null>(null);
+  const [editingEquipment, setEditingEquipment] = useState<EquipmentItem | null>(null);
+  const [editingZone, setEditingZone] = useState<ZoneItem | null>(null);
+  const [showServiceModal, setShowServiceModal] = useState(false);
+  const [showEquipmentModal, setShowEquipmentModal] = useState(false);
+  const [showZoneModal, setShowZoneModal] = useState(false);
+
+  // État pour le drag & drop
+  const [draggedItem, setDraggedItem] = useState<{ type: 'service' | 'equipment'; id: string } | null>(null);
+
   const toggleModule = (id: string) => {
     setModules(modules.map(m => m.id === id ? { ...m, enabled: !m.enabled } : m));
   };
@@ -230,6 +281,101 @@ export default function EntreprisePage() {
     setRdvConfig({
       ...rdvConfig,
       services: rdvConfig.services.map(s => s.id === id ? { ...s, enabled: !s.enabled } : s)
+    });
+  };
+
+  // === CRUD Services ===
+  const addService = (service: Omit<ServiceItem, 'id' | 'order'>) => {
+    const newService: ServiceItem = {
+      ...service,
+      id: `service_${Date.now()}`,
+      order: rdvConfig.services.length,
+    };
+    setRdvConfig({ ...rdvConfig, services: [...rdvConfig.services, newService] });
+  };
+
+  const updateService = (id: string, updates: Partial<ServiceItem>) => {
+    setRdvConfig({
+      ...rdvConfig,
+      services: rdvConfig.services.map(s => s.id === id ? { ...s, ...updates } : s)
+    });
+  };
+
+  const deleteService = (id: string) => {
+    setRdvConfig({
+      ...rdvConfig,
+      services: rdvConfig.services.filter(s => s.id !== id).map((s, i) => ({ ...s, order: i }))
+    });
+  };
+
+  const moveService = (id: string, direction: 'up' | 'down') => {
+    const services = [...rdvConfig.services].sort((a, b) => a.order - b.order);
+    const index = services.findIndex(s => s.id === id);
+    if ((direction === 'up' && index === 0) || (direction === 'down' && index === services.length - 1)) return;
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    [services[index], services[newIndex]] = [services[newIndex], services[index]];
+    setRdvConfig({
+      ...rdvConfig,
+      services: services.map((s, i) => ({ ...s, order: i }))
+    });
+  };
+
+  // === CRUD Équipements ===
+  const addEquipment = (equipment: Omit<EquipmentItem, 'id' | 'order'>) => {
+    const newEquipment: EquipmentItem = {
+      ...equipment,
+      id: `equipment_${Date.now()}`,
+      order: rdvConfig.equipments.length,
+    };
+    setRdvConfig({ ...rdvConfig, equipments: [...rdvConfig.equipments, newEquipment] });
+  };
+
+  const updateEquipment = (id: string, updates: Partial<EquipmentItem>) => {
+    setRdvConfig({
+      ...rdvConfig,
+      equipments: rdvConfig.equipments.map(e => e.id === id ? { ...e, ...updates } : e)
+    });
+  };
+
+  const deleteEquipment = (id: string) => {
+    setRdvConfig({
+      ...rdvConfig,
+      equipments: rdvConfig.equipments.filter(e => e.id !== id).map((e, i) => ({ ...e, order: i }))
+    });
+  };
+
+  const moveEquipment = (id: string, direction: 'up' | 'down') => {
+    const equipments = [...rdvConfig.equipments].sort((a, b) => a.order - b.order);
+    const index = equipments.findIndex(e => e.id === id);
+    if ((direction === 'up' && index === 0) || (direction === 'down' && index === equipments.length - 1)) return;
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    [equipments[index], equipments[newIndex]] = [equipments[newIndex], equipments[index]];
+    setRdvConfig({
+      ...rdvConfig,
+      equipments: equipments.map((e, i) => ({ ...e, order: i }))
+    });
+  };
+
+  // === CRUD Zones ===
+  const addZone = (zone: Omit<ZoneItem, 'id'>) => {
+    const newZone: ZoneItem = {
+      ...zone,
+      id: `zone_${Date.now()}`,
+    };
+    setRdvConfig({ ...rdvConfig, zones: [...rdvConfig.zones, newZone] });
+  };
+
+  const updateZone = (id: string, updates: Partial<ZoneItem>) => {
+    setRdvConfig({
+      ...rdvConfig,
+      zones: rdvConfig.zones.map(z => z.id === id ? { ...z, ...updates } : z)
+    });
+  };
+
+  const deleteZone = (id: string) => {
+    setRdvConfig({
+      ...rdvConfig,
+      zones: rdvConfig.zones.filter(z => z.id !== id)
     });
   };
 
@@ -780,17 +926,56 @@ export default function EntreprisePage() {
 
               {/* Services */}
               {rdvConfigTab === 'services' && (
-                <div className="space-y-6">
+                <div className="space-y-8">
+                  {/* === SERVICES PROPOSÉS === */}
                   <div>
-                    <h3 className="font-semibold mb-3">Services proposés</h3>
-                    <p className="text-sm text-secondary-500 mb-4">Sélectionnez les services disponibles à la réservation en ligne</p>
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold">Services proposés</h3>
+                        <p className="text-sm text-secondary-500">Gérez les prestations disponibles à la réservation</p>
+                      </div>
+                      <button
+                        onClick={() => { setEditingService(null); setShowServiceModal(true); }}
+                        className="flex items-center gap-2 px-3 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Ajouter
+                      </button>
+                    </div>
                     <div className="space-y-2">
-                      {rdvConfig.services.map(service => (
-                        <div key={service.id} className="flex items-center justify-between p-3 bg-secondary-50 rounded-lg">
-                          <span className="font-medium">{service.name}</span>
+                      {[...rdvConfig.services].sort((a, b) => a.order - b.order).map((service, index) => (
+                        <div
+                          key={service.id}
+                          className="flex items-center gap-3 p-3 bg-white border border-secondary-200 rounded-lg group hover:border-secondary-300"
+                        >
+                          {/* Poignée de réorganisation */}
+                          <div className="flex flex-col gap-0.5">
+                            <button
+                              onClick={() => moveService(service.id, 'up')}
+                              disabled={index === 0}
+                              className="p-0.5 text-secondary-400 hover:text-secondary-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <ChevronUp className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => moveService(service.id, 'down')}
+                              disabled={index === rdvConfig.services.length - 1}
+                              className="p-0.5 text-secondary-400 hover:text-secondary-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <ChevronDown className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          {/* Infos service */}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-secondary-900">{service.name}</p>
+                            <p className="text-sm text-primary-600 font-medium">{service.tarif}</p>
+                          </div>
+
+                          {/* Toggle ON/OFF */}
                           <button
                             onClick={() => toggleService(service.id)}
-                            className={`w-10 h-6 rounded-full transition-colors ${
+                            className={`w-10 h-6 rounded-full transition-colors flex-shrink-0 ${
                               service.enabled ? 'bg-primary-500' : 'bg-secondary-300'
                             }`}
                           >
@@ -798,18 +983,133 @@ export default function EntreprisePage() {
                               service.enabled ? 'translate-x-5' : 'translate-x-1'
                             }`} />
                           </button>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => { setEditingService(service); setShowServiceModal(true); }}
+                              className="p-1.5 text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100 rounded"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => { if (confirm('Supprimer ce service ?')) deleteService(service.id); }}
+                              className="p-1.5 text-secondary-400 hover:text-red-600 hover:bg-red-50 rounded"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
 
+                  {/* === ÉQUIPEMENTS === */}
                   <div>
-                    <h3 className="font-semibold mb-3">Zones d'intervention</h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold">Équipements</h3>
+                        <p className="text-sm text-secondary-500">Types d'équipements avec leurs tarifs</p>
+                      </div>
+                      <button
+                        onClick={() => { setEditingEquipment(null); setShowEquipmentModal(true); }}
+                        className="flex items-center gap-2 px-3 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Ajouter
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {[...rdvConfig.equipments].sort((a, b) => a.order - b.order).map((equipment, index) => (
+                        <div
+                          key={equipment.id}
+                          className="flex items-center gap-3 p-3 bg-white border border-secondary-200 rounded-lg group hover:border-secondary-300"
+                        >
+                          {/* Poignée de réorganisation */}
+                          <div className="flex flex-col gap-0.5">
+                            <button
+                              onClick={() => moveEquipment(equipment.id, 'up')}
+                              disabled={index === 0}
+                              className="p-0.5 text-secondary-400 hover:text-secondary-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <ChevronUp className="w-3 h-3" />
+                            </button>
+                            <button
+                              onClick={() => moveEquipment(equipment.id, 'down')}
+                              disabled={index === rdvConfig.equipments.length - 1}
+                              className="p-0.5 text-secondary-400 hover:text-secondary-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <ChevronDown className="w-3 h-3" />
+                            </button>
+                          </div>
+
+                          {/* Infos équipement */}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-secondary-900 text-sm">{equipment.name}</p>
+                          </div>
+
+                          {/* Tarif */}
+                          <span className="text-sm font-semibold text-primary-600 bg-primary-50 px-2 py-1 rounded">
+                            {equipment.tarif}
+                          </span>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => { setEditingEquipment(equipment); setShowEquipmentModal(true); }}
+                              className="p-1 text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100 rounded"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => { if (confirm('Supprimer cet équipement ?')) deleteEquipment(equipment.id); }}
+                              className="p-1 text-secondary-400 hover:text-red-600 hover:bg-red-50 rounded"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* === ZONES D'INTERVENTION === */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h3 className="font-semibold">Zones d'intervention</h3>
+                        <p className="text-sm text-secondary-500">Départements où vous intervenez</p>
+                      </div>
+                      <button
+                        onClick={() => { setEditingZone(null); setShowZoneModal(true); }}
+                        className="flex items-center gap-2 px-3 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Ajouter
+                      </button>
+                    </div>
                     <div className="flex flex-wrap gap-2">
-                      {['60', '95'].map(dept => (
-                        <span key={dept} className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">
-                          {dept === '60' ? 'Oise (60)' : 'Val-d\'Oise (95)'}
-                        </span>
+                      {rdvConfig.zones.map(zone => (
+                        <div
+                          key={zone.id}
+                          className="flex items-center gap-2 px-3 py-2 bg-primary-50 border border-primary-200 rounded-lg group"
+                        >
+                          <span className="font-medium text-primary-700">{zone.name} ({zone.code})</span>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => { setEditingZone(zone); setShowZoneModal(true); }}
+                              className="p-1 text-primary-400 hover:text-primary-600 rounded"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => { if (confirm('Supprimer cette zone ?')) deleteZone(zone.id); }}
+                              className="p-1 text-primary-400 hover:text-red-600 rounded"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -981,6 +1281,192 @@ export default function EntreprisePage() {
                 Sauvegarder
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Service */}
+      {showServiceModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowServiceModal(false)} />
+          <div className="bg-white rounded-xl w-full max-w-md relative z-10">
+            <div className="flex items-center justify-between p-4 border-b border-secondary-200">
+              <h3 className="font-semibold">{editingService ? 'Modifier le service' : 'Ajouter un service'}</h3>
+              <button onClick={() => setShowServiceModal(false)} className="p-1 hover:bg-secondary-100 rounded">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const name = formData.get('name') as string;
+                const tarif = formData.get('tarif') as string;
+                if (editingService) {
+                  updateService(editingService.id, { name, tarif });
+                } else {
+                  addService({ name, tarif, enabled: true });
+                }
+                setShowServiceModal(false);
+              }}
+              className="p-4 space-y-4"
+            >
+              <div>
+                <label className="block text-sm font-medium mb-1">Nom du service *</label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  defaultValue={editingService?.name || ''}
+                  placeholder="Ex: Ramonage / Entretien"
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Tarif *</label>
+                <input
+                  type="text"
+                  name="tarif"
+                  required
+                  defaultValue={editingService?.tarif || ''}
+                  placeholder="Ex: À partir de 60€"
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                />
+                <p className="text-xs text-secondary-500 mt-1">Format: "À partir de X€", "Sur devis", "Gratuit", etc.</p>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setShowServiceModal(false)} className="px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50">
+                  Annuler
+                </button>
+                <button type="submit" className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600">
+                  {editingService ? 'Modifier' : 'Ajouter'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Équipement */}
+      {showEquipmentModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowEquipmentModal(false)} />
+          <div className="bg-white rounded-xl w-full max-w-md relative z-10">
+            <div className="flex items-center justify-between p-4 border-b border-secondary-200">
+              <h3 className="font-semibold">{editingEquipment ? 'Modifier l\'équipement' : 'Ajouter un équipement'}</h3>
+              <button onClick={() => setShowEquipmentModal(false)} className="p-1 hover:bg-secondary-100 rounded">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const name = formData.get('name') as string;
+                const tarif = formData.get('tarif') as string;
+                if (editingEquipment) {
+                  updateEquipment(editingEquipment.id, { name, tarif });
+                } else {
+                  addEquipment({ name, tarif });
+                }
+                setShowEquipmentModal(false);
+              }}
+              className="p-4 space-y-4"
+            >
+              <div>
+                <label className="block text-sm font-medium mb-1">Nom de l'équipement *</label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  defaultValue={editingEquipment?.name || ''}
+                  placeholder="Ex: Poêle à bois"
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Tarif *</label>
+                <input
+                  type="text"
+                  name="tarif"
+                  required
+                  defaultValue={editingEquipment?.tarif || ''}
+                  placeholder="Ex: 80€"
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                />
+                <p className="text-xs text-secondary-500 mt-1">Format: "80€", "Dès 80€", etc.</p>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setShowEquipmentModal(false)} className="px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50">
+                  Annuler
+                </button>
+                <button type="submit" className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600">
+                  {editingEquipment ? 'Modifier' : 'Ajouter'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Zone */}
+      {showZoneModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowZoneModal(false)} />
+          <div className="bg-white rounded-xl w-full max-w-md relative z-10">
+            <div className="flex items-center justify-between p-4 border-b border-secondary-200">
+              <h3 className="font-semibold">{editingZone ? 'Modifier la zone' : 'Ajouter une zone'}</h3>
+              <button onClick={() => setShowZoneModal(false)} className="p-1 hover:bg-secondary-100 rounded">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const code = formData.get('code') as string;
+                const name = formData.get('name') as string;
+                if (editingZone) {
+                  updateZone(editingZone.id, { code, name });
+                } else {
+                  addZone({ code, name });
+                }
+                setShowZoneModal(false);
+              }}
+              className="p-4 space-y-4"
+            >
+              <div>
+                <label className="block text-sm font-medium mb-1">Code département *</label>
+                <input
+                  type="text"
+                  name="code"
+                  required
+                  maxLength={3}
+                  defaultValue={editingZone?.code || ''}
+                  placeholder="Ex: 60"
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Nom du département *</label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  defaultValue={editingZone?.name || ''}
+                  placeholder="Ex: Oise"
+                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setShowZoneModal(false)} className="px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50">
+                  Annuler
+                </button>
+                <button type="submit" className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600">
+                  {editingZone ? 'Modifier' : 'Ajouter'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
