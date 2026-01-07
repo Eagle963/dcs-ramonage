@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { MapPin, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Loader2, Home, Flame, Droplet, Wind, CircleDot, Calendar, List, ArrowRight, Wrench, FileText, SprayCan, PenTool, CircleOff, Sun, Sunset, Building2, Ruler } from 'lucide-react';
 
 interface DayAvailability {
@@ -133,7 +133,9 @@ const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet'
 
 export default function ReservationWidgetPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const slug = params.slug as string;
+  const isEmbed = searchParams.get('embed') === 'true';
 
   // Configuration chargée depuis l'API
   const [config, setConfig] = useState<WidgetConfig | null>(null);
@@ -410,19 +412,22 @@ export default function ReservationWidgetPage() {
 
   return (
     <>
-      <section className="pt-32 pb-12 bg-mesh">
-        <div className="container-site">
-          <div className="text-center max-w-2xl mx-auto">
-            <span className="badge-primary mb-4">Réservation en ligne</span>
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-secondary-900 mb-4">
-              {config?.organization.name || 'Prenez rendez-vous'}
-            </h1>
-            <p className="text-secondary-600">Choisissez votre créneau et nous vous recontactons pour confirmer.</p>
+      {/* Header - masqué en mode embed */}
+      {!isEmbed && (
+        <section className="pt-32 pb-12 bg-mesh">
+          <div className="container-site">
+            <div className="text-center max-w-2xl mx-auto">
+              <span className="badge-primary mb-4">Réservation en ligne</span>
+              <h1 className="text-3xl md:text-4xl font-display font-bold text-secondary-900 mb-4">
+                {config?.organization.name || 'Prenez rendez-vous'}
+              </h1>
+              <p className="text-secondary-600">Choisissez votre créneau et nous vous recontactons pour confirmer.</p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <section className="section-padding">
+      <section className={isEmbed ? "py-4" : "section-padding"}>
         <div className="container-site max-w-4xl">
           {/* Barre de progression */}
           <div className="mb-8">
