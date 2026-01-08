@@ -11,7 +11,7 @@ export default function ReservationPage() {
       // Recevoir la hauteur du contenu depuis l'iframe
       if (event.data?.type === 'widget-resize' && event.data?.height) {
         if (iframeRef.current) {
-          iframeRef.current.style.height = `${event.data.height + 50}px`; // +50 pour marge de sécurité
+          iframeRef.current.style.height = `${event.data.height}px`;
         }
       }
     };

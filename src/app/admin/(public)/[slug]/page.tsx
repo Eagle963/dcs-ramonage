@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { MapPin, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Loader2, Home, Flame, Droplet, Wind, CircleDot, Calendar, List, ArrowRight, Wrench, FileText, SprayCan, PenTool, CircleOff, Sun, Sunset, Building2, Ruler } from 'lucide-react';
 
@@ -203,20 +203,25 @@ export default function ReservationWidgetPage() {
     }
   }, [slug]);
 
+  // Ref pour mesurer la hauteur du contenu en mode embed
+  const contentRef = useRef<HTMLDivElement>(null);
+
   // Communication avec le parent pour ajuster la hauteur de l'iframe
   useEffect(() => {
-    if (isEmbed && typeof window !== 'undefined') {
+    if (isEmbed && typeof window !== 'undefined' && contentRef.current) {
       const sendHeight = () => {
-        const height = document.documentElement.scrollHeight;
-        window.parent.postMessage({ type: 'widget-resize', height }, '*');
+        if (contentRef.current) {
+          const height = contentRef.current.offsetHeight;
+          window.parent.postMessage({ type: 'widget-resize', height }, '*');
+        }
       };
 
       // Envoyer la hauteur initiale après un court délai
       const timeout = setTimeout(sendHeight, 100);
 
-      // Observer les changements de taille
+      // Observer les changements de taille du contenu
       const observer = new ResizeObserver(sendHeight);
-      observer.observe(document.body);
+      observer.observe(contentRef.current);
 
       return () => {
         clearTimeout(timeout);
@@ -450,7 +455,7 @@ export default function ReservationWidgetPage() {
   }
 
   return (
-    <>
+    <div ref={contentRef}>
       {/* Header - masqué en mode embed */}
       {!isEmbed && (
         <section className="pt-32 pb-12 bg-mesh">
@@ -814,6 +819,6 @@ export default function ReservationWidgetPage() {
           )}
         </div>
       </section>
-    </>
+    </div>
   );
 }
