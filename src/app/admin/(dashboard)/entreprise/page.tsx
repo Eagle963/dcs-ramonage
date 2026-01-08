@@ -272,6 +272,7 @@ interface RdvConfig {
   headerBadge: string;
   headerTitle: string;
   headerSubtitle: string;
+  enableClientTypeStep: boolean;
 }
 
 const settingsMenu = [
@@ -419,6 +420,7 @@ export default function EntreprisePage() {
     headerBadge: 'Réservation en ligne',
     headerTitle: 'Prenez rendez-vous',
     headerSubtitle: 'Choisissez votre créneau et nous vous recontactons pour confirmer.',
+    enableClientTypeStep: true,
   });
 
   const [modules, setModules] = useState<Module[]>([
@@ -1363,6 +1365,25 @@ export default function EntreprisePage() {
                       <button className="absolute top-2 right-2 p-1 bg-white border border-secondary-200 rounded hover:bg-secondary-50">
                         <Copy className="w-4 h-4" />
                       </button>
+                    </div>
+                  </div>
+
+                  {/* Options avancées */}
+                  <div>
+                    <h3 className="font-semibold mb-3">Options avancées</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-secondary-50 rounded-lg">
+                        <div>
+                          <p className="font-medium">Étape type de client</p>
+                          <p className="text-sm text-secondary-500">Demander si le client est Particulier, Professionnel ou Syndic</p>
+                        </div>
+                        <button
+                          onClick={() => setRdvConfig({ ...rdvConfig, enableClientTypeStep: !rdvConfig.enableClientTypeStep })}
+                          className={`w-10 h-6 rounded-full transition-colors ${rdvConfig.enableClientTypeStep ? 'bg-primary-500' : 'bg-secondary-300'}`}
+                        >
+                          <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${rdvConfig.enableClientTypeStep ? 'translate-x-5' : 'translate-x-1'}`} />
+                        </button>
+                      </div>
                     </div>
                   </div>
 

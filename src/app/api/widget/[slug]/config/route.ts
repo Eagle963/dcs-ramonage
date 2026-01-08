@@ -49,6 +49,7 @@ interface WidgetConfig {
     headerBadge: string;
     headerTitle: string;
     headerSubtitle: string;
+    enableClientTypeStep: boolean;
   };
 }
 
@@ -111,6 +112,7 @@ const MOCK_CONFIGS: { [slug: string]: WidgetConfig } = {
       headerBadge: 'Réservation en ligne',
       headerTitle: 'Prenez rendez-vous',
       headerSubtitle: 'Choisissez votre créneau et nous vous recontactons pour confirmer.',
+      enableClientTypeStep: true,
     },
   },
 };

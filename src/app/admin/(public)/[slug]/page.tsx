@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import { MapPin, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Loader2, Home, Flame, Droplet, Wind, CircleDot, Calendar, List, ArrowRight, Wrench, FileText, SprayCan, PenTool, CircleOff, Sun, Sunset, Building2, Ruler } from 'lucide-react';
+import { MapPin, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Loader2, Home, Flame, Droplet, Wind, CircleDot, Calendar, List, ArrowRight, Wrench, FileText, SprayCan, PenTool, CircleOff, Sun, Sunset, Building2, Ruler, User } from 'lucide-react';
+import AddressAutocomplete from '@/components/forms/AddressAutocomplete';
+import CompanySearchInput from '@/components/forms/CompanySearchInput';
+
+type ClientType = 'PARTICULIER' | 'PROFESSIONNEL' | 'SYNDIC';
 
 interface DayAvailability {
   date: string;
@@ -61,6 +65,7 @@ interface WidgetConfig {
     headerBadge: string;
     headerTitle: string;
     headerSubtitle: string;
+    enableClientTypeStep: boolean;
   };
 }
 
@@ -149,6 +154,9 @@ export default function ReservationWidgetPage() {
   const [postalCode, setPostalCode] = useState('');
   const [postalCodeError, setPostalCodeError] = useState('');
 
+  // Type de client (Particulier, Professionnel, Syndic)
+  const [clientType, setClientType] = useState<ClientType | null>(null);
+
   // Sélections
   const [selectedPrestation, setSelectedPrestation] = useState<string | null>(null);
   const [selectedEquipment, setSelectedEquipment] = useState<string | null>(null);
@@ -170,11 +178,34 @@ export default function ReservationWidgetPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<'MORNING' | 'AFTERNOON' | null>(null);
 
-  // Formulaire
+  // Formulaire Particulier
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [formData, setFormData] = useState({ lastName: '', firstName: '', email: '', phone: '', address: '', city: '', message: '' });
   const [addressSuggestions, setAddressSuggestions] = useState<any[]>([]);
+
+  // Formulaire Pro/Syndic
+  const [proFormData, setProFormData] = useState({
+    // Entreprise
+    raisonSociale: '',
+    siret: '',
+    tvaIntra: '',
+    codeAPE: '',
+    // Adresse
+    adresse: '',
+    complement: '',
+    codePostal: '',
+    ville: '',
+    lat: undefined as number | undefined,
+    lng: undefined as number | undefined,
+    // Contact
+    contactNom: '',
+    contactPrenom: '',
+    contactEmail: '',
+    contactTelephone: '',
+    // Message
+    message: '',
+  });
 
   // Charger la config au montage
   useEffect(() => {
@@ -268,6 +299,23 @@ export default function ReservationWidgetPage() {
     }
 
     setPostalCodeError('');
+
+    // Si l'étape type client est activée, aller à 1.5, sinon directement à 2
+    if (config?.widget.enableClientTypeStep) {
+      setStep(1.5);
+    } else {
+      setClientType('PARTICULIER'); // Par défaut particulier si étape désactivée
+      setStep(2);
+    }
+  };
+
+  // Sélection du type de client
+  const selectClientType = (type: ClientType) => {
+    setClientType(type);
+    // Pré-remplir le code postal dans le formulaire pro
+    if (type !== 'PARTICULIER') {
+      setProFormData(prev => ({ ...prev, codePostal: postalCode }));
+    }
     setStep(2);
   };
 
@@ -347,6 +395,35 @@ export default function ReservationWidgetPage() {
     setAddressSuggestions([]);
   };
 
+  // Handlers pour le formulaire Pro/Syndic
+  const handleProCompanySelect = (company: any) => {
+    setProFormData(prev => ({
+      ...prev,
+      raisonSociale: company.nom,
+      siret: company.siret,
+      tvaIntra: company.tvaIntra,
+      codeAPE: company.codeAPE,
+      adresse: [company.adresse, company.codePostal, company.ville].filter(Boolean).join(', '),
+      codePostal: company.codePostal,
+      ville: company.ville,
+      lat: company.lat,
+      lng: company.lng,
+    }));
+  };
+
+  const handleProAddressSelect = (address: any) => {
+    if (address) {
+      setProFormData(prev => ({
+        ...prev,
+        adresse: `${address.housenumber || ''} ${address.street || ''}`.trim() || address.label,
+        codePostal: address.postcode,
+        ville: address.city,
+        lat: address.lat,
+        lng: address.lng,
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -380,6 +457,7 @@ export default function ReservationWidgetPage() {
 
   const getStepName = () => {
     if (step === 1) return 'Zone d\'intervention';
+    if (step === 1.5) return 'Vous êtes';
     if (step === 2) return 'Type de prestation';
     if (step === 3) return 'Équipement';
     if (step === 3.5) return 'Options poêle à granulés';
@@ -388,12 +466,19 @@ export default function ReservationWidgetPage() {
     return 'Confirmation';
   };
 
-  // Calcul du numéro d'étape pour l'affichage (max 6)
+  // Calcul du numéro d'étape pour l'affichage (max 7)
   const getDisplayStep = () => {
-    if (step <= 3) return step;
+    if (step === 1) return 1;
+    if (step === 1.5) return 2;
+    if (step === 2) return 3;
+    if (step === 3) return 4;
     if (step === 3.5) return 4;
-    return step === 4 ? 4 : step === 5 ? 5 : 6;
+    if (step === 4) return 5;
+    if (step === 5) return 6;
+    return 7;
   };
+
+  const totalSteps = 7;
 
   const getTarif = () => {
     if (selectedPrestation === 'ramonage') {
@@ -477,13 +562,13 @@ export default function ReservationWidgetPage() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-secondary-600">{getStepName()}</span>
-              <span className="text-sm text-secondary-400">Étape {getDisplayStep()}/6</span>
+              <span className="text-sm text-secondary-400">Étape {getDisplayStep()}/{totalSteps}</span>
             </div>
             <div className="h-2 bg-secondary-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
-                  width: `${(getDisplayStep() / 6) * 100}%`,
+                  width: `${(getDisplayStep() / totalSteps) * 100}%`,
                   backgroundColor: config?.widget.color || '#f97316'
                 }}
               />
@@ -504,20 +589,70 @@ export default function ReservationWidgetPage() {
             </div>
           )}
 
+          {/* Étape 1.5: Type de client */}
+          {step === 1.5 && (
+            <div className="bg-white rounded-2xl shadow-soft p-8">
+              <button onClick={() => { setStep(1); setClientType(null); }} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
+              <h2 className="text-xl font-semibold text-center mb-2">Vous êtes</h2>
+              <p className="text-secondary-600 text-center mb-6">Sélectionnez votre profil pour voir les tarifs adaptés</p>
+              <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto">
+                <button
+                  onClick={() => selectClientType('PARTICULIER')}
+                  className={`p-6 rounded-xl border-2 transition-all flex flex-col items-center gap-3 hover:border-blue-500 ${
+                    clientType === 'PARTICULIER' ? 'border-blue-500 bg-blue-50' : 'border-secondary-200'
+                  }`}
+                >
+                  <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <User className="w-7 h-7 text-blue-600" />
+                  </div>
+                  <span className="font-medium text-sm">Particulier</span>
+                  <span className="text-xs text-secondary-500">Tarifs TTC</span>
+                </button>
+                <button
+                  onClick={() => selectClientType('PROFESSIONNEL')}
+                  className={`p-6 rounded-xl border-2 transition-all flex flex-col items-center gap-3 hover:border-purple-500 ${
+                    clientType === 'PROFESSIONNEL' ? 'border-purple-500 bg-purple-50' : 'border-secondary-200'
+                  }`}
+                >
+                  <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <Building2 className="w-7 h-7 text-purple-600" />
+                  </div>
+                  <span className="font-medium text-sm">Professionnel</span>
+                  <span className="text-xs text-secondary-500">Tarifs HT</span>
+                </button>
+                <button
+                  onClick={() => selectClientType('SYNDIC')}
+                  className={`p-6 rounded-xl border-2 transition-all flex flex-col items-center gap-3 hover:border-amber-500 ${
+                    clientType === 'SYNDIC' ? 'border-amber-500 bg-amber-50' : 'border-secondary-200'
+                  }`}
+                >
+                  <div className="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center">
+                    <Home className="w-7 h-7 text-amber-600" />
+                  </div>
+                  <span className="font-medium text-sm">Syndic</span>
+                  <span className="text-xs text-secondary-500">Tarifs HT</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Étape 2: Type de prestation */}
           {step === 2 && (
             <div className="bg-white rounded-2xl shadow-soft p-8">
-              <button onClick={() => setStep(1)} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
+              <button onClick={() => setStep(config?.widget.enableClientTypeStep ? 1.5 : 1)} className="text-secondary-500 hover:text-secondary-700 flex items-center gap-1 mb-6"><ChevronLeft className="w-4 h-4" />Retour</button>
               <h2 className="text-xl font-semibold text-center mb-6">Quelle prestation souhaitez-vous ?</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {services.map((service) => {
                   const Icon = SERVICE_ICONS[service.id] || Flame;
                   const color = SERVICE_COLORS[service.id] || 'bg-gray-500';
+                  const showHT = clientType !== 'PARTICULIER';
+                  // TODO: Afficher tarif HT pour les pros quand disponible
+                  const displayTarif = service.tarif + (showHT ? ' HT' : ' TTC');
                   return (
                     <button key={service.id} onClick={() => selectPrestation(service.id)} className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 hover:border-primary-500 ${selectedPrestation === service.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
                       <div className={`w-14 h-14 ${color} rounded-xl flex items-center justify-center`}><Icon className="w-7 h-7 text-white" /></div>
                       <span className="font-medium text-sm text-center">{service.name}</span>
-                      <span className="text-xs font-semibold" style={{ color: config?.widget.color || '#f97316' }}>{service.tarif}</span>
+                      <span className="text-xs font-semibold" style={{ color: config?.widget.color || '#f97316' }}>{displayTarif}</span>
                     </button>
                   );
                 })}
@@ -538,11 +673,13 @@ export default function ReservationWidgetPage() {
                     {equipments.map((eq) => {
                       const Icon = EQUIPMENT_ICONS[eq.id] || Flame;
                       const color = EQUIPMENT_COLORS[eq.id] || 'bg-gray-500';
+                      const showHT = clientType !== 'PARTICULIER';
+                      const displayTarif = eq.tarif + (showHT ? ' HT' : ' TTC');
                       return (
                         <button key={eq.id} onClick={() => selectEquipment(eq.id)} className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 hover:border-primary-500 ${selectedEquipment === eq.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
                           <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center`}><Icon className="w-6 h-6 text-white" /></div>
                           <span className="font-medium text-sm text-center">{eq.name}</span>
-                          <span className="text-xs font-semibold" style={{ color: config?.widget.color || '#f97316' }}>{eq.tarif}</span>
+                          <span className="text-xs font-semibold" style={{ color: config?.widget.color || '#f97316' }}>{displayTarif}</span>
                         </button>
                       );
                     })}
@@ -745,35 +882,124 @@ export default function ReservationWidgetPage() {
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <h2 className="text-xl font-semibold">Vos informations</h2>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium mb-1">Nom *</label><input type="text" required value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
-                  <div><label className="block text-sm font-medium mb-1">Prénom *</label><input type="text" required value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium mb-1">Email *</label><input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
-                  <div><label className="block text-sm font-medium mb-1">Téléphone *</label><input type="tel" required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
-                </div>
-                <div className="relative">
-                  <label className="block text-sm font-medium mb-1">Adresse *</label>
-                  <input type="text" required value={formData.address} onChange={(e) => { setFormData({ ...formData, address: e.target.value }); searchAddress(e.target.value); }} placeholder="Commencez à taper..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" />
-                  {addressSuggestions.length > 0 && (
-                    <div className="absolute z-10 w-full bg-white border border-secondary-200 rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto">
-                      {addressSuggestions.map((s, i) => (
-                        <button key={i} type="button" onClick={() => selectAddress(s)} className="w-full px-4 py-2 text-left hover:bg-secondary-50 text-sm">{s.properties.label}</button>
-                      ))}
+              {/* ============ FORMULAIRE PARTICULIER ============ */}
+              {(!clientType || clientType === 'PARTICULIER') && (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <h2 className="text-xl font-semibold">Vos informations</h2>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div><label className="block text-sm font-medium mb-1">Nom *</label><input type="text" required value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
+                    <div><label className="block text-sm font-medium mb-1">Prénom *</label><input type="text" required value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div><label className="block text-sm font-medium mb-1">Email *</label><input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
+                    <div><label className="block text-sm font-medium mb-1">Téléphone *</label><input type="tel" required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
+                  </div>
+                  <div className="relative">
+                    <label className="block text-sm font-medium mb-1">Adresse *</label>
+                    <input type="text" required value={formData.address} onChange={(e) => { setFormData({ ...formData, address: e.target.value }); searchAddress(e.target.value); }} placeholder="Commencez à taper..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" />
+                    {addressSuggestions.length > 0 && (
+                      <div className="absolute z-10 w-full bg-white border border-secondary-200 rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto">
+                        {addressSuggestions.map((s, i) => (
+                          <button key={i} type="button" onClick={() => selectAddress(s)} className="w-full px-4 py-2 text-left hover:bg-secondary-50 text-sm">{s.properties.label}</button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div><label className="block text-sm font-medium mb-1">Code postal</label><input type="text" value={postalCode} disabled className="w-full px-4 py-2 border border-secondary-200 rounded-lg bg-secondary-50" /></div>
+                    <div><label className="block text-sm font-medium mb-1">Ville *</label><input type="text" required value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
+                  </div>
+                  <div><label className="block text-sm font-medium mb-1">Message</label><textarea rows={3} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} placeholder="Informations complémentaires..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
+                  {submitError && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2"><AlertCircle className="w-5 h-5" />{submitError}</div>}
+                  <button type="submit" disabled={submitting} className="btn-primary w-full flex items-center justify-center gap-2" style={{ backgroundColor: config?.widget.color || '#f97316' }}>{submitting ? <><Loader2 className="w-5 h-5 animate-spin" />Envoi...</> : 'Envoyer ma demande'}</button>
+                </form>
+              )}
+
+              {/* ============ FORMULAIRE PROFESSIONNEL / SYNDIC ============ */}
+              {(clientType === 'PROFESSIONNEL' || clientType === 'SYNDIC') && (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Entreprise */}
+                  <div className={`rounded-xl p-4 space-y-4 ${clientType === 'PROFESSIONNEL' ? 'bg-purple-50' : 'bg-amber-50'}`}>
+                    <h3 className={`font-medium flex items-center gap-2 ${clientType === 'PROFESSIONNEL' ? 'text-purple-900' : 'text-amber-900'}`}>
+                      {clientType === 'PROFESSIONNEL' ? <Building2 className="w-4 h-4" /> : <Home className="w-4 h-4" />}
+                      {clientType === 'PROFESSIONNEL' ? 'Entreprise' : 'Syndicat de copropriété'}
+                    </h3>
+
+                    <CompanySearchInput
+                      value={proFormData.raisonSociale}
+                      onChange={(value) => setProFormData(prev => ({ ...prev, raisonSociale: value }))}
+                      onCompanySelect={handleProCompanySelect}
+                      label={clientType === 'PROFESSIONNEL' ? 'Raison sociale' : 'Nom du syndic'}
+                      required
+                      placeholder="Tapez le nom ou SIRET..."
+                    />
+                  </div>
+
+                  {/* Adresse */}
+                  <div className="bg-secondary-50 rounded-xl p-4 space-y-4">
+                    <h3 className="font-medium text-secondary-900 flex items-center gap-2">
+                      <MapPin className="w-4 h-4" /> Adresse d'intervention
+                    </h3>
+
+                    <AddressAutocomplete
+                      value={proFormData.adresse}
+                      onChange={handleProAddressSelect}
+                      required
+                    />
+
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-700 mb-1">Complément d'adresse</label>
+                      <input
+                        type="text"
+                        value={proFormData.complement}
+                        onChange={(e) => setProFormData(prev => ({ ...prev, complement: e.target.value }))}
+                        className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                        placeholder="Bâtiment, étage..."
+                      />
                     </div>
-                  )}
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div><label className="block text-sm font-medium mb-1">Code postal</label><input type="text" value={postalCode} disabled className="w-full px-4 py-2 border border-secondary-200 rounded-lg bg-secondary-50" /></div>
-                  <div><label className="block text-sm font-medium mb-1">Ville *</label><input type="text" required value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
-                </div>
-                <div><label className="block text-sm font-medium mb-1">Message</label><textarea rows={3} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} placeholder="Informations complémentaires..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
-                {submitError && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2"><AlertCircle className="w-5 h-5" />{submitError}</div>}
-                <button type="submit" disabled={submitting} className="btn-primary w-full flex items-center justify-center gap-2" style={{ backgroundColor: config?.widget.color || '#f97316' }}>{submitting ? <><Loader2 className="w-5 h-5 animate-spin" />Envoi...</> : 'Envoyer ma demande'}</button>
-              </form>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-secondary-700 mb-1">Code postal</label>
+                        <input type="text" value={proFormData.codePostal} readOnly className="w-full px-3 py-2 border border-secondary-200 rounded-lg bg-secondary-100" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-sm font-medium text-secondary-700 mb-1">Ville</label>
+                        <input type="text" value={proFormData.ville} readOnly className="w-full px-3 py-2 border border-secondary-200 rounded-lg bg-secondary-100" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact */}
+                  <div className="bg-secondary-50 rounded-xl p-4 space-y-4">
+                    <h3 className="font-medium text-secondary-900 flex items-center gap-2">
+                      <User className="w-4 h-4" /> Contact
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div><label className="block text-sm font-medium text-secondary-700 mb-1">Nom du contact *</label><input type="text" required value={proFormData.contactNom} onChange={(e) => setProFormData(prev => ({ ...prev, contactNom: e.target.value }))} className="w-full px-3 py-2 border border-secondary-200 rounded-lg" /></div>
+                      <div><label className="block text-sm font-medium text-secondary-700 mb-1">Prénom</label><input type="text" value={proFormData.contactPrenom} onChange={(e) => setProFormData(prev => ({ ...prev, contactPrenom: e.target.value }))} className="w-full px-3 py-2 border border-secondary-200 rounded-lg" /></div>
+                      <div><label className="block text-sm font-medium text-secondary-700 mb-1">Email *</label><input type="email" required value={proFormData.contactEmail} onChange={(e) => setProFormData(prev => ({ ...prev, contactEmail: e.target.value }))} className="w-full px-3 py-2 border border-secondary-200 rounded-lg" placeholder="email@entreprise.com" /></div>
+                      <div><label className="block text-sm font-medium text-secondary-700 mb-1">Téléphone *</label><input type="tel" required value={proFormData.contactTelephone} onChange={(e) => setProFormData(prev => ({ ...prev, contactTelephone: e.target.value }))} className="w-full px-3 py-2 border border-secondary-200 rounded-lg" /></div>
+                    </div>
+                  </div>
+
+                  {/* Détails entreprise */}
+                  <div className="bg-secondary-50 rounded-xl p-4 space-y-4">
+                    <h3 className="font-medium text-secondary-900">Détails de l'entreprise</h3>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div><label className="block text-sm font-medium text-secondary-700 mb-1">SIRET</label><input type="text" value={proFormData.siret} readOnly className="w-full px-3 py-2 border border-secondary-200 rounded-lg bg-secondary-100 text-sm" /></div>
+                      <div><label className="block text-sm font-medium text-secondary-700 mb-1">N° TVA intra.</label><input type="text" value={proFormData.tvaIntra} readOnly className="w-full px-3 py-2 border border-secondary-200 rounded-lg bg-secondary-100 text-sm" /></div>
+                      <div><label className="block text-sm font-medium text-secondary-700 mb-1">Code APE</label><input type="text" value={proFormData.codeAPE} readOnly className="w-full px-3 py-2 border border-secondary-200 rounded-lg bg-secondary-100 text-sm" /></div>
+                    </div>
+                  </div>
+
+                  {/* Message */}
+                  <div><label className="block text-sm font-medium mb-1">Message</label><textarea rows={3} value={proFormData.message} onChange={(e) => setProFormData(prev => ({ ...prev, message: e.target.value }))} placeholder="Informations complémentaires..." className="w-full px-4 py-2 border border-secondary-200 rounded-lg" /></div>
+
+                  {submitError && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2"><AlertCircle className="w-5 h-5" />{submitError}</div>}
+                  <button type="submit" disabled={submitting} className="btn-primary w-full flex items-center justify-center gap-2" style={{ backgroundColor: config?.widget.color || '#f97316' }}>{submitting ? <><Loader2 className="w-5 h-5 animate-spin" />Envoi...</> : 'Envoyer ma demande'}</button>
+                </form>
+              )}
             </div>
           )}
 
@@ -798,6 +1024,7 @@ export default function ReservationWidgetPage() {
                   // Reset all states
                   setStep(1);
                   setPostalCode('');
+                  setClientType(null);
                   setSelectedPrestation(null);
                   setSelectedEquipment(null);
                   setSelectedIntervention(null);
@@ -809,6 +1036,7 @@ export default function ReservationWidgetPage() {
                   setSelectedDate(null);
                   setSelectedSlot(null);
                   setFormData({ lastName: '', firstName: '', email: '', phone: '', address: '', city: '', message: '' });
+                  setProFormData({ raisonSociale: '', siret: '', tvaIntra: '', codeAPE: '', adresse: '', complement: '', codePostal: '', ville: '', lat: undefined, lng: undefined, contactNom: '', contactPrenom: '', contactEmail: '', contactTelephone: '', message: '' });
                 }}
                 className="btn-primary inline-flex items-center gap-2"
                 style={{ backgroundColor: config?.widget.color || '#f97316' }}
