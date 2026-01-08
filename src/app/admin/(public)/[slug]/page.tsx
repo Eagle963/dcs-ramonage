@@ -21,12 +21,14 @@ interface ServiceConfig {
   id: string;
   name: string;
   tarif: string;
+  tarifHT?: string;
 }
 
 interface EquipmentConfig {
   id: string;
   name: string;
   tarif: string;
+  tarifHT?: string;
 }
 
 interface ZoneConfig {
