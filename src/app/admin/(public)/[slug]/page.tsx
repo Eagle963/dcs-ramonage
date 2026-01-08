@@ -403,7 +403,7 @@ export default function ReservationWidgetPage() {
       siret: company.siret,
       tvaIntra: company.tvaIntra,
       codeAPE: company.codeAPE,
-      adresse: [company.adresse, company.codePostal, company.ville].filter(Boolean).join(', '),
+      adresse: company.adresse,
       codePostal: company.codePostal,
       ville: company.ville,
       lat: company.lat,
