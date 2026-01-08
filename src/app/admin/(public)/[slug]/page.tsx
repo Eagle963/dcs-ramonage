@@ -429,11 +429,39 @@ export default function ReservationWidgetPage() {
     setSubmitting(true);
     setSubmitError('');
     try {
+      // Préparer les données selon le type de client
+      const isPro = clientType === 'PROFESSIONNEL' || clientType === 'SYNDIC';
+      const clientData = isPro
+        ? {
+            clientType,
+            lastName: proFormData.contactNom,
+            firstName: proFormData.contactPrenom,
+            email: proFormData.contactEmail,
+            phone: proFormData.contactTelephone,
+            address: proFormData.adresse,
+            city: proFormData.ville,
+            message: proFormData.message,
+            company: {
+              name: proFormData.raisonSociale,
+              siret: proFormData.siret,
+              tvaIntra: proFormData.tvaIntra,
+              codeAPE: proFormData.codeAPE,
+            },
+            addressComplement: proFormData.complement,
+          }
+        : {
+            clientType: clientType || 'PARTICULIER',
+            ...formData,
+          };
+
       const res = await fetch('/api/booking/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          date: selectedDate, slot: selectedSlot, ...formData, postalCode,
+          date: selectedDate,
+          slot: selectedSlot,
+          ...clientData,
+          postalCode: isPro ? proFormData.codePostal : postalCode,
           equipmentType: selectedEquipment || selectedPrestation,
           serviceType: selectedIntervention || selectedPrestation,
           brand, model, comment, exhaustType,
@@ -1011,12 +1039,22 @@ export default function ReservationWidgetPage() {
               <p className="text-secondary-600 mb-6">Nous vous recontactons rapidement pour confirmer.</p>
 
               <div className="bg-secondary-50 rounded-xl p-6 mb-6 max-w-md mx-auto text-left space-y-3">
-                <div className="flex justify-between"><span className="text-secondary-500">Nom</span><span className="font-medium">{formData.lastName} {formData.firstName}</span></div>
+                {(clientType === 'PROFESSIONNEL' || clientType === 'SYNDIC') ? (
+                  <>
+                    <div className="flex justify-between"><span className="text-secondary-500">Entreprise</span><span className="font-medium">{proFormData.raisonSociale}</span></div>
+                    <div className="flex justify-between"><span className="text-secondary-500">Contact</span><span className="font-medium">{proFormData.contactNom} {proFormData.contactPrenom}</span></div>
+                  </>
+                ) : (
+                  <div className="flex justify-between"><span className="text-secondary-500">Nom</span><span className="font-medium">{formData.lastName} {formData.firstName}</span></div>
+                )}
                 <div className="flex justify-between"><span className="text-secondary-500">Prestation</span><span className="font-medium">{prestation?.name}{equipment ? ` - ${equipment.name}` : ''}</span></div>
                 <div className="flex justify-between"><span className="text-secondary-500">Date</span><span className="font-medium capitalize">{formatDate(selectedDate!)}</span></div>
                 <div className="flex justify-between"><span className="text-secondary-500">Créneau</span><span className="font-medium">{selectedSlot === 'MORNING' ? 'Matin' : 'Après-midi'}</span></div>
-                <div className="flex justify-between"><span className="text-secondary-500">Adresse</span><span className="font-medium text-right">{formData.address}<br/>{postalCode} {formData.city}</span></div>
-                <div className="flex justify-between border-t border-secondary-200 pt-3"><span className="text-secondary-500">Tarif indicatif</span><span className="font-bold" style={{ color: config?.widget.color || '#f97316' }}>{getTarif()}</span></div>
+                <div className="flex justify-between"><span className="text-secondary-500">Adresse</span><span className="font-medium text-right">
+                  {(clientType === 'PROFESSIONNEL' || clientType === 'SYNDIC') ? proFormData.adresse : formData.address}<br/>
+                  {(clientType === 'PROFESSIONNEL' || clientType === 'SYNDIC') ? `${proFormData.codePostal} ${proFormData.ville}` : `${postalCode} ${formData.city}`}
+                </span></div>
+                <div className="flex justify-between border-t border-secondary-200 pt-3"><span className="text-secondary-500">Tarif indicatif</span><span className="font-bold" style={{ color: config?.widget.color || '#f97316' }}>{getTarif()} {clientType !== 'PARTICULIER' ? 'HT' : 'TTC'}</span></div>
               </div>
 
               <button
