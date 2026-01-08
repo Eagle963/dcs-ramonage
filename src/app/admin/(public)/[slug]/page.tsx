@@ -58,6 +58,9 @@ interface WidgetConfig {
   widget: {
     color: string;
     showLogo: boolean;
+    headerBadge: string;
+    headerTitle: string;
+    headerSubtitle: string;
   };
 }
 
@@ -431,17 +434,17 @@ export default function ReservationWidgetPage() {
         <section className="pt-32 pb-12 bg-mesh">
           <div className="container-site">
             <div className="text-center max-w-2xl mx-auto">
-              <span className="badge-primary mb-4">Réservation en ligne</span>
+              <span className="badge-primary mb-4">{config?.widget.headerBadge || 'Réservation en ligne'}</span>
               <h1 className="text-3xl md:text-4xl font-display font-bold text-secondary-900 mb-4">
-                {config?.organization.name || 'Prenez rendez-vous'}
+                {config?.widget.headerTitle || 'Prenez rendez-vous'}
               </h1>
-              <p className="text-secondary-600">Choisissez votre créneau et nous vous recontactons pour confirmer.</p>
+              <p className="text-secondary-600">{config?.widget.headerSubtitle || 'Choisissez votre créneau et nous vous recontactons pour confirmer.'}</p>
             </div>
           </div>
         </section>
       )}
 
-      <section className={isEmbed ? "py-4" : "section-padding"}>
+      <section className="section-padding">
         <div className="container-site max-w-4xl">
           {/* Barre de progression */}
           <div className="mb-8">

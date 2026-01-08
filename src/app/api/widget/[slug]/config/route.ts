@@ -46,6 +46,9 @@ interface WidgetConfig {
   widget: {
     color: string;
     showLogo: boolean;
+    headerBadge: string;
+    headerTitle: string;
+    headerSubtitle: string;
   };
 }
 
@@ -105,6 +108,9 @@ const MOCK_CONFIGS: { [slug: string]: WidgetConfig } = {
     widget: {
       color: '#f97316',
       showLogo: true,
+      headerBadge: 'Réservation en ligne',
+      headerTitle: 'Prenez rendez-vous',
+      headerSubtitle: 'Choisissez votre créneau et nous vous recontactons pour confirmer.',
     },
   },
 };
