@@ -202,6 +202,7 @@ interface ServiceItem {
   id: string;
   name: string;
   tarif: string;
+  tarifHT?: string;
   enabled: boolean;
   order: number;
 }
@@ -211,6 +212,7 @@ interface EquipmentItem {
   id: string;
   name: string;
   tarif: string;
+  tarifHT?: string;
   order: number;
 }
 
@@ -388,23 +390,23 @@ export default function EntreprisePage() {
     maxDelayEnabled: true,
     maxDelayDays: 60,
     services: [
-      { id: 'ramonage', name: 'Ramonage / Entretien', tarif: 'À partir de 60€', enabled: true, order: 0 },
-      { id: 'debistrage', name: 'Débistrage', tarif: 'À partir de 90€', enabled: true, order: 1 },
-      { id: 'tubage', name: 'Tubage', tarif: 'Sur devis', enabled: true, order: 2 },
-      { id: 'depannage', name: 'Dépannage', tarif: 'À partir de 90€', enabled: true, order: 3 },
-      { id: 'devis', name: 'Devis', tarif: 'Gratuit', enabled: true, order: 4 },
-      { id: 'nettoyage', name: 'Démoussage / Nettoyage', tarif: 'Sur devis', enabled: false, order: 5 },
+      { id: 'ramonage', name: 'Ramonage / Entretien', tarif: 'À partir de 60€', tarifHT: 'À partir de 50€ HT', enabled: true, order: 0 },
+      { id: 'debistrage', name: 'Débistrage', tarif: 'À partir de 90€', tarifHT: 'À partir de 75€ HT', enabled: true, order: 1 },
+      { id: 'tubage', name: 'Tubage', tarif: 'Sur devis', tarifHT: 'Sur devis', enabled: true, order: 2 },
+      { id: 'depannage', name: 'Dépannage', tarif: 'À partir de 90€', tarifHT: 'À partir de 75€ HT', enabled: true, order: 3 },
+      { id: 'devis', name: 'Devis', tarif: 'Gratuit', tarifHT: 'Gratuit', enabled: true, order: 4 },
+      { id: 'nettoyage', name: 'Démoussage / Nettoyage', tarif: 'Sur devis', tarifHT: 'Sur devis', enabled: false, order: 5 },
     ],
     equipments: [
-      { id: 'gas_boiler', name: 'Chaudière gaz', tarif: '60€', order: 0 },
-      { id: 'chimney_open', name: 'Cheminée ouverte', tarif: '70€', order: 1 },
-      { id: 'chimney_insert', name: 'Insert', tarif: '70€', order: 2 },
-      { id: 'wood_stove', name: 'Poêle à bois', tarif: '80€', order: 3 },
-      { id: 'oil_boiler', name: 'Chaudière fioul', tarif: '80€', order: 4 },
-      { id: 'pellet_stove', name: 'Poêle à granulés', tarif: 'Dès 80€', order: 5 },
-      { id: 'wood_boiler', name: 'Chaudière bois', tarif: '80€', order: 6 },
-      { id: 'polyflam', name: 'Cheminée Polyflam', tarif: '90€', order: 7 },
-      { id: 'conduit_difficile', name: 'Conduit difficile', tarif: '110€', order: 8 },
+      { id: 'gas_boiler', name: 'Chaudière gaz', tarif: '60€', tarifHT: '50€ HT', order: 0 },
+      { id: 'chimney_open', name: 'Cheminée ouverte', tarif: '70€', tarifHT: '58€ HT', order: 1 },
+      { id: 'chimney_insert', name: 'Insert', tarif: '70€', tarifHT: '58€ HT', order: 2 },
+      { id: 'wood_stove', name: 'Poêle à bois', tarif: '80€', tarifHT: '67€ HT', order: 3 },
+      { id: 'oil_boiler', name: 'Chaudière fioul', tarif: '80€', tarifHT: '67€ HT', order: 4 },
+      { id: 'pellet_stove', name: 'Poêle à granulés', tarif: 'Dès 80€', tarifHT: 'Dès 67€ HT', order: 5 },
+      { id: 'wood_boiler', name: 'Chaudière bois', tarif: '80€', tarifHT: '67€ HT', order: 6 },
+      { id: 'polyflam', name: 'Cheminée Polyflam', tarif: '90€', tarifHT: '75€ HT', order: 7 },
+      { id: 'conduit_difficile', name: 'Conduit difficile', tarif: '110€', tarifHT: '92€ HT', order: 8 },
     ],
     zones: [
       { id: 'zone_60', code: '60', name: 'Oise' },
@@ -1496,10 +1498,11 @@ export default function EntreprisePage() {
                 const formData = new FormData(e.currentTarget);
                 const name = formData.get('name') as string;
                 const tarif = formData.get('tarif') as string;
+                const tarifHT = formData.get('tarifHT') as string;
                 if (editingService) {
-                  updateService(editingService.id, { name, tarif });
+                  updateService(editingService.id, { name, tarif, tarifHT });
                 } else {
-                  addService({ name, tarif, enabled: true });
+                  addService({ name, tarif, tarifHT, enabled: true });
                 }
                 setShowServiceModal(false);
               }}
@@ -1516,18 +1519,30 @@ export default function EntreprisePage() {
                   className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Tarif *</label>
-                <input
-                  type="text"
-                  name="tarif"
-                  required
-                  defaultValue={editingService?.tarif || ''}
-                  placeholder="Ex: À partir de 60€"
-                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
-                />
-                <p className="text-xs text-secondary-500 mt-1">Format: "À partir de X€", "Sur devis", "Gratuit", etc.</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tarif TTC *</label>
+                  <input
+                    type="text"
+                    name="tarif"
+                    required
+                    defaultValue={editingService?.tarif || ''}
+                    placeholder="Ex: À partir de 60€"
+                    className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tarif HT (Pro)</label>
+                  <input
+                    type="text"
+                    name="tarifHT"
+                    defaultValue={editingService?.tarifHT || ''}
+                    placeholder="Ex: À partir de 50€ HT"
+                    className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                  />
+                </div>
               </div>
+              <p className="text-xs text-secondary-500">Format: "À partir de X€", "Sur devis", "Gratuit", etc.</p>
               <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setShowServiceModal(false)} className="px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50">
                   Annuler
@@ -1558,10 +1573,11 @@ export default function EntreprisePage() {
                 const formData = new FormData(e.currentTarget);
                 const name = formData.get('name') as string;
                 const tarif = formData.get('tarif') as string;
+                const tarifHT = formData.get('tarifHT') as string;
                 if (editingEquipment) {
-                  updateEquipment(editingEquipment.id, { name, tarif });
+                  updateEquipment(editingEquipment.id, { name, tarif, tarifHT });
                 } else {
-                  addEquipment({ name, tarif });
+                  addEquipment({ name, tarif, tarifHT });
                 }
                 setShowEquipmentModal(false);
               }}
@@ -1578,18 +1594,30 @@ export default function EntreprisePage() {
                   className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Tarif *</label>
-                <input
-                  type="text"
-                  name="tarif"
-                  required
-                  defaultValue={editingEquipment?.tarif || ''}
-                  placeholder="Ex: 80€"
-                  className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
-                />
-                <p className="text-xs text-secondary-500 mt-1">Format: "80€", "Dès 80€", etc.</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tarif TTC *</label>
+                  <input
+                    type="text"
+                    name="tarif"
+                    required
+                    defaultValue={editingEquipment?.tarif || ''}
+                    placeholder="Ex: 80€"
+                    className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tarif HT (Pro)</label>
+                  <input
+                    type="text"
+                    name="tarifHT"
+                    defaultValue={editingEquipment?.tarifHT || ''}
+                    placeholder="Ex: 67€ HT"
+                    className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                  />
+                </div>
               </div>
+              <p className="text-xs text-secondary-500">Format: "80€", "Dès 80€", etc.</p>
               <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setShowEquipmentModal(false)} className="px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50">
                   Annuler

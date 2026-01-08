@@ -5,12 +5,14 @@ interface ServiceConfig {
   id: string;
   name: string;
   tarif: string;
+  tarifHT?: string;
 }
 
 interface EquipmentConfig {
   id: string;
   name: string;
   tarif: string;
+  tarifHT?: string;
 }
 
 interface ZoneConfig {
@@ -85,22 +87,22 @@ const MOCK_CONFIGS: { [slug: string]: WidgetConfig } = {
       maxDelayDays: 60,
     },
     services: [
-      { id: 'ramonage', name: 'Ramonage / Entretien', tarif: 'À partir de 60€' },
-      { id: 'debistrage', name: 'Débistrage', tarif: 'À partir de 90€' },
-      { id: 'tubage', name: 'Tubage', tarif: 'Sur devis' },
-      { id: 'depannage', name: 'Dépannage', tarif: 'À partir de 90€' },
-      { id: 'devis', name: 'Devis', tarif: 'Gratuit' },
+      { id: 'ramonage', name: 'Ramonage / Entretien', tarif: 'À partir de 60€', tarifHT: 'À partir de 50€ HT' },
+      { id: 'debistrage', name: 'Débistrage', tarif: 'À partir de 90€', tarifHT: 'À partir de 75€ HT' },
+      { id: 'tubage', name: 'Tubage', tarif: 'Sur devis', tarifHT: 'Sur devis' },
+      { id: 'depannage', name: 'Dépannage', tarif: 'À partir de 90€', tarifHT: 'À partir de 75€ HT' },
+      { id: 'devis', name: 'Devis', tarif: 'Gratuit', tarifHT: 'Gratuit' },
     ],
     equipments: [
-      { id: 'gas_boiler', name: 'Chaudière gaz', tarif: '60€' },
-      { id: 'chimney_open', name: 'Cheminée ouverte', tarif: '70€' },
-      { id: 'chimney_insert', name: 'Insert', tarif: '70€' },
-      { id: 'wood_stove', name: 'Poêle à bois', tarif: '80€' },
-      { id: 'oil_boiler', name: 'Chaudière fioul', tarif: '80€' },
-      { id: 'pellet_stove', name: 'Poêle à granulés', tarif: 'Dès 80€' },
-      { id: 'wood_boiler', name: 'Chaudière bois', tarif: '80€' },
-      { id: 'polyflam', name: 'Cheminée Polyflam', tarif: '90€' },
-      { id: 'conduit_difficile', name: 'Conduit difficile', tarif: '110€' },
+      { id: 'gas_boiler', name: 'Chaudière gaz', tarif: '60€', tarifHT: '50€ HT' },
+      { id: 'chimney_open', name: 'Cheminée ouverte', tarif: '70€', tarifHT: '58€ HT' },
+      { id: 'chimney_insert', name: 'Insert', tarif: '70€', tarifHT: '58€ HT' },
+      { id: 'wood_stove', name: 'Poêle à bois', tarif: '80€', tarifHT: '67€ HT' },
+      { id: 'oil_boiler', name: 'Chaudière fioul', tarif: '80€', tarifHT: '67€ HT' },
+      { id: 'pellet_stove', name: 'Poêle à granulés', tarif: 'Dès 80€', tarifHT: 'Dès 67€ HT' },
+      { id: 'wood_boiler', name: 'Chaudière bois', tarif: '80€', tarifHT: '67€ HT' },
+      { id: 'polyflam', name: 'Cheminée Polyflam', tarif: '90€', tarifHT: '75€ HT' },
+      { id: 'conduit_difficile', name: 'Conduit difficile', tarif: '110€', tarifHT: '92€ HT' },
     ],
     zones: [
       { id: 'zone_60', code: '60', name: 'Oise' },

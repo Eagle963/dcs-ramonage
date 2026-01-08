@@ -115,9 +115,9 @@ const EQUIPMENT_COLORS: { [key: string]: string } = {
 
 // Interventions poêle à granulés (statique pour l'instant)
 const PELLET_INTERVENTIONS = [
-  { id: 'RAMONAGE_ENTRETIEN', name: 'Ramonage + Entretien', tarif: '180€' },
-  { id: 'ENTRETIEN', name: 'Entretien seul', tarif: '100€' },
-  { id: 'RAMONAGE', name: 'Ramonage seul', tarif: '80€' },
+  { id: 'RAMONAGE_ENTRETIEN', name: 'Ramonage + Entretien', tarif: '180€', tarifHT: '150€ HT' },
+  { id: 'ENTRETIEN', name: 'Entretien seul', tarif: '100€', tarifHT: '83€ HT' },
+  { id: 'RAMONAGE', name: 'Ramonage seul', tarif: '80€', tarifHT: '67€ HT' },
 ];
 
 // Types de sortie
@@ -509,15 +509,18 @@ export default function ReservationWidgetPage() {
   const totalSteps = 7;
 
   const getTarif = () => {
+    const isHT = clientType !== 'PARTICULIER';
     if (selectedPrestation === 'ramonage') {
       if (selectedEquipment === 'pellet_stove' && selectedIntervention) {
-        return PELLET_INTERVENTIONS.find(i => i.id === selectedIntervention)?.tarif || '';
+        const intervention = PELLET_INTERVENTIONS.find(i => i.id === selectedIntervention);
+        return (isHT && intervention?.tarifHT) ? intervention.tarifHT : (intervention?.tarif || '');
       }
       if (selectedEquipment) {
-        return equipments.find(e => e.id === selectedEquipment)?.tarif || '';
+        const eq = equipments.find(e => e.id === selectedEquipment);
+        return (isHT && eq?.tarifHT) ? eq.tarifHT : (eq?.tarif || '');
       }
     }
-    return prestation?.tarif || '';
+    return (isHT && prestation?.tarifHT) ? prestation.tarifHT : (prestation?.tarif || '');
   };
 
   const toggleNettoyage = (id: string) => {
@@ -674,8 +677,7 @@ export default function ReservationWidgetPage() {
                   const Icon = SERVICE_ICONS[service.id] || Flame;
                   const color = SERVICE_COLORS[service.id] || 'bg-gray-500';
                   const showHT = clientType !== 'PARTICULIER';
-                  // TODO: Afficher tarif HT pour les pros quand disponible
-                  const displayTarif = service.tarif + (showHT ? ' HT' : ' TTC');
+                  const displayTarif = showHT && service.tarifHT ? service.tarifHT : service.tarif + (showHT ? '' : ' TTC');
                   return (
                     <button key={service.id} onClick={() => selectPrestation(service.id)} className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 hover:border-primary-500 ${selectedPrestation === service.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
                       <div className={`w-14 h-14 ${color} rounded-xl flex items-center justify-center`}><Icon className="w-7 h-7 text-white" /></div>
@@ -702,7 +704,7 @@ export default function ReservationWidgetPage() {
                       const Icon = EQUIPMENT_ICONS[eq.id] || Flame;
                       const color = EQUIPMENT_COLORS[eq.id] || 'bg-gray-500';
                       const showHT = clientType !== 'PARTICULIER';
-                      const displayTarif = eq.tarif + (showHT ? ' HT' : ' TTC');
+                      const displayTarif = showHT && eq.tarifHT ? eq.tarifHT : eq.tarif + (showHT ? '' : ' TTC');
                       return (
                         <button key={eq.id} onClick={() => selectEquipment(eq.id)} className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 hover:border-primary-500 ${selectedEquipment === eq.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
                           <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center`}><Icon className="w-6 h-6 text-white" /></div>
@@ -759,12 +761,16 @@ export default function ReservationWidgetPage() {
                 <div>
                   <h3 className="font-medium mb-3">Type d'intervention</h3>
                   <div className="grid grid-cols-3 gap-3">
-                    {PELLET_INTERVENTIONS.map((int) => (
-                      <button key={int.id} onClick={() => setSelectedIntervention(int.id)} className={`p-3 rounded-xl border-2 text-center ${selectedIntervention === int.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
-                        <span className="block font-medium text-sm">{int.name}</span>
-                        <span className="text-xs" style={{ color: config?.widget.color || '#f97316' }}>{int.tarif}</span>
-                      </button>
-                    ))}
+                    {PELLET_INTERVENTIONS.map((int) => {
+                      const showHT = clientType !== 'PARTICULIER';
+                      const displayTarif = showHT && int.tarifHT ? int.tarifHT : int.tarif + (showHT ? '' : ' TTC');
+                      return (
+                        <button key={int.id} onClick={() => setSelectedIntervention(int.id)} className={`p-3 rounded-xl border-2 text-center ${selectedIntervention === int.id ? 'border-primary-500 bg-primary-50' : 'border-secondary-200'}`}>
+                          <span className="block font-medium text-sm">{int.name}</span>
+                          <span className="text-xs" style={{ color: config?.widget.color || '#f97316' }}>{displayTarif}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1054,7 +1060,7 @@ export default function ReservationWidgetPage() {
                   {(clientType === 'PROFESSIONNEL' || clientType === 'SYNDIC') ? proFormData.adresse : formData.address}<br/>
                   {(clientType === 'PROFESSIONNEL' || clientType === 'SYNDIC') ? `${proFormData.codePostal} ${proFormData.ville}` : `${postalCode} ${formData.city}`}
                 </span></div>
-                <div className="flex justify-between border-t border-secondary-200 pt-3"><span className="text-secondary-500">Tarif indicatif</span><span className="font-bold" style={{ color: config?.widget.color || '#f97316' }}>{getTarif()} {clientType !== 'PARTICULIER' ? 'HT' : 'TTC'}</span></div>
+                <div className="flex justify-between border-t border-secondary-200 pt-3"><span className="text-secondary-500">Tarif indicatif</span><span className="font-bold" style={{ color: config?.widget.color || '#f97316' }}>{getTarif()}{clientType === 'PARTICULIER' ? ' TTC' : ''}</span></div>
               </div>
 
               <button
