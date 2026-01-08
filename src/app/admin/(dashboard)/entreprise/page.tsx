@@ -12,6 +12,171 @@ import {
   Check, Info, Save, X, Copy, ExternalLink,
   Plus, Pencil, Trash2, GripVertical, ChevronDown, ChevronUp
 } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+// Composant Sortable pour les services
+function SortableServiceItem({
+  service,
+  onToggle,
+  onEdit,
+  onDelete
+}: {
+  service: ServiceItem;
+  onToggle: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: service.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-3 p-3 bg-white border border-secondary-200 rounded-lg group hover:border-secondary-300"
+    >
+      {/* Poignée de drag */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing p-1 text-secondary-400 hover:text-secondary-600 touch-none"
+      >
+        <GripVertical className="w-4 h-4" />
+      </button>
+
+      {/* Infos service */}
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-secondary-900">{service.name}</p>
+        <p className="text-sm text-primary-600 font-medium">{service.tarif}</p>
+      </div>
+
+      {/* Toggle ON/OFF */}
+      <button
+        onClick={onToggle}
+        className={`w-10 h-6 rounded-full transition-colors flex-shrink-0 ${
+          service.enabled ? 'bg-primary-500' : 'bg-secondary-300'
+        }`}
+      >
+        <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${
+          service.enabled ? 'translate-x-5' : 'translate-x-1'
+        }`} />
+      </button>
+
+      {/* Actions */}
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={onEdit}
+          className="p-1.5 text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100 rounded"
+        >
+          <Pencil className="w-4 h-4" />
+        </button>
+        <button
+          onClick={onDelete}
+          className="p-1.5 text-secondary-400 hover:text-red-600 hover:bg-red-50 rounded"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Composant Sortable pour les équipements
+function SortableEquipmentItem({
+  equipment,
+  onEdit,
+  onDelete
+}: {
+  equipment: EquipmentItem;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: equipment.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-3 p-3 bg-white border border-secondary-200 rounded-lg group hover:border-secondary-300"
+    >
+      {/* Poignée de drag */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing p-1 text-secondary-400 hover:text-secondary-600 touch-none"
+      >
+        <GripVertical className="w-4 h-4" />
+      </button>
+
+      {/* Infos équipement */}
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-secondary-900 text-sm">{equipment.name}</p>
+      </div>
+
+      {/* Tarif */}
+      <span className="text-sm font-semibold text-primary-600 bg-primary-50 px-2 py-1 rounded">
+        {equipment.tarif}
+      </span>
+
+      {/* Actions */}
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={onEdit}
+          className="p-1 text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100 rounded"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={onDelete}
+          className="p-1 text-secondary-400 hover:text-red-600 hover:bg-red-50 rounded"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 type MainTab = 'general' | 'documents' | 'parametres' | 'abonnement' | 'parrainage' | 'avantages';
 type SettingsSection = 
@@ -104,6 +269,9 @@ interface RdvConfig {
   // Widget
   widgetColor: string;
   showLogo: boolean;
+  headerBadge: string;
+  headerTitle: string;
+  headerSubtitle: string;
 }
 
 const settingsMenu = [
@@ -248,6 +416,9 @@ export default function EntreprisePage() {
     confirmMessage: 'Votre demande de rendez-vous a bien été enregistrée. Nous vous confirmerons le créneau dans les plus brefs délais.',
     widgetColor: '#f97316',
     showLogo: true,
+    headerBadge: 'Réservation en ligne',
+    headerTitle: 'Prenez rendez-vous',
+    headerSubtitle: 'Choisissez votre créneau et nous vous recontactons pour confirmer.',
   });
 
   const [modules, setModules] = useState<Module[]>([
@@ -270,8 +441,41 @@ export default function EntreprisePage() {
   const [showEquipmentModal, setShowEquipmentModal] = useState(false);
   const [showZoneModal, setShowZoneModal] = useState(false);
 
-  // État pour le drag & drop
-  const [draggedItem, setDraggedItem] = useState<{ type: 'service' | 'equipment'; id: string } | null>(null);
+  // Sensors pour le drag & drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handler pour le drag & drop des services
+  const handleServiceDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const services = [...rdvConfig.services].sort((a, b) => a.order - b.order);
+      const oldIndex = services.findIndex(s => s.id === active.id);
+      const newIndex = services.findIndex(s => s.id === over.id);
+      const reordered = arrayMove(services, oldIndex, newIndex).map((s, i) => ({ ...s, order: i }));
+      setRdvConfig({ ...rdvConfig, services: reordered });
+    }
+  };
+
+  // Handler pour le drag & drop des équipements
+  const handleEquipmentDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const equipments = [...rdvConfig.equipments].sort((a, b) => a.order - b.order);
+      const oldIndex = equipments.findIndex(e => e.id === active.id);
+      const newIndex = equipments.findIndex(e => e.id === over.id);
+      const reordered = arrayMove(equipments, oldIndex, newIndex).map((e, i) => ({ ...e, order: i }));
+      setRdvConfig({ ...rdvConfig, equipments: reordered });
+    }
+  };
 
   const toggleModule = (id: string) => {
     setModules(modules.map(m => m.id === id ? { ...m, enabled: !m.enabled } : m));
@@ -942,66 +1146,28 @@ export default function EntreprisePage() {
                         Ajouter
                       </button>
                     </div>
-                    <div className="space-y-2">
-                      {[...rdvConfig.services].sort((a, b) => a.order - b.order).map((service, index) => (
-                        <div
-                          key={service.id}
-                          className="flex items-center gap-3 p-3 bg-white border border-secondary-200 rounded-lg group hover:border-secondary-300"
-                        >
-                          {/* Poignée de réorganisation */}
-                          <div className="flex flex-col gap-0.5">
-                            <button
-                              onClick={() => moveService(service.id, 'up')}
-                              disabled={index === 0}
-                              className="p-0.5 text-secondary-400 hover:text-secondary-600 disabled:opacity-30 disabled:cursor-not-allowed"
-                            >
-                              <ChevronUp className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => moveService(service.id, 'down')}
-                              disabled={index === rdvConfig.services.length - 1}
-                              className="p-0.5 text-secondary-400 hover:text-secondary-600 disabled:opacity-30 disabled:cursor-not-allowed"
-                            >
-                              <ChevronDown className="w-4 h-4" />
-                            </button>
-                          </div>
-
-                          {/* Infos service */}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-secondary-900">{service.name}</p>
-                            <p className="text-sm text-primary-600 font-medium">{service.tarif}</p>
-                          </div>
-
-                          {/* Toggle ON/OFF */}
-                          <button
-                            onClick={() => toggleService(service.id)}
-                            className={`w-10 h-6 rounded-full transition-colors flex-shrink-0 ${
-                              service.enabled ? 'bg-primary-500' : 'bg-secondary-300'
-                            }`}
-                          >
-                            <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                              service.enabled ? 'translate-x-5' : 'translate-x-1'
-                            }`} />
-                          </button>
-
-                          {/* Actions */}
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={() => { setEditingService(service); setShowServiceModal(true); }}
-                              className="p-1.5 text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100 rounded"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => { if (confirm('Supprimer ce service ?')) deleteService(service.id); }}
-                              className="p-1.5 text-secondary-400 hover:text-red-600 hover:bg-red-50 rounded"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleServiceDragEnd}
+                    >
+                      <SortableContext
+                        items={[...rdvConfig.services].sort((a, b) => a.order - b.order).map(s => s.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="space-y-2">
+                          {[...rdvConfig.services].sort((a, b) => a.order - b.order).map((service) => (
+                            <SortableServiceItem
+                              key={service.id}
+                              service={service}
+                              onToggle={() => toggleService(service.id)}
+                              onEdit={() => { setEditingService(service); setShowServiceModal(true); }}
+                              onDelete={() => { if (confirm('Supprimer ce service ?')) deleteService(service.id); }}
+                            />
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </SortableContext>
+                    </DndContext>
                   </div>
 
                   {/* === ÉQUIPEMENTS === */}
@@ -1019,58 +1185,27 @@ export default function EntreprisePage() {
                         Ajouter
                       </button>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {[...rdvConfig.equipments].sort((a, b) => a.order - b.order).map((equipment, index) => (
-                        <div
-                          key={equipment.id}
-                          className="flex items-center gap-3 p-3 bg-white border border-secondary-200 rounded-lg group hover:border-secondary-300"
-                        >
-                          {/* Poignée de réorganisation */}
-                          <div className="flex flex-col gap-0.5">
-                            <button
-                              onClick={() => moveEquipment(equipment.id, 'up')}
-                              disabled={index === 0}
-                              className="p-0.5 text-secondary-400 hover:text-secondary-600 disabled:opacity-30 disabled:cursor-not-allowed"
-                            >
-                              <ChevronUp className="w-3 h-3" />
-                            </button>
-                            <button
-                              onClick={() => moveEquipment(equipment.id, 'down')}
-                              disabled={index === rdvConfig.equipments.length - 1}
-                              className="p-0.5 text-secondary-400 hover:text-secondary-600 disabled:opacity-30 disabled:cursor-not-allowed"
-                            >
-                              <ChevronDown className="w-3 h-3" />
-                            </button>
-                          </div>
-
-                          {/* Infos équipement */}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-secondary-900 text-sm">{equipment.name}</p>
-                          </div>
-
-                          {/* Tarif */}
-                          <span className="text-sm font-semibold text-primary-600 bg-primary-50 px-2 py-1 rounded">
-                            {equipment.tarif}
-                          </span>
-
-                          {/* Actions */}
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={() => { setEditingEquipment(equipment); setShowEquipmentModal(true); }}
-                              className="p-1 text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100 rounded"
-                            >
-                              <Pencil className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => { if (confirm('Supprimer cet équipement ?')) deleteEquipment(equipment.id); }}
-                              className="p-1 text-secondary-400 hover:text-red-600 hover:bg-red-50 rounded"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleEquipmentDragEnd}
+                    >
+                      <SortableContext
+                        items={[...rdvConfig.equipments].sort((a, b) => a.order - b.order).map(e => e.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {[...rdvConfig.equipments].sort((a, b) => a.order - b.order).map((equipment) => (
+                            <SortableEquipmentItem
+                              key={equipment.id}
+                              equipment={equipment}
+                              onEdit={() => { setEditingEquipment(equipment); setShowEquipmentModal(true); }}
+                              onDelete={() => { if (confirm('Supprimer cet équipement ?')) deleteEquipment(equipment.id); }}
+                            />
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </SortableContext>
+                    </DndContext>
                   </div>
 
                   {/* === ZONES D'INTERVENTION === */}
@@ -1228,6 +1363,44 @@ export default function EntreprisePage() {
                       <button className="absolute top-2 right-2 p-1 bg-white border border-secondary-200 rounded hover:bg-secondary-50">
                         <Copy className="w-4 h-4" />
                       </button>
+                    </div>
+                  </div>
+
+                  {/* Textes du header */}
+                  <div>
+                    <h3 className="font-semibold mb-3">Textes du header</h3>
+                    <p className="text-sm text-secondary-500 mb-4">Personnalisez les textes affichés en haut du widget de réservation</p>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Badge</label>
+                        <input
+                          type="text"
+                          value={rdvConfig.headerBadge}
+                          onChange={(e) => setRdvConfig({ ...rdvConfig, headerBadge: e.target.value })}
+                          placeholder="Ex: Réservation en ligne"
+                          className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Titre</label>
+                        <input
+                          type="text"
+                          value={rdvConfig.headerTitle}
+                          onChange={(e) => setRdvConfig({ ...rdvConfig, headerTitle: e.target.value })}
+                          placeholder="Ex: Prenez rendez-vous"
+                          className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Sous-titre</label>
+                        <textarea
+                          value={rdvConfig.headerSubtitle}
+                          onChange={(e) => setRdvConfig({ ...rdvConfig, headerSubtitle: e.target.value })}
+                          placeholder="Ex: Choisissez votre créneau et nous vous recontactons pour confirmer."
+                          rows={2}
+                          className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                        />
+                      </div>
                     </div>
                   </div>
 

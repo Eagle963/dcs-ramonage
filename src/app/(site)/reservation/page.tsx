@@ -9,9 +9,9 @@ export default function ReservationPage() {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       // Recevoir la hauteur du contenu depuis l'iframe
-      if (event.data?.type === 'resize' && event.data?.height) {
+      if (event.data?.type === 'widget-resize' && event.data?.height) {
         if (iframeRef.current) {
-          iframeRef.current.style.height = `${event.data.height}px`;
+          iframeRef.current.style.height = `${event.data.height + 50}px`; // +50 pour marge de sécurité
         }
       }
     };

@@ -203,6 +203,28 @@ export default function ReservationWidgetPage() {
     }
   }, [slug]);
 
+  // Communication avec le parent pour ajuster la hauteur de l'iframe
+  useEffect(() => {
+    if (isEmbed && typeof window !== 'undefined') {
+      const sendHeight = () => {
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage({ type: 'widget-resize', height }, '*');
+      };
+
+      // Envoyer la hauteur initiale après un court délai
+      const timeout = setTimeout(sendHeight, 100);
+
+      // Observer les changements de taille
+      const observer = new ResizeObserver(sendHeight);
+      observer.observe(document.body);
+
+      return () => {
+        clearTimeout(timeout);
+        observer.disconnect();
+      };
+    }
+  }, [isEmbed, step, configLoading]);
+
   // Données dérivées de la config
   const services = config?.services || [];
   const equipments = config?.equipments || [];
