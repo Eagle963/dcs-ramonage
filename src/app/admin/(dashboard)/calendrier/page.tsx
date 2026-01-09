@@ -2,10 +2,11 @@
 
 import { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { 
-  ChevronLeft, ChevronRight, Calendar, List, Map, Clock, 
+import {
+  ChevronLeft, ChevronRight, Calendar, List, Map, Clock,
   Search, Filter, User, CheckCircle2, XCircle, LayoutGrid,
-  MapPin, Phone, Navigation, Plus, MoreVertical, ChevronDown
+  MapPin, Phone, Navigation, Plus, MoreVertical, ChevronDown,
+  Users, FileText, Euro, Sparkles, RotateCcw
 } from 'lucide-react';
 
 const PlanningMap = dynamic(() => import('@/components/map/PlanningMap'), {
@@ -58,8 +59,8 @@ const mockBookings: Booking[] = [
   { id: 'br_006', date: '2026-01-05', slot: 'MORNING', startTime: '08:00', endTime: '09:00', clientName: 'HYBA LA MAMMA', clientPhone: '03 44 12 34 56', address: '8 place du Marché', city: 'Senlis', postalCode: '60300', lat: 49.2069, lng: 2.5856, serviceType: 'Entretien professionnel', status: 'CONFIRMED', technicianId: '1' },
 ];
 
-type ViewMode = 'month' | 'week' | 'day' | 'list';
-type ViewType = 'calendar' | 'map' | 'timeline' | 'toplan';
+type ViewMode = 'month' | 'week' | 'day';
+type ViewType = 'calendar' | 'list' | 'map' | 'timeline' | 'toplan';
 
 export default function PlanningPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('month');
@@ -209,115 +210,97 @@ export default function PlanningPage() {
   };
 
   const views = [
-    { id: 'calendar', label: 'Calendrier', icon: Calendar },
-    { id: 'map', label: 'Carte', icon: Map },
-    { id: 'timeline', label: 'Timeline', icon: Clock },
-    { id: 'toplan', label: 'À planifier', icon: LayoutGrid },
+    { id: 'calendar', label: 'Calendrier', icon: Calendar, sparkle: false },
+    { id: 'list', label: 'Liste', icon: List, sparkle: false },
+    { id: 'map', label: 'Carte', icon: Map, sparkle: true },
+    { id: 'timeline', label: 'Timeline', icon: Clock, sparkle: false },
+    { id: 'toplan', label: 'À planifier', icon: LayoutGrid, sparkle: false },
   ];
 
   const calendarViews = [
     { id: 'month', label: 'Mois' },
     { id: 'week', label: 'Semaine' },
     { id: 'day', label: 'Jour' },
-    { id: 'list', label: 'Liste' },
   ];
 
   const timeSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
 
+  const goToToday = () => {
+    const today = new Date();
+    setCurrentMonth(today);
+    setSelectedDate(today.toISOString().split('T')[0]);
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+    setCurrentWeekStart(new Date(today.getFullYear(), today.getMonth(), diff));
+  };
+
   return (
     <div>
-      {/* Header actions */}
-      <div className="flex items-center justify-end gap-2 mb-4">
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium">
-          <Plus className="w-4 h-4" />
-          Nouvelle intervention
-        </button>
-      </div>
-
-      {/* Filtres */}
+      {/* Header avec filtres */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
           <input
             type="text"
-            placeholder="Rechercher..."
+            placeholder="Filtrer par titre ou numéro"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
+            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm bg-white"
           />
         </div>
-        <select
-          value={selectedTechnicianId}
-          onChange={(e) => setSelectedTechnicianId(e.target.value)}
-          className="px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white"
-        >
-          {technicians.map((tech) => (
-            <option key={tech.id} value={tech.id}>{tech.name}</option>
-          ))}
-        </select>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Users className="w-4 h-4" /> Client
+        </button>
+
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <User className="w-4 h-4" /> Intervenant
+        </button>
+
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <CheckCircle2 className="w-4 h-4" /> Statut
         </button>
-        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50">
+
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <FileText className="w-4 h-4" /> Prévoir un devis
+        </button>
+
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Euro className="w-4 h-4" /> À facturer
+        </button>
+
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <Filter className="w-4 h-4" /> Tous les filtres
         </button>
+
         <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
-          <XCircle className="w-4 h-4" /> Réinitialiser
+          <RotateCcw className="w-4 h-4" /> Réinitialiser
+        </button>
+
+        <div className="flex-1"></div>
+
+        <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium">
+          <Plus className="w-4 h-4" />
+          Planifier
         </button>
       </div>
 
-      {/* Onglets avec dropdown pour vue Calendrier */}
-      <div className="flex items-center justify-between gap-1 mb-4 border-b border-secondary-200">
-        <div className="flex gap-1">
-          {views.map((view) => {
-            const Icon = view.icon;
-            return (
-              <button
-                key={view.id}
-                onClick={() => setViewType(view.id as ViewType)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                  viewType === view.id
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-secondary-500 hover:text-secondary-700'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {view.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Dropdown de sélection de vue (uniquement pour Calendrier) */}
-        {viewType === 'calendar' && (
-          <div className="relative mr-4">
-            <button
-              onClick={() => setShowViewDropdown(!showViewDropdown)}
-              className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg text-sm font-medium bg-white hover:bg-secondary-50"
-            >
-              {calendarViews.find(v => v.id === viewMode)?.label}
-              <ChevronDown className="w-4 h-4" />
-            </button>
-            {showViewDropdown && (
-              <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-secondary-200 rounded-lg shadow-lg z-10">
-                {calendarViews.map((view) => (
-                  <button
-                    key={view.id}
-                    onClick={() => {
-                      setViewMode(view.id as ViewMode);
-                      setShowViewDropdown(false);
-                    }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-secondary-50 first:rounded-t-lg last:rounded-b-lg ${
-                      viewMode === view.id ? 'text-primary-600 font-medium bg-primary-50' : 'text-secondary-700'
-                    }`}
-                  >
-                    {view.id === viewMode && '✓ '}{view.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+      {/* Onglets */}
+      <div className="flex items-center gap-1 mb-4 border-b border-secondary-200">
+        {views.map((view) => (
+          <button
+            key={view.id}
+            onClick={() => setViewType(view.id as ViewType)}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              viewType === view.id
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-secondary-500 hover:text-secondary-700'
+            }`}
+          >
+            {view.label}
+            {view.sparkle && <Sparkles className="w-4 h-4 text-amber-500" />}
+          </button>
+        ))}
       </div>
 
       {/* Vue Calendrier - Mois */}
@@ -325,23 +308,56 @@ export default function PlanningPage() {
         <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
           {/* Navigation mois */}
           <div className="flex items-center justify-between p-4 border-b border-secondary-100">
-            <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-secondary-100 rounded-lg">
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <div className="text-center">
-              <span className="font-semibold text-secondary-900 capitalize">
+            <div className="flex items-center gap-2">
+              <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-secondary-100 rounded-lg">
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <span className="font-semibold text-secondary-900">
                 {currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
               </span>
+              <button onClick={() => changeMonth(1)} className="p-2 hover:bg-secondary-100 rounded-lg">
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              <button
+                onClick={goToToday}
+                className="ml-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
+              >
+                Aujourd'hui
+              </button>
             </div>
-            <button onClick={() => changeMonth(1)} className="p-2 hover:bg-secondary-100 rounded-lg">
-              <ChevronRight className="w-5 h-5" />
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowViewDropdown(!showViewDropdown)}
+                className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg text-sm font-medium bg-white hover:bg-secondary-50"
+              >
+                {calendarViews.find(v => v.id === viewMode)?.label}
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              {showViewDropdown && (
+                <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-secondary-200 rounded-lg shadow-lg z-10">
+                  {calendarViews.map((view) => (
+                    <button
+                      key={view.id}
+                      onClick={() => {
+                        setViewMode(view.id as ViewMode);
+                        setShowViewDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-secondary-50 first:rounded-t-lg last:rounded-b-lg ${
+                        viewMode === view.id ? 'text-primary-600 font-medium bg-primary-50' : 'text-secondary-700'
+                      }`}
+                    >
+                      {view.id === viewMode && '✓ '}{view.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* En-têtes jours */}
           <div className="grid grid-cols-7 border-b border-secondary-100">
-            {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day) => (
-              <div key={day} className="p-2 text-center text-xs font-medium text-secondary-500 uppercase">
+            {['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.'].map((day) => (
+              <div key={day} className="p-2 text-center text-xs font-medium text-secondary-500">
                 {day}
               </div>
             ))}
@@ -367,13 +383,14 @@ export default function PlanningPage() {
                       {new Date(date).getDate()}
                     </span>
                   </div>
-                  <div className="px-1 space-y-1 mt-1">
+                  <div className="px-1 space-y-0.5 mt-1">
                     {dayBookings.slice(0, 3).map((booking) => (
-                      <div 
+                      <div
                         key={booking.id}
-                        className={`px-1.5 py-0.5 rounded text-xs truncate ${statusConfig[booking.status].color}`}
+                        className="flex items-center gap-1 text-xs text-secondary-700 truncate"
                       >
-                        {booking.startTime} - {booking.clientName}
+                        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${statusConfig[booking.status].dot}`}></span>
+                        <span className="truncate">{booking.startTime} {booking.serviceType} {booking.clientName.split(' ')[1] || booking.clientName}</span>
                       </div>
                     ))}
                     {dayBookings.length > 3 && (
@@ -546,8 +563,8 @@ export default function PlanningPage() {
         </div>
       )}
 
-      {/* Vue Calendrier - Liste */}
-      {viewType === 'calendar' && viewMode === 'list' && (
+      {/* Vue Liste */}
+      {viewType === 'list' && (
         <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b border-secondary-100">
             <button onClick={() => changeDate(-1)} className="p-2 hover:bg-secondary-100 rounded-lg">
