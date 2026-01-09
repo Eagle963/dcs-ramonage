@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { 
+import {
   Plus, Search, Filter, ChevronDown, ChevronLeft, ChevronRight,
   User, Calendar, Clock, CheckCircle2, XCircle, FileText,
-  Send, Settings2, AlertTriangle, CalendarClock
+  Send, Settings2, AlertTriangle, CalendarClock, RotateCcw, Users
 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import DevisForm from '@/components/forms/DevisForm';
@@ -145,21 +145,6 @@ export default function DevisPage() {
 
   return (
     <div>
-      {/* Header actions */}
-      <div className="flex items-center justify-end gap-2 mb-4">
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="btn-primary"
-        >
-          <Plus className="w-4 h-4" />
-          Nouveau devis
-        </button>
-        <button className="btn-outline">
-          Actions
-          <ChevronDown className="w-4 h-4" />
-        </button>
-      </div>
-
       {/* Stats cards */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
         <StatCard 
@@ -214,33 +199,41 @@ export default function DevisPage() {
 
       {/* Filters bar */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
           <input
             type="text"
             placeholder="Filtrer par titre, numéro ou chantier"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
+            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm bg-white"
           />
         </div>
-        <button className="btn-outline btn-sm">
-          <User className="w-4 h-4" /> Client
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Users className="w-4 h-4" /> Client
         </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <Calendar className="w-4 h-4" /> Date
         </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <Clock className="w-4 h-4" /> Expiré
         </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <CalendarClock className="w-4 h-4" /> À planifier
         </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <Filter className="w-4 h-4" /> Tous les filtres
         </button>
         <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
-          <XCircle className="w-4 h-4" /> Réinitialiser
+          <RotateCcw className="w-4 h-4" /> Réinitialiser
+        </button>
+        <div className="flex-1"></div>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium"
+        >
+          <Plus className="w-4 h-4" />
+          Nouveau devis
         </button>
       </div>
 

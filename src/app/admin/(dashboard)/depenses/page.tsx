@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { 
+import {
   Plus, Search, ChevronDown, ChevronLeft, ChevronRight,
-  Calendar, Euro, Filter, Settings2, Download, XCircle,
-  Building2
+  Calendar, Euro, Filter, Settings2, Download, RotateCcw,
+  Building2, XCircle
 } from 'lucide-react';
 
 interface Depense {
@@ -83,19 +83,6 @@ export default function DepensesPage() {
 
   return (
     <div>
-      {/* Header actions */}
-      <div className="flex items-center justify-end gap-2 mb-4">
-        <button className="btn-primary">
-          <Plus className="w-4 h-4" />
-          Ajouter
-          <ChevronDown className="w-4 h-4" />
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50 text-sm">
-          <Download className="w-4 h-4" />
-          Exporter
-        </button>
-      </div>
-
       {/* Stats cards */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
         <StatCard 
@@ -126,33 +113,35 @@ export default function DepensesPage() {
 
       {/* Filters bar */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
           <input
             type="text"
             placeholder="Filtrer par libellé ou par numéro"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
+            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm bg-white"
           />
         </div>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <Building2 className="w-4 h-4" /> Fournisseur
         </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <Calendar className="w-4 h-4" /> Date
         </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <Euro className="w-4 h-4" /> Montant TTC
         </button>
-        <button className="btn-outline btn-sm">
-          <Filter className="w-4 h-4" /> Catégorie
-        </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <Filter className="w-4 h-4" /> Tous les filtres
         </button>
         <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
-          <XCircle className="w-4 h-4" /> Réinitialiser
+          <RotateCcw className="w-4 h-4" /> Réinitialiser
+        </button>
+        <div className="flex-1"></div>
+        <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium">
+          <Plus className="w-4 h-4" />
+          Ajouter
         </button>
       </div>
 

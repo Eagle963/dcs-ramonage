@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { 
+import {
   Search, ChevronDown, ChevronLeft, ChevronRight,
-  User, Calendar, CreditCard, Banknote, Building2,
-  Smartphone, Settings2, Download, XCircle
+  Calendar, CreditCard, Banknote, Building2,
+  Smartphone, Settings2, Download, RotateCcw, Users, Filter
 } from 'lucide-react';
 
 interface Paiement {
@@ -59,14 +59,6 @@ export default function PaiementsPage() {
 
   return (
     <div>
-      {/* Header actions */}
-      <div className="flex items-center justify-end gap-2 mb-4">
-        <button className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50 text-sm">
-          <Download className="w-4 h-4" />
-          Exporter
-        </button>
-      </div>
-
       {/* Tabs */}
       <div className="flex gap-4 mb-6">
         <button
@@ -93,27 +85,35 @@ export default function PaiementsPage() {
 
       {/* Filters bar */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
           <input
             type="text"
             placeholder="Filtrer par titre ou numéro de facture"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
+            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm bg-white"
           />
         </div>
-        <button className="btn-outline btn-sm">
-          <User className="w-4 h-4" /> Client
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Users className="w-4 h-4" /> Client
         </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <CreditCard className="w-4 h-4" /> Type
         </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <Calendar className="w-4 h-4" /> Date
         </button>
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Filter className="w-4 h-4" /> Tous les filtres
+        </button>
         <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
-          <XCircle className="w-4 h-4" /> Réinitialiser
+          <RotateCcw className="w-4 h-4" /> Réinitialiser
+        </button>
+        <div className="flex-1"></div>
+        <button className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50 text-sm bg-white">
+          <Download className="w-4 h-4" />
+          Exporter
         </button>
       </div>
 

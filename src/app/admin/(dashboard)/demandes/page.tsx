@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Search, CheckCircle2, XCircle, Clock, Phone, Mail, MapPin, Calendar, Eye, X, ExternalLink } from 'lucide-react';
+import { Search, CheckCircle2, XCircle, Clock, Phone, Mail, MapPin, Calendar, Eye, X, ExternalLink, Filter, RotateCcw, Users } from 'lucide-react';
 
 // Import dynamique pour éviter les erreurs SSR avec Leaflet
 const LeafletMap = dynamic(() => import('@/components/ui/LeafletMap'), { 
@@ -188,29 +188,42 @@ export default function DemandesPage() {
       </div>
 
       {/* Filtres */}
-      <div className="bg-white rounded-xl border border-secondary-100 p-4 mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary-400" />
-            <input 
-              type="text" 
-              placeholder="Rechercher par nom, ville, téléphone..." 
-              value={searchQuery} 
-              onChange={(e) => setSearchQuery(e.target.value)} 
-              className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
-            />
-          </div>
-          <select 
-            value={filterStatus} 
-            onChange={(e) => setFilterStatus(e.target.value)} 
-            className="px-4 py-2 border border-secondary-200 rounded-lg bg-white"
-          >
-            <option value="ALL">Tous les statuts</option>
-            <option value="PENDING">En attente</option>
-            <option value="CONFIRMED">Confirmés</option>
-            <option value="REJECTED">Refusés</option>
-          </select>
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="relative flex-1 max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
+          <input
+            type="text"
+            placeholder="Rechercher par nom, ville, téléphone..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm bg-white"
+          />
         </div>
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Users className="w-4 h-4" /> Client
+        </button>
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Calendar className="w-4 h-4" /> Date
+        </button>
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50"
+        >
+          <option value="ALL">Tous les statuts</option>
+          <option value="PENDING">En attente</option>
+          <option value="CONFIRMED">Confirmés</option>
+          <option value="REJECTED">Refusés</option>
+        </select>
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Filter className="w-4 h-4" /> Tous les filtres
+        </button>
+        <button
+          onClick={() => { setFilterStatus('ALL'); setSearchQuery(''); }}
+          className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700"
+        >
+          <RotateCcw className="w-4 h-4" /> Réinitialiser
+        </button>
       </div>
 
       {/* Liste des demandes */}

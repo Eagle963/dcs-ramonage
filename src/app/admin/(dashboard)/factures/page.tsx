@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { 
-  Plus, Search, Filter, MoreHorizontal, Eye, Edit2, Trash2, 
+import {
+  Plus, Search, Filter, MoreHorizontal, Eye, Edit2, Trash2,
   Send, Download, CheckCircle2, Clock, XCircle, AlertTriangle,
-  ChevronLeft, ChevronRight, ChevronDown, User, Calendar,
-  FileText, RefreshCw, Settings2
+  ChevronLeft, ChevronRight, ChevronDown, Calendar,
+  FileText, RefreshCw, Settings2, RotateCcw, Users
 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import FactureForm from '@/components/forms/FactureForm';
@@ -132,21 +132,6 @@ export default function FacturesPage() {
 
   return (
     <div>
-      {/* Header actions */}
-      <div className="flex items-center justify-end gap-2 mb-4">
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="btn-primary"
-        >
-          <Plus className="w-4 h-4" />
-          Nouvelle facture
-        </button>
-        <button className="btn-outline">
-          Actions
-          <ChevronDown className="w-4 h-4" />
-        </button>
-      </div>
-
       {/* Stats cards */}
       <div className="flex gap-3 mb-6 overflow-x-auto pb-2">
         <StatCard 
@@ -189,30 +174,38 @@ export default function FacturesPage() {
 
       {/* Filters bar */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
           <input
             type="text"
             placeholder="Filtrer par titre, numéro ou chantier"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
+            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm bg-white"
           />
         </div>
-        <button className="btn-outline btn-sm">
-          <User className="w-4 h-4" /> Client
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Users className="w-4 h-4" /> Client
         </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <Calendar className="w-4 h-4" /> Date
         </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <AlertTriangle className="w-4 h-4" /> En retard
         </button>
-        <button className="btn-outline btn-sm">
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
           <Filter className="w-4 h-4" /> Tous les filtres
         </button>
         <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
-          <XCircle className="w-4 h-4" /> Réinitialiser
+          <RotateCcw className="w-4 h-4" /> Réinitialiser
+        </button>
+        <div className="flex-1"></div>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium"
+        >
+          <Plus className="w-4 h-4" />
+          Nouvelle facture
         </button>
       </div>
 
