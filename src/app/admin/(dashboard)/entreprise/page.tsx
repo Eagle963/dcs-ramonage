@@ -475,6 +475,28 @@ export default function EntreprisePage() {
   const [showEquipmentModal, setShowEquipmentModal] = useState(false);
   const [showZoneModal, setShowZoneModal] = useState(false);
 
+  // États pour les paramètres du calendrier
+  const [calendarSettings, setCalendarSettings] = useState({
+    showEventTitle: true,
+    maxEventsDisplay: 10,
+    plageHoraireStart: '08:00',
+    plageHoraireEnd: '17:00',
+    workDays: {
+      lundi: true,
+      mardi: true,
+      mercredi: true,
+      jeudi: true,
+      vendredi: true,
+      samedi: true,
+      dimanche: false,
+    },
+    showToPlanOnMobile: true,
+    absencesEnabled: false,
+    customStatuts: [] as { id: string; name: string; color: string }[],
+  });
+  const [showAddStatutModal, setShowAddStatutModal] = useState(false);
+  const [newStatut, setNewStatut] = useState({ name: '', color: '#3b82f6' });
+
   // Sensors pour le drag & drop
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -1262,17 +1284,215 @@ export default function EntreprisePage() {
             )}
 
             {settingsSection === 'calendrier' && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Calendrier</h2>
-                <div className="bg-white border border-secondary-100 rounded-xl p-6 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Premier jour de la semaine</label>
-                    <select className="w-full max-w-xs px-3 py-2 border border-secondary-200 rounded-lg">
-                      <option>Lundi</option>
-                      <option>Dimanche</option>
-                    </select>
+              <div className="space-y-6">
+                {/* Section Calendrier */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-5 h-5 text-secondary-500" />
+                    <h2 className="text-xl font-semibold">Calendrier</h2>
+                  </div>
+                  <p className="text-secondary-500 text-sm mb-4">Adaptez votre calendrier à votre activité.</p>
+
+                  <div className="bg-white border border-secondary-100 rounded-xl p-6 space-y-6">
+                    {/* Afficher le titre de l'événement */}
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        id="showEventTitle"
+                        checked={calendarSettings.showEventTitle}
+                        onChange={(e) => setCalendarSettings({ ...calendarSettings, showEventTitle: e.target.checked })}
+                        className="mt-1 rounded"
+                      />
+                      <div>
+                        <label htmlFor="showEventTitle" className="font-medium">Afficher le titre de l&apos;événement</label>
+                        <p className="text-sm text-secondary-500">En activant cette option, le titre de l&apos;événement sera affiché dans le calendrier à la place du nom du client.</p>
+                      </div>
+                    </div>
+
+                    {/* Nombre d'événements à afficher */}
+                    <div>
+                      <label className="block font-medium mb-1">Nombre d&apos;événements à afficher</label>
+                      <p className="text-sm text-secondary-500 mb-2">Vous réalisez un nombre important d&apos;interventions par jour ? Augmentez le nombre d&apos;événements à afficher pour ne rien manquer.</p>
+                      <input
+                        type="number"
+                        min={1}
+                        max={50}
+                        value={calendarSettings.maxEventsDisplay}
+                        onChange={(e) => setCalendarSettings({ ...calendarSettings, maxEventsDisplay: parseInt(e.target.value) || 10 })}
+                        className="w-24 px-3 py-2 border border-secondary-200 rounded-lg"
+                      />
+                    </div>
+
+                    {/* Plage horaire */}
+                    <div>
+                      <label className="block font-medium mb-1">Plage horaire</label>
+                      <p className="text-sm text-secondary-500 mb-2">Définissez la plage horaire à afficher dans les calendriers en vous basant sur les horaires de travail de votre entreprise.</p>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm">De</span>
+                        <input
+                          type="time"
+                          value={calendarSettings.plageHoraireStart}
+                          onChange={(e) => setCalendarSettings({ ...calendarSettings, plageHoraireStart: e.target.value })}
+                          className="px-3 py-2 border border-secondary-200 rounded-lg"
+                        />
+                        <span className="text-sm">à</span>
+                        <input
+                          type="time"
+                          value={calendarSettings.plageHoraireEnd}
+                          onChange={(e) => setCalendarSettings({ ...calendarSettings, plageHoraireEnd: e.target.value })}
+                          className="px-3 py-2 border border-secondary-200 rounded-lg"
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {Object.entries(calendarSettings.workDays).map(([day, enabled]) => (
+                          <label key={day} className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={enabled}
+                              onChange={(e) => setCalendarSettings({
+                                ...calendarSettings,
+                                workDays: { ...calendarSettings.workDays, [day]: e.target.checked }
+                              })}
+                              className="rounded"
+                            />
+                            <span className="text-sm capitalize">{day}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
+
+                {/* Section Interventions à planifier */}
+                <div>
+                  <h3 className="font-semibold mb-2">Interventions à planifier</h3>
+                  <p className="text-secondary-500 text-sm mb-4">Vous souhaitez plus de souplesse dans la planification des interventions ? Laissez les techniciens choisir des interventions à réaliser parmi celles qui ne sont pas encore planifiées.</p>
+
+                  <div className="bg-white border border-secondary-100 rounded-xl p-6">
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        id="showToPlanOnMobile"
+                        checked={calendarSettings.showToPlanOnMobile}
+                        onChange={(e) => setCalendarSettings({ ...calendarSettings, showToPlanOnMobile: e.target.checked })}
+                        className="mt-1 rounded"
+                      />
+                      <div>
+                        <label htmlFor="showToPlanOnMobile" className="font-medium">Afficher les interventions à planifier sur l&apos;application Terrain</label>
+                        <p className="text-sm text-secondary-500">En activant cette fonctionnalité, les interventions à planifier sont listées dans l&apos;onglet <span className="font-medium">Calendrier &gt; À planifier</span> de l&apos;application mobile. Les <span className="font-medium">techniciens</span> ont accès uniquement aux interventions qui leurs sont affectées. Les <span className="font-medium">techniciens +</span> ont accès à toute les interventions à planifier.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section Statuts de traitement */}
+                <div>
+                  <h3 className="font-semibold mb-2">Statuts de traitement</h3>
+                  <p className="text-secondary-500 text-sm mb-4">Vous souhaitez bénéficier de statuts supplémentaires sur vos interventions ? Ajoutez de nouveaux statuts de traitement.</p>
+
+                  <div className="bg-white border border-secondary-100 rounded-xl p-6">
+                    {calendarSettings.customStatuts.length > 0 && (
+                      <div className="space-y-2 mb-4">
+                        {calendarSettings.customStatuts.map((statut) => (
+                          <div key={statut.id} className="flex items-center justify-between p-3 bg-secondary-50 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 rounded" style={{ backgroundColor: statut.color }} />
+                              <span>{statut.name}</span>
+                            </div>
+                            <button
+                              onClick={() => setCalendarSettings({
+                                ...calendarSettings,
+                                customStatuts: calendarSettings.customStatuts.filter(s => s.id !== statut.id)
+                              })}
+                              className="text-secondary-400 hover:text-red-500"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <button
+                      onClick={() => setShowAddStatutModal(true)}
+                      className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg text-sm hover:bg-secondary-50"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Ajouter un statut
+                    </button>
+                  </div>
+                </div>
+
+                {/* Section Absences */}
+                <div>
+                  <h3 className="font-semibold mb-2">Absences</h3>
+                  <p className="text-secondary-500 text-sm mb-4">Gérez les absences de vos collaborateurs en toute simplicité et retrouvez-les directement dans votre calendrier.</p>
+
+                  <div className="bg-white border border-secondary-100 rounded-xl p-6">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={calendarSettings.absencesEnabled}
+                        onChange={(e) => setCalendarSettings({ ...calendarSettings, absencesEnabled: e.target.checked })}
+                        className="rounded"
+                      />
+                      <span className="font-medium">Absences</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Modal Ajouter statut */}
+                {showAddStatutModal && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-black/50" onClick={() => setShowAddStatutModal(false)} />
+                    <div className="bg-white rounded-xl w-full max-w-md relative z-10 p-6">
+                      <h3 className="text-lg font-semibold mb-4">Ajouter un statut</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Nom du statut</label>
+                          <input
+                            type="text"
+                            value={newStatut.name}
+                            onChange={(e) => setNewStatut({ ...newStatut, name: e.target.value })}
+                            className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                            placeholder="Ex: En cours de traitement"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Couleur</label>
+                          <input
+                            type="color"
+                            value={newStatut.color}
+                            onChange={(e) => setNewStatut({ ...newStatut, color: e.target.value })}
+                            className="w-12 h-10 rounded cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2 mt-6">
+                        <button
+                          onClick={() => setShowAddStatutModal(false)}
+                          className="px-4 py-2 text-sm text-secondary-600 hover:bg-secondary-50 rounded-lg"
+                        >
+                          Annuler
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (newStatut.name.trim()) {
+                              setCalendarSettings({
+                                ...calendarSettings,
+                                customStatuts: [...calendarSettings.customStatuts, { ...newStatut, id: `statut_${Date.now()}` }]
+                              });
+                              setNewStatut({ name: '', color: '#3b82f6' });
+                              setShowAddStatutModal(false);
+                            }
+                          }}
+                          className="px-4 py-2 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600"
+                        >
+                          Ajouter
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
