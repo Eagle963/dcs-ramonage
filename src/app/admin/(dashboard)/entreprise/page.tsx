@@ -766,85 +766,107 @@ export default function EntreprisePage() {
           <div className="flex-1">
             {/* Section Métiers */}
             {generalSection === 'metiers' && (
-              <div className="bg-white rounded-xl border border-secondary-100 p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-lg font-semibold">Mes métiers</h2>
-                  {!editingMetiers && (
-                    <button
-                      onClick={() => {
-                        setTempMetiers([...selectedMetiers]);
-                        setEditingMetiers(true);
-                      }}
-                      className="flex items-center gap-2 px-3 py-1.5 text-sm border border-secondary-200 rounded-lg hover:bg-secondary-50"
-                    >
-                      <Pencil className="w-4 h-4" />
-                      Modifier
-                    </button>
-                  )}
-                </div>
-                <p className="text-secondary-500 text-sm mb-6">
-                  Définissez les métiers exercés par votre entreprise pour adapter le logiciel à votre activité.
-                </p>
-
-                {!editingMetiers ? (
-                  // Mode lecture
-                  <div className="flex flex-wrap gap-2">
-                    {selectedMetiers.map((metier) => (
-                      <span key={metier} className="px-3 py-1.5 bg-secondary-100 text-secondary-700 rounded-lg text-sm">
-                        {metier}
-                      </span>
-                    ))}
-                    {selectedMetiers.length === 0 && (
-                      <p className="text-secondary-400 italic">Aucun métier sélectionné</p>
-                    )}
-                  </div>
-                ) : (
-                  // Mode édition
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-secondary-700 mb-2">
-                        Mes métiers <span className="text-red-500">*</span>
-                      </label>
-
-                      {/* Tags sélectionnés */}
-                      <div className="min-h-[80px] p-3 border border-secondary-200 rounded-lg bg-white">
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {tempMetiers.map((metier) => (
-                            <span
-                              key={metier}
-                              className="inline-flex items-center gap-1 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm"
-                            >
-                              {metier}
-                              <button
-                                onClick={() => setTempMetiers(prev => prev.filter(m => m !== metier))}
-                                className="hover:text-primary-900"
-                              >
-                                <X className="w-3.5 h-3.5" />
-                              </button>
-                            </span>
-                          ))}
-                        </div>
-
-                        {/* Dropdown pour ajouter */}
-                        <div className="relative">
+              <div className="flex flex-col gap-3" style={{ maxWidth: '800px' }}>
+                <div className="mb-5">
+                  <div className="mb-2">
+                    <div className="flex flex-row flex-wrap justify-between gap-2 sm:gap-4 items-start">
+                      <div className="flex flex-col flex-1">
+                        <h2 className="text-xl font-semibold mb-1">Mes métiers</h2>
+                        <span className="text-secondary-500">
+                          Définissez les métiers exercés par votre entreprise pour adapter le logiciel à votre activité.
+                        </span>
+                      </div>
+                      <div className="flex-shrink-0">
+                        {!editingMetiers && (
                           <button
-                            onClick={() => setMetiersDropdownOpen(!metiersDropdownOpen)}
-                            className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
+                            onClick={() => {
+                              setTempMetiers([...selectedMetiers]);
+                              setEditingMetiers(true);
+                            }}
+                            className="flex items-center gap-2 px-3 py-1.5 text-sm border border-secondary-200 rounded-lg hover:bg-secondary-50 whitespace-nowrap"
                           >
-                            <Plus className="w-4 h-4" />
-                            Ajouter un métier
+                            <Pencil className="w-4 h-4" />
+                            Modifier
                           </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <hr className="border-secondary-200 mt-2 mb-4" />
+
+                  {!editingMetiers ? (
+                    // Mode lecture - Liste à puces
+                    <div className="grid grid-cols-2 gap-x-8">
+                      <ul className="list-disc list-inside text-secondary-900 space-y-1">
+                        {selectedMetiers.slice(0, Math.ceil(selectedMetiers.length / 2)).map((metier) => (
+                          <li key={metier}>{metier}</li>
+                        ))}
+                      </ul>
+                      <ul className="list-disc list-inside text-secondary-900 space-y-1">
+                        {selectedMetiers.slice(Math.ceil(selectedMetiers.length / 2)).map((metier) => (
+                          <li key={metier}>{metier}</li>
+                        ))}
+                      </ul>
+                      {selectedMetiers.length === 0 && (
+                        <p className="text-secondary-400 italic col-span-2">Aucun métier sélectionné</p>
+                      )}
+                    </div>
+                  ) : (
+                    // Mode édition - Multi-select dropdown
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-secondary-700 mb-2">
+                          Mes métiers <span className="text-red-500">*</span>
+                        </label>
+
+                        {/* Input avec tags et dropdown intégré */}
+                        <div className="relative">
+                          <div
+                            className="flex flex-wrap items-center gap-2 p-2 border border-secondary-200 rounded-lg bg-white min-h-[44px] cursor-text"
+                            onClick={() => setMetiersDropdownOpen(true)}
+                          >
+                            {tempMetiers.map((metier) => (
+                              <span
+                                key={metier}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 bg-secondary-100 text-secondary-700 rounded text-sm"
+                              >
+                                {metier}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setTempMetiers(prev => prev.filter(m => m !== metier));
+                                  }}
+                                  className="hover:text-secondary-900 ml-1"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </span>
+                            ))}
+                            <div className="flex-1 min-w-[100px]" />
+                            <div className="flex items-center gap-2 text-secondary-400">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setTempMetiers([]);
+                                }}
+                                className="hover:text-secondary-600"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                              <ChevronDown className="w-4 h-4" />
+                            </div>
+                          </div>
 
                           {metiersDropdownOpen && (
-                            <div className="absolute top-full left-0 mt-1 w-72 max-h-60 overflow-y-auto bg-white border border-secondary-200 rounded-lg shadow-lg z-10">
+                            <div className="absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-secondary-200 rounded-lg shadow-lg z-10">
                               {METIERS_LIST.filter(m => !tempMetiers.includes(m)).map((metier) => (
                                 <button
                                   key={metier}
                                   onClick={() => {
                                     setTempMetiers(prev => [...prev, metier]);
-                                    setMetiersDropdownOpen(false);
                                   }}
-                                  className="w-full px-3 py-2 text-left text-sm hover:bg-secondary-50"
+                                  className="w-full px-3 py-2 text-left text-sm hover:bg-primary-50 hover:text-primary-700"
                                 >
                                   {metier}
                                 </button>
@@ -856,34 +878,34 @@ export default function EntreprisePage() {
                           )}
                         </div>
                       </div>
-                    </div>
 
-                    {/* Boutons d'action */}
-                    <div className="flex justify-end gap-3">
-                      <button
-                        onClick={() => {
-                          setEditingMetiers(false);
-                          setMetiersDropdownOpen(false);
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50"
-                      >
-                        <X className="w-4 h-4" />
-                        Annuler
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelectedMetiers([...tempMetiers]);
-                          setEditingMetiers(false);
-                          setMetiersDropdownOpen(false);
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
-                      >
-                        <Check className="w-4 h-4" />
-                        Enregistrer
-                      </button>
+                      {/* Boutons d'action */}
+                      <div className="flex justify-end gap-3">
+                        <button
+                          onClick={() => {
+                            setEditingMetiers(false);
+                            setMetiersDropdownOpen(false);
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50"
+                        >
+                          <X className="w-4 h-4" />
+                          Annuler
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedMetiers([...tempMetiers]);
+                            setEditingMetiers(false);
+                            setMetiersDropdownOpen(false);
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
+                        >
+                          <Check className="w-4 h-4" />
+                          Enregistrer
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             )}
 
