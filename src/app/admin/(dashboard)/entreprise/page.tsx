@@ -448,6 +448,27 @@ export default function EntreprisePage() {
     return result;
   };
 
+  // États pour la Présentation des documents
+  const [documentColor, setDocumentColor] = useState('#3b82f6');
+  const [documentStyle, setDocumentStyle] = useState<'classique' | 'moderne'>('classique');
+  const [phoneInternational, setPhoneInternational] = useState(false);
+  const [autoCreateArticles, setAutoCreateArticles] = useState(true);
+  const [presentationSections, setPresentationSections] = useState<Record<string, boolean>>({
+    entreprise: false,
+    client: false,
+    tableaux: false,
+    operations: false,
+    paiements: false,
+    piedPage: false,
+    mentions: false,
+    cgv: false,
+    automatisations: false,
+  });
+
+  const togglePresentationSection = (section: string) => {
+    setPresentationSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
   const [entreprise, setEntreprise] = useState({
     name: 'DCS Ramonage Oise & Val d\'Oise',
     slogan: '',
@@ -1341,10 +1362,206 @@ export default function EntreprisePage() {
             )}
 
             {settingsSection === 'presentation' && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Présentation des devis / factures</h2>
-                <div className="bg-white border border-secondary-100 rounded-xl p-6">
-                  <p className="text-secondary-500">Personnalisez l'apparence de vos devis et factures.</p>
+              <div className="flex gap-6">
+                {/* Colonne de gauche - Paramètres */}
+                <div className="flex-1 space-y-6" style={{ maxWidth: '600px' }}>
+                  {/* Header */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <h2 className="text-xl font-semibold">Présentation</h2>
+                      <button className="text-secondary-400 hover:text-secondary-600">
+                        <Info className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <p className="text-secondary-500">Personnalisez vos documents pour les adapter à votre entreprise.</p>
+                  </div>
+
+                  {/* Couleur du document */}
+                  <div className="border-t border-secondary-100 pt-6">
+                    <h3 className="font-medium mb-1">Couleur du document</h3>
+                    <p className="text-sm text-secondary-500 mb-3">Sélectionner la couleur des titres du document.</p>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 border border-secondary-200 rounded-lg p-1">
+                        <button className="w-8 h-8 rounded flex items-center justify-center text-white font-bold" style={{ backgroundColor: documentColor }}>A</button>
+                        <input
+                          type="color"
+                          value={documentColor}
+                          onChange={(e) => setDocumentColor(e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer"
+                        />
+                      </div>
+                      <button className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1">
+                        <Pencil className="w-3 h-3" />
+                        Appliquer à tout le document
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Style du document */}
+                  <div className="border-t border-secondary-100 pt-6">
+                    <h3 className="font-medium mb-1">Style du document</h3>
+                    <p className="text-sm text-secondary-500 mb-3">Donnez un style plus moderne en choisissant un type d'arrondi pour les bordures de vos tableaux.</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setDocumentStyle('classique')}
+                        className={`px-6 py-2 rounded-lg border text-sm font-medium ${
+                          documentStyle === 'classique'
+                            ? 'border-primary-500 bg-primary-50 text-primary-700'
+                            : 'border-secondary-200 hover:bg-secondary-50'
+                        }`}
+                      >
+                        Classique
+                      </button>
+                      <button
+                        onClick={() => setDocumentStyle('moderne')}
+                        className={`px-6 py-2 rounded-lg border text-sm font-medium ${
+                          documentStyle === 'moderne'
+                            ? 'border-primary-500 bg-primary-50 text-primary-700'
+                            : 'border-secondary-200 hover:bg-secondary-50'
+                        }`}
+                      >
+                        Moderne
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Format téléphone */}
+                  <div className="border-t border-secondary-100 pt-6">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={phoneInternational}
+                        onChange={(e) => setPhoneInternational(e.target.checked)}
+                        className="mt-1 rounded border-secondary-300"
+                      />
+                      <div>
+                        <span className="font-medium">Numéros de téléphone au format international</span>
+                        <p className="text-sm text-secondary-500">Affiche les numéros de téléphone au format international.</p>
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* Accordéons */}
+                  <div className="border-t border-secondary-100 pt-6 space-y-0">
+                    {[
+                      { key: 'entreprise', label: 'Entreprise' },
+                      { key: 'client', label: 'Client' },
+                      { key: 'tableaux', label: 'Tableaux' },
+                      { key: 'operations', label: 'Opérations' },
+                      { key: 'paiements', label: 'Paiements' },
+                      { key: 'piedPage', label: 'Pied de page' },
+                      { key: 'mentions', label: 'Mentions' },
+                      { key: 'cgv', label: 'CGV et filigrane' },
+                      { key: 'automatisations', label: 'Automatisations' },
+                    ].map((section) => (
+                      <div key={section.key} className="border-b border-secondary-100">
+                        <button
+                          onClick={() => togglePresentationSection(section.key)}
+                          className="w-full flex items-center justify-between py-4 text-left"
+                        >
+                          <span className="font-medium">{section.label}</span>
+                          <ChevronDown className={`w-5 h-5 text-secondary-400 transition-transform ${presentationSections[section.key] ? 'rotate-180' : ''}`} />
+                        </button>
+                        {presentationSections[section.key] && (
+                          <div className="pb-4 text-sm text-secondary-500">
+                            Options de configuration pour {section.label.toLowerCase()}...
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Création d'articles */}
+                  <div className="border-t border-secondary-100 pt-6">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={autoCreateArticles}
+                        onChange={(e) => setAutoCreateArticles(e.target.checked)}
+                        className="mt-1 rounded border-secondary-300"
+                      />
+                      <div>
+                        <span className="font-medium">Création d'articles</span>
+                        <p className="text-sm text-secondary-500">Lors de la saisie manuelle d'une ligne dans un devis / facture, un article est automatiquement créé au sein de la bibliothèque dans le catalogue « Autres ».</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Colonne de droite - Aperçu */}
+                <div className="w-96 flex-shrink-0">
+                  <div className="sticky top-4">
+                    {/* Toolbar aperçu */}
+                    <div className="flex items-center justify-center gap-1 mb-4 text-secondary-400">
+                      <button className="p-1.5 hover:bg-secondary-100 rounded">−</button>
+                      <button className="p-1.5 hover:bg-secondary-100 rounded">+</button>
+                      <button className="p-1.5 hover:bg-secondary-100 rounded">↕</button>
+                      <button className="p-1.5 hover:bg-secondary-100 rounded">↔</button>
+                      <button className="p-1.5 hover:bg-secondary-100 rounded"><Download className="w-4 h-4" /></button>
+                      <button className="p-1.5 hover:bg-secondary-100 rounded">🖨</button>
+                    </div>
+
+                    {/* Aperçu de la facture */}
+                    <div className="bg-white border border-secondary-200 rounded-lg shadow-sm p-6 text-xs">
+                      <div className="flex justify-between mb-6">
+                        <div>
+                          <div className="w-20 h-12 bg-secondary-100 rounded flex items-center justify-center text-secondary-400 text-[8px]">
+                            DCS RAMONAGE
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-sm" style={{ color: documentColor }}>Facture F0000</p>
+                          <p className="text-secondary-500">Date émission : 10/01/2026</p>
+                          <p className="text-secondary-500">Date échéance : 10/01/2026</p>
+                        </div>
+                      </div>
+
+                      <div className="mb-4">
+                        <p className="font-semibold" style={{ color: documentColor }}>Dcs Ramonage Oise & Val d'Oise</p>
+                        <p className="text-secondary-600">58 RUE de Monceau</p>
+                        <p className="text-secondary-600">75008 Paris 8e Arrondissement</p>
+                        <p className="text-secondary-600">contact@dcs-ramonage.fr</p>
+                        <p className="text-secondary-600">09 80 80 10 61</p>
+                      </div>
+
+                      <div className="border border-secondary-200 rounded p-2 mb-4">
+                        <p className="font-semibold text-secondary-700">Client</p>
+                        <p className="text-secondary-600">Hedi Maronier</p>
+                        <p className="text-secondary-600">6 rue d'Armaillé</p>
+                        <p className="text-secondary-600">75017 Paris</p>
+                      </div>
+
+                      <p className="text-secondary-500 mb-2">N° de bon de commande : XXXXXXZZZ</p>
+
+                      <p className="font-semibold mb-2" style={{ color: documentColor }}>Installation climatisation</p>
+
+                      <table className="w-full text-[8px] border-collapse mb-4">
+                        <thead>
+                          <tr className="bg-secondary-100">
+                            <th className="border border-secondary-200 p-1 text-left">Désignation</th>
+                            <th className="border border-secondary-200 p-1">Qté</th>
+                            <th className="border border-secondary-200 p-1">Prix U.HT</th>
+                            <th className="border border-secondary-200 p-1">TVA</th>
+                            <th className="border border-secondary-200 p-1">Total HT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="border border-secondary-200 p-1">Installation climatisation</td>
+                            <td className="border border-secondary-200 p-1 text-center">1</td>
+                            <td className="border border-secondary-200 p-1 text-right">120,00€</td>
+                            <td className="border border-secondary-200 p-1 text-center">10%</td>
+                            <td className="border border-secondary-200 p-1 text-right">600,00€</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <div className="text-right">
+                        <p className="text-secondary-600">Sous-total : 600,00 €</p>
+                        <p className="font-bold">Total TTC : 660,00 €</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
