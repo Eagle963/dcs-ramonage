@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { 
+import {
   Plus, Search, ChevronDown, ChevronLeft, ChevronRight,
   User, Building2, Filter, Settings2, Download, XCircle,
   MapPin, Phone, Mail, MoreVertical, Eye, Edit, Calendar,
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import ClientForm from '@/components/forms/ClientForm';
+import { usePageHeader } from '@/contexts/PageHeaderContext';
 
 // Import dynamique pour éviter les erreurs SSR
 const ClientsMap = dynamic(() => import('@/components/map/ClientsMap'), {
@@ -60,12 +61,40 @@ const statsData = {
 type ViewType = 'list' | 'map';
 
 export default function ClientsPage() {
+  const { setActions, setInfoTooltip } = usePageHeader();
   const [clients] = useState<Client[]>(mockClients);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [viewType, setViewType] = useState<ViewType>('list');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Actions du header
+  useEffect(() => {
+    setActions([
+      {
+        label: 'Importer',
+        icon: Download,
+        variant: 'outline',
+        onClick: () => {
+          // TODO: Ouvrir le modal d'importation
+          console.log('Importer des clients');
+        },
+      },
+      {
+        label: 'Ajouter un client',
+        icon: Plus,
+        variant: 'primary',
+        onClick: () => setIsModalOpen(true),
+      },
+    ]);
+    setInfoTooltip('Gérez votre base de clients');
+
+    return () => {
+      setActions([]);
+      setInfoTooltip(undefined);
+    };
+  }, [setActions, setInfoTooltip]);
 
   const handleCreateClient = (data: any) => {
     console.log('Nouveau client:', data);
@@ -107,40 +136,6 @@ export default function ClientsPage() {
 
   return (
     <div>
-      {/* Header actions */}
-      <div className="flex items-center justify-end gap-2 mb-4">
-        {/* Toggle Vue */}
-        <div className="flex border border-secondary-200 rounded-lg overflow-hidden mr-2">
-          <button
-            onClick={() => setViewType('list')}
-            className={`flex items-center gap-1 px-3 py-2 text-sm ${
-              viewType === 'list' ? 'bg-primary-50 text-primary-700' : 'bg-white text-secondary-600 hover:bg-secondary-50'
-            }`}
-          >
-            <List className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setViewType('map')}
-            className={`flex items-center gap-1 px-3 py-2 text-sm border-l border-secondary-200 ${
-              viewType === 'map' ? 'bg-primary-50 text-primary-700' : 'bg-white text-secondary-600 hover:bg-secondary-50'
-            }`}
-          >
-            <Map className="w-4 h-4" />
-          </button>
-        </div>
-        <button className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50 text-sm">
-          <Download className="w-4 h-4" />
-          Importer
-        </button>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium"
-        >
-          <Plus className="w-4 h-4" />
-          Ajouter un client
-        </button>
-      </div>
-
       {/* Stats cards */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
         <StatCard 
@@ -186,6 +181,26 @@ export default function ClientsPage() {
         <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
           <XCircle className="w-4 h-4" /> Réinitialiser
         </button>
+        {/* Toggle Vue */}
+        <div className="flex-1"></div>
+        <div className="flex border border-secondary-200 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setViewType('list')}
+            className={`flex items-center gap-1 px-3 py-2 text-sm ${
+              viewType === 'list' ? 'bg-primary-50 text-primary-700' : 'bg-white text-secondary-600 hover:bg-secondary-50'
+            }`}
+          >
+            <List className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setViewType('map')}
+            className={`flex items-center gap-1 px-3 py-2 text-sm border-l border-secondary-200 ${
+              viewType === 'map' ? 'bg-primary-50 text-primary-700' : 'bg-white text-secondary-600 hover:bg-secondary-50'
+            }`}
+          >
+            <Map className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Vue Liste */}

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Search, Filter, ChevronDown, ChevronLeft, ChevronRight,
-  Calendar, Clock, XCircle, FileText, Send, Settings2, RotateCcw, Users
+  Calendar, Clock, XCircle, FileText, Send, Settings2, RotateCcw, Users, Plus
 } from 'lucide-react';
+import { usePageHeader } from '@/contexts/PageHeaderContext';
 
 interface Avoir {
   id: string;
@@ -30,9 +31,31 @@ const statsData = {
 };
 
 export default function AvoirsPage() {
+  const { setActions, setInfoTooltip } = usePageHeader();
   const [avoirs] = useState<Avoir[]>(mockAvoirs);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('tous');
+
+  // Actions du header
+  useEffect(() => {
+    setActions([
+      {
+        label: 'Nouvel avoir',
+        icon: Plus,
+        variant: 'primary',
+        onClick: () => {
+          // TODO: Ouvrir le formulaire de nouvel avoir
+          console.log('Nouvel avoir');
+        },
+      },
+    ]);
+    setInfoTooltip('Gérez vos avoirs');
+
+    return () => {
+      setActions([]);
+      setInfoTooltip(undefined);
+    };
+  }, [setActions, setInfoTooltip]);
 
   const formatMoney = (amount: number) => amount.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 

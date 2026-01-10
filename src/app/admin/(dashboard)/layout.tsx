@@ -3,12 +3,12 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Calendar, 
-  FileText, 
-  Users, 
-  Settings, 
-  ChevronDown, 
+import {
+  Calendar,
+  FileText,
+  Users,
+  Settings,
+  ChevronDown,
   ChevronRight,
   LayoutDashboard,
   ClipboardList,
@@ -34,9 +34,12 @@ import {
   MapPin,
   Euro,
   Wrench,
-  Package
+  Package,
+  Plus,
+  Info
 } from 'lucide-react';
 import DateRangePicker from '@/components/ui/DateRangePicker';
+import { PageHeaderProvider, usePageHeader } from '@/contexts/PageHeaderContext';
 
 interface MenuItem {
   label: string;
@@ -109,7 +112,47 @@ const menuSections: { title: string; items: MenuItem[] }[] = [
   },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+// Composant pour afficher les actions du header
+function HeaderActions() {
+  const { actions, infoTooltip } = usePageHeader();
+
+  return (
+    <div className="flex items-center gap-2">
+      {infoTooltip && (
+        <button className="text-secondary-400 hover:text-secondary-600" title={infoTooltip}>
+          <Info className="w-4 h-4" />
+        </button>
+      )}
+      {actions.map((action, index) => {
+        const Icon = action.icon;
+        const className = action.variant === 'primary'
+          ? 'px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium flex items-center gap-2'
+          : action.variant === 'outline'
+            ? 'px-3 py-1.5 border border-secondary-200 text-secondary-700 rounded-lg hover:bg-secondary-50 text-sm font-medium flex items-center gap-2'
+            : 'px-3 py-1.5 bg-secondary-100 text-secondary-700 rounded-lg hover:bg-secondary-200 text-sm font-medium flex items-center gap-2';
+
+        if (action.href) {
+          return (
+            <Link key={index} href={action.href} className={className}>
+              {Icon && <Icon className="w-4 h-4" />}
+              <span className="hidden sm:inline">{action.label}</span>
+            </Link>
+          );
+        }
+
+        return (
+          <button key={index} onClick={action.onClick} className={className}>
+            {Icon && <Icon className="w-4 h-4" />}
+            <span className="hidden sm:inline">{action.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// Composant interne du layout
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -459,6 +502,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 />
               </div>
             )}
+            {/* Actions de la page - rendues via HeaderActions */}
+            <HeaderActions />
           </div>
         </header>
 
@@ -468,5 +513,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </main>
       </div>
     </div>
+  );
+}
+
+// Export avec le provider
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <PageHeaderProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </PageHeaderProvider>
   );
 }

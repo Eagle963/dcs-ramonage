@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Plus, Search, Filter, MoreHorizontal, Eye, Edit2, Trash2,
   Send, Download, CheckCircle2, Clock, XCircle, AlertTriangle,
@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import FactureForm from '@/components/forms/FactureForm';
+import { usePageHeader } from '@/contexts/PageHeaderContext';
 
 interface Facture {
   id: string;
@@ -49,11 +50,30 @@ const statsData = {
 };
 
 export default function FacturesPage() {
+  const { setActions, setInfoTooltip } = usePageHeader();
   const [factures] = useState<Facture[]>(mockFactures);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('toutes');
   const [showActions, setShowActions] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Actions du header
+  useEffect(() => {
+    setActions([
+      {
+        label: 'Nouvelle facture',
+        icon: Plus,
+        variant: 'primary',
+        onClick: () => setIsModalOpen(true),
+      },
+    ]);
+    setInfoTooltip('Gérez vos factures et suivez les paiements');
+
+    return () => {
+      setActions([]);
+      setInfoTooltip(undefined);
+    };
+  }, [setActions, setInfoTooltip]);
 
   const handleCreateFacture = (data: any) => {
     console.log('Nouvelle facture:', data);
@@ -198,14 +218,6 @@ export default function FacturesPage() {
         </button>
         <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
           <RotateCcw className="w-4 h-4" /> Réinitialiser
-        </button>
-        <div className="flex-1"></div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium"
-        >
-          <Plus className="w-4 h-4" />
-          Nouvelle facture
         </button>
       </div>
 

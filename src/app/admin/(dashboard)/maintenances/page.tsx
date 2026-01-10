@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { 
-  Search, 
-  Users, 
-  UserCheck, 
-  CheckCircle, 
+import {
+  Search,
+  Users,
+  UserCheck,
+  CheckCircle,
   X,
   Plus,
   Calendar,
@@ -14,6 +14,7 @@ import {
   Check
 } from 'lucide-react';
 import DateRangePicker from '@/components/ui/DateRangePicker';
+import { usePageHeader } from '@/contexts/PageHeaderContext';
 
 interface Maintenance {
   id: string;
@@ -96,13 +97,44 @@ const MONTHS = [
 ];
 
 export default function MaintenancesPage() {
+  const { setActions, setInfoTooltip } = usePageHeader();
   const [activeTab, setActiveTab] = useState<'toutes' | 'a-planifier'>('toutes');
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<{ start: Date | null; end: Date | null }>({
     start: new Date(2025, 10, 1), // 1er novembre 2025
     end: new Date(2026, 9, 31),   // 31 octobre 2026
   });
-  
+
+  // Actions du header
+  useEffect(() => {
+    setActions([
+      {
+        label: 'Planificateur',
+        icon: Calendar,
+        variant: 'outline',
+        onClick: () => {
+          // TODO: Ouvrir le planificateur
+          console.log('Planificateur');
+        },
+      },
+      {
+        label: 'Nouvelle maintenance',
+        icon: Plus,
+        variant: 'primary',
+        onClick: () => {
+          // TODO: Ouvrir le formulaire de nouvelle maintenance
+          console.log('Nouvelle maintenance');
+        },
+      },
+    ]);
+    setInfoTooltip('Gérez vos contrats de maintenance');
+
+    return () => {
+      setActions([]);
+      setInfoTooltip(undefined);
+    };
+  }, [setActions, setInfoTooltip]);
+
   const currentMonth = '2026-01'; // Janvier 2026
   
   const filteredMaintenances = MOCK_MAINTENANCES.filter(m => {
@@ -145,23 +177,6 @@ export default function MaintenancesPage() {
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-secondary-900">Maintenances</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <button className="btn-outline">
-            <Calendar className="w-4 h-4" />
-            Planificateur
-          </button>
-          <button className="btn-primary">
-            <Plus className="w-4 h-4" />
-            Nouvelle maintenance
-          </button>
-        </div>
-      </div>
-
       {/* Onglets */}
       <div className="flex gap-1 mb-4">
         <button

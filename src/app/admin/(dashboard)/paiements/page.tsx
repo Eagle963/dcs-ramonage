@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Search, ChevronDown, ChevronLeft, ChevronRight,
   Calendar, CreditCard, Banknote, Building2,
-  Smartphone, Settings2, Download, RotateCcw, Users, Filter
+  Smartphone, Settings2, Download, RotateCcw, Users, Filter, Plus
 } from 'lucide-react';
+import { usePageHeader } from '@/contexts/PageHeaderContext';
 
 interface Paiement {
   id: string;
@@ -46,9 +47,40 @@ const modeIcons = {
 };
 
 export default function PaiementsPage() {
+  const { setActions, setInfoTooltip } = usePageHeader();
   const [paiements] = useState<Paiement[]>(mockPaiements);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'consignes' | 'primes'>('consignes');
+
+  // Actions du header
+  useEffect(() => {
+    setActions([
+      {
+        label: 'Exporter',
+        icon: Download,
+        variant: 'outline',
+        onClick: () => {
+          // TODO: Exporter les paiements
+          console.log('Exporter');
+        },
+      },
+      {
+        label: 'Nouveau paiement',
+        icon: Plus,
+        variant: 'primary',
+        onClick: () => {
+          // TODO: Ouvrir le formulaire de nouveau paiement
+          console.log('Nouveau paiement');
+        },
+      },
+    ]);
+    setInfoTooltip('Suivez les paiements reçus');
+
+    return () => {
+      setActions([]);
+      setInfoTooltip(undefined);
+    };
+  }, [setActions, setInfoTooltip]);
 
   const filteredPaiements = paiements.filter(p =>
     p.numero.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -109,11 +141,6 @@ export default function PaiementsPage() {
         </button>
         <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
           <RotateCcw className="w-4 h-4" /> Réinitialiser
-        </button>
-        <div className="flex-1"></div>
-        <button className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50 text-sm bg-white">
-          <Download className="w-4 h-4" />
-          Exporter
         </button>
       </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import {
   ChevronLeft, ChevronRight, Calendar, List, Map, Clock,
@@ -8,6 +8,7 @@ import {
   MapPin, Phone, Navigation, Plus, MoreVertical, ChevronDown,
   Users, FileText, Euro, Sparkles, RotateCcw
 } from 'lucide-react';
+import { usePageHeader } from '@/contexts/PageHeaderContext';
 
 const PlanningMap = dynamic(() => import('@/components/map/PlanningMap'), {
   ssr: false,
@@ -63,6 +64,7 @@ type ViewMode = 'month' | 'week' | 'day';
 type ViewType = 'calendar' | 'list' | 'map' | 'timeline' | 'toplan';
 
 export default function PlanningPage() {
+  const { setActions, setInfoTooltip } = usePageHeader();
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [viewType, setViewType] = useState<ViewType>('calendar');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -76,6 +78,27 @@ export default function PlanningPage() {
     return new Date(today.setDate(diff));
   });
   const [showViewDropdown, setShowViewDropdown] = useState(false);
+
+  // Actions du header
+  useEffect(() => {
+    setActions([
+      {
+        label: 'Planifier',
+        icon: Plus,
+        variant: 'primary',
+        onClick: () => {
+          // TODO: Ouvrir le modal de planification
+          console.log('Planifier une intervention');
+        },
+      },
+    ]);
+    setInfoTooltip('Gérez votre planning et vos interventions');
+
+    return () => {
+      setActions([]);
+      setInfoTooltip(undefined);
+    };
+  }, [setActions, setInfoTooltip]);
 
   const selectedTechnician = technicians.find(t => t.id === selectedTechnicianId) || technicians[0];
 
@@ -277,12 +300,6 @@ export default function PlanningPage() {
           <RotateCcw className="w-4 h-4" /> Réinitialiser
         </button>
 
-        <div className="flex-1"></div>
-
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium">
-          <Plus className="w-4 h-4" />
-          Planifier
-        </button>
       </div>
 
       {/* Onglets */}

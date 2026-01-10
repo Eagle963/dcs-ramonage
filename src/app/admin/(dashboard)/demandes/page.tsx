@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Search, CheckCircle2, XCircle, Clock, Phone, Mail, MapPin, Calendar, Eye, X, ExternalLink, Filter, RotateCcw, Users } from 'lucide-react';
+import { Search, CheckCircle2, XCircle, Clock, Phone, Mail, MapPin, Calendar, Eye, X, ExternalLink, Filter, RotateCcw, Users, Plus } from 'lucide-react';
+import { usePageHeader } from '@/contexts/PageHeaderContext';
 
 // Import dynamique pour éviter les erreurs SSR avec Leaflet
 const LeafletMap = dynamic(() => import('@/components/ui/LeafletMap'), { 
@@ -136,10 +137,32 @@ const mockBookings: BookingRequest[] = [
 ];
 
 export default function DemandesPage() {
+  const { setActions, setInfoTooltip } = usePageHeader();
   const [bookings, setBookings] = useState<BookingRequest[]>(mockBookings);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBooking, setSelectedBooking] = useState<BookingRequest | null>(null);
+
+  // Actions du header
+  useEffect(() => {
+    setActions([
+      {
+        label: 'Nouvelle demande',
+        icon: Plus,
+        variant: 'primary',
+        onClick: () => {
+          // TODO: Ouvrir le formulaire de nouvelle demande
+          console.log('Nouvelle demande');
+        },
+      },
+    ]);
+    setInfoTooltip('Gérez les demandes de rendez-vous de vos clients');
+
+    return () => {
+      setActions([]);
+      setInfoTooltip(undefined);
+    };
+  }, [setActions, setInfoTooltip]);
 
   const filteredBookings = bookings.filter(b => {
     const matchesStatus = filterStatus === 'ALL' || b.status === filterStatus;
@@ -176,17 +199,6 @@ export default function DemandesPage() {
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-secondary-900">Demandes de RDV</h1>
-          <p className="text-secondary-500">
-            {pendingCount > 0 
-              ? `${pendingCount} demande${pendingCount > 1 ? 's' : ''} en attente` 
-              : 'Aucune demande en attente'}
-          </p>
-        </div>
-      </div>
-
       {/* Filtres */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative flex-1 max-w-xs">
