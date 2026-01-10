@@ -476,6 +476,51 @@ export default function EntreprisePage() {
     setPresentationSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
+  // États pour les RIBs
+  const [ribs, setRibs] = useState([
+    { id: 1, name: 'DCS RAMONAGE', iban: '', bic: '', isPrimary: true },
+  ]);
+  const [selectedRibIndex, setSelectedRibIndex] = useState(0);
+  const [showRibNameInPdf, setShowRibNameInPdf] = useState(true);
+  const [ribDropdownOpen, setRibDropdownOpen] = useState(false);
+
+  const addRib = () => {
+    const newRib = {
+      id: Date.now(),
+      name: '',
+      iban: '',
+      bic: '',
+      isPrimary: false,
+    };
+    setRibs([...ribs, newRib]);
+    setSelectedRibIndex(ribs.length);
+  };
+
+  const deleteRib = (index: number) => {
+    if (ribs.length > 1) {
+      const newRibs = ribs.filter((_, i) => i !== index);
+      // Si on supprime le RIB principal, le premier devient principal
+      if (ribs[index].isPrimary && newRibs.length > 0) {
+        newRibs[0].isPrimary = true;
+      }
+      setRibs(newRibs);
+      setSelectedRibIndex(Math.min(selectedRibIndex, newRibs.length - 1));
+    }
+  };
+
+  const updateRib = (index: number, field: string, value: string | boolean) => {
+    const newRibs = [...ribs];
+    if (field === 'isPrimary' && value === true) {
+      // Un seul RIB peut être principal
+      newRibs.forEach((rib, i) => {
+        rib.isPrimary = i === index;
+      });
+    } else {
+      (newRibs[index] as Record<string, string | boolean | number>)[field] = value;
+    }
+    setRibs(newRibs);
+  };
+
   const [entreprise, setEntreprise] = useState({
     name: 'DCS Ramonage Oise & Val d\'Oise',
     slogan: '',
@@ -1517,18 +1562,165 @@ export default function EntreprisePage() {
             )}
 
             {settingsSection === 'paiements' && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Paiements et taxes</h2>
-                <div className="bg-white border border-secondary-100 rounded-xl p-6 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Taux de TVA par défaut</label>
-                    <select className="w-full max-w-xs px-3 py-2 border border-secondary-200 rounded-lg">
-                      <option>20% - TVA normale</option>
-                      <option>10% - TVA réduite</option>
-                      <option>5.5% - TVA réduite</option>
-                      <option>0% - Exonéré</option>
-                    </select>
+              <div className="space-y-6" style={{ maxWidth: '800px' }}>
+                {/* En-tête */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h2 className="text-xl font-semibold">RIBs</h2>
+                    <button className="text-secondary-400 hover:text-secondary-600">
+                      <Info className="w-4 h-4" />
+                    </button>
                   </div>
+                  <p className="text-secondary-500">Configurez les RIBs de votre entreprise que vous pourrez utiliser dans vos devis / factures.</p>
+                </div>
+
+                {/* Checkbox afficher libellé */}
+                <div className="border-t border-secondary-100 pt-6">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showRibNameInPdf}
+                      onChange={(e) => setShowRibNameInPdf(e.target.checked)}
+                      className="mt-1 rounded border-secondary-300"
+                    />
+                    <div>
+                      <span className="font-medium">Afficher le libellé du RIB dans le PDF ?</span>
+                      <p className="text-sm text-secondary-500">La modification de cette option s'applique uniquement sur les nouveaux devis / factures.</p>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Sélecteur de RIB */}
+                <div className="border-t border-secondary-100 pt-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="font-medium">Sélectionner le RIB à modifier ou ajoutez en un nouveau</label>
+                    <button
+                      onClick={addRib}
+                      className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Ajouter un RIB
+                    </button>
+                  </div>
+
+                  {/* Dropdown sélection RIB */}
+                  <div className="relative mb-6">
+                    <button
+                      onClick={() => setRibDropdownOpen(!ribDropdownOpen)}
+                      className="w-full px-4 py-3 border border-secondary-200 rounded-lg text-left flex items-center justify-between hover:border-secondary-300"
+                    >
+                      <span>{selectedRibIndex + 1}. {ribs[selectedRibIndex]?.name || 'Sans nom'}</span>
+                      <ChevronDown className={`w-5 h-5 text-secondary-400 transition-transform ${ribDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {ribDropdownOpen && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-secondary-200 rounded-lg shadow-lg z-10 max-h-60 overflow-auto">
+                        {ribs.map((rib, index) => (
+                          <button
+                            key={rib.id}
+                            onClick={() => {
+                              setSelectedRibIndex(index);
+                              setRibDropdownOpen(false);
+                            }}
+                            className={`w-full px-4 py-3 text-left hover:bg-secondary-50 flex items-center justify-between ${
+                              index === selectedRibIndex ? 'bg-primary-50 text-primary-700' : ''
+                            }`}
+                          >
+                            <span>{index + 1}. {rib.name || 'Sans nom'}</span>
+                            {rib.isPrimary && (
+                              <span className="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded">Principal</span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Formulaire RIB sélectionné */}
+                  {ribs[selectedRibIndex] && (
+                    <div className="bg-white border border-secondary-200 rounded-xl p-6 space-y-4">
+                      {/* Libellé + Principal */}
+                      <div className="flex gap-4 items-start">
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium mb-1">
+                            Libellé <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={ribs[selectedRibIndex].name}
+                            onChange={(e) => updateRib(selectedRibIndex, 'name', e.target.value)}
+                            className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                            placeholder="Nom du RIB"
+                          />
+                        </div>
+                        <div className="pt-7">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="primaryRib"
+                              checked={ribs[selectedRibIndex].isPrimary}
+                              onChange={() => updateRib(selectedRibIndex, 'isPrimary', true)}
+                              className="text-primary-600"
+                            />
+                            <span className="text-sm font-medium">Principal</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* IBAN + BIC */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">
+                            IBAN <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={ribs[selectedRibIndex].iban}
+                            onChange={(e) => updateRib(selectedRibIndex, 'iban', e.target.value.toUpperCase())}
+                            className="w-full px-3 py-2 border border-secondary-200 rounded-lg font-mono"
+                            placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX"
+                          />
+                          {ribs[selectedRibIndex].iban && ribs[selectedRibIndex].iban.length < 14 && (
+                            <p className="text-red-500 text-xs mt-1">L'IBAN saisi est invalide</p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">
+                            BIC <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={ribs[selectedRibIndex].bic}
+                            onChange={(e) => updateRib(selectedRibIndex, 'bic', e.target.value.toUpperCase())}
+                            className="w-full px-3 py-2 border border-secondary-200 rounded-lg font-mono"
+                            placeholder="XXXXXXXX"
+                          />
+                          {ribs[selectedRibIndex].bic && ribs[selectedRibIndex].bic.length < 8 && (
+                            <p className="text-red-500 text-xs mt-1">Le BIC saisi est invalide</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Bouton supprimer */}
+                      {ribs.length > 1 && (
+                        <button
+                          onClick={() => deleteRib(selectedRibIndex)}
+                          className="text-red-600 hover:text-red-700 text-sm flex items-center gap-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Supprimer ce RIB
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Bouton sauvegarder */}
+                <div className="flex justify-end pt-4">
+                  <button className="px-6 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium flex items-center gap-2">
+                    <Save className="w-4 h-4" />
+                    Sauvegarder
+                  </button>
                 </div>
               </div>
             )}
