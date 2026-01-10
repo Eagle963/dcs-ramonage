@@ -484,6 +484,57 @@ export default function EntreprisePage() {
   const [showRibNameInPdf, setShowRibNameInPdf] = useState(true);
   const [ribDropdownOpen, setRibDropdownOpen] = useState(false);
 
+  // États pour les sections accordéon de Paiements & taxes
+  const [paiementsSections, setPaiementsSections] = useState<Record<string, boolean>>({
+    ribs: true,
+    conditions: false,
+    devis: false,
+    tva: false,
+  });
+
+  const togglePaiementsSection = (section: string) => {
+    setPaiementsSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  // États pour conditions de paiement
+  const [conditionsPaiement, setConditionsPaiement] = useState({
+    delai: 30,
+    typeDuree: 'jours_calendaires',
+  });
+
+  // États pour les paramètres devis
+  const [devisParams, setDevisParams] = useState({
+    dureeValidite: 1,
+    uniteValidite: 'mois',
+    dateAcompte: false,
+    acompteAuto: false,
+    acomptePourcentage: 30,
+    acompteDelai: 7,
+    acompteUnite: 'jours',
+  });
+
+  // États pour les taux de TVA
+  const [tauxTva, setTauxTva] = useState([
+    { id: 1, taux: 20, compte: '44571' },
+    { id: 2, taux: 10, compte: '44571' },
+    { id: 3, taux: 5.5, compte: '44571' },
+    { id: 4, taux: 0, compte: '44571' },
+  ]);
+
+  const addTauxTva = () => {
+    setTauxTva([...tauxTva, { id: Date.now(), taux: 0, compte: '44571' }]);
+  };
+
+  const deleteTauxTva = (id: number) => {
+    if (tauxTva.length > 1) {
+      setTauxTva(tauxTva.filter(t => t.id !== id));
+    }
+  };
+
+  const updateTauxTva = (id: number, field: string, value: number | string) => {
+    setTauxTva(tauxTva.map(t => t.id === id ? { ...t, [field]: value } : t));
+  };
+
   const addRib = () => {
     const newRib = {
       id: Date.now(),
@@ -1563,156 +1614,393 @@ export default function EntreprisePage() {
 
             {settingsSection === 'paiements' && (
               <div className="space-y-6" style={{ maxWidth: '800px' }}>
-                {/* En-tête */}
+                {/* En-tête principal */}
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <h2 className="text-xl font-semibold">RIBs</h2>
+                    <h2 className="text-xl font-semibold">Paiements & taxes</h2>
                     <button className="text-secondary-400 hover:text-secondary-600">
                       <Info className="w-4 h-4" />
                     </button>
                   </div>
-                  <p className="text-secondary-500">Configurez les RIBs de votre entreprise que vous pourrez utiliser dans vos devis / factures.</p>
                 </div>
 
-                {/* Checkbox afficher libellé */}
-                <div className="border-t border-secondary-100 pt-6">
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={showRibNameInPdf}
-                      onChange={(e) => setShowRibNameInPdf(e.target.checked)}
-                      className="mt-1 rounded border-secondary-300"
-                    />
-                    <div>
-                      <span className="font-medium">Afficher le libellé du RIB dans le PDF ?</span>
-                      <p className="text-sm text-secondary-500">La modification de cette option s'applique uniquement sur les nouveaux devis / factures.</p>
-                    </div>
-                  </label>
-                </div>
+                {/* Accordéons */}
+                <div className="space-y-0 border border-secondary-200 rounded-xl overflow-hidden">
 
-                {/* Sélecteur de RIB */}
-                <div className="border-t border-secondary-100 pt-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="font-medium">Sélectionner le RIB à modifier ou ajoutez en un nouveau</label>
+                  {/* 1. RIBs */}
+                  <div className="border-b border-secondary-200">
                     <button
-                      onClick={addRib}
-                      className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium flex items-center gap-2"
+                      onClick={() => togglePaiementsSection('ribs')}
+                      className="w-full flex items-center justify-between p-4 bg-white hover:bg-secondary-50 text-left"
                     >
-                      <Plus className="w-4 h-4" />
-                      Ajouter un RIB
-                    </button>
-                  </div>
-
-                  {/* Dropdown sélection RIB */}
-                  <div className="relative mb-6">
-                    <button
-                      onClick={() => setRibDropdownOpen(!ribDropdownOpen)}
-                      className="w-full px-4 py-3 border border-secondary-200 rounded-lg text-left flex items-center justify-between hover:border-secondary-300"
-                    >
-                      <span>{selectedRibIndex + 1}. {ribs[selectedRibIndex]?.name || 'Sans nom'}</span>
-                      <ChevronDown className={`w-5 h-5 text-secondary-400 transition-transform ${ribDropdownOpen ? 'rotate-180' : ''}`} />
+                      <div>
+                        <h3 className="font-semibold">RIBs</h3>
+                        <p className="text-sm text-secondary-500">Configurez les RIBs de votre entreprise.</p>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-secondary-400 transition-transform ${paiementsSections.ribs ? 'rotate-180' : ''}`} />
                     </button>
 
-                    {ribDropdownOpen && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-secondary-200 rounded-lg shadow-lg z-10 max-h-60 overflow-auto">
-                        {ribs.map((rib, index) => (
-                          <button
-                            key={rib.id}
-                            onClick={() => {
-                              setSelectedRibIndex(index);
-                              setRibDropdownOpen(false);
-                            }}
-                            className={`w-full px-4 py-3 text-left hover:bg-secondary-50 flex items-center justify-between ${
-                              index === selectedRibIndex ? 'bg-primary-50 text-primary-700' : ''
-                            }`}
-                          >
-                            <span>{index + 1}. {rib.name || 'Sans nom'}</span>
-                            {rib.isPrimary && (
-                              <span className="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded">Principal</span>
+                    {paiementsSections.ribs && (
+                      <div className="p-4 pt-0 bg-white space-y-4">
+                        {/* Checkbox afficher libellé */}
+                        <label className="flex items-start gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={showRibNameInPdf}
+                            onChange={(e) => setShowRibNameInPdf(e.target.checked)}
+                            className="mt-1 rounded border-secondary-300"
+                          />
+                          <div>
+                            <span className="font-medium">Afficher le libellé du RIB dans le PDF ?</span>
+                            <p className="text-sm text-secondary-500">La modification de cette option s'applique uniquement sur les nouveaux devis / factures.</p>
+                          </div>
+                        </label>
+
+                        {/* Sélecteur de RIB */}
+                        <div className="pt-4 border-t border-secondary-100">
+                          <div className="flex items-center justify-between mb-3">
+                            <label className="font-medium text-sm">Sélectionner le RIB à modifier ou ajoutez en un nouveau</label>
+                            <button
+                              onClick={addRib}
+                              className="px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium flex items-center gap-1"
+                            >
+                              <Plus className="w-4 h-4" />
+                              Ajouter un RIB
+                            </button>
+                          </div>
+
+                          {/* Dropdown sélection RIB */}
+                          <div className="relative mb-4">
+                            <button
+                              onClick={() => setRibDropdownOpen(!ribDropdownOpen)}
+                              className="w-full px-4 py-2.5 border border-secondary-200 rounded-lg text-left flex items-center justify-between hover:border-secondary-300"
+                            >
+                              <span>{selectedRibIndex + 1}. {ribs[selectedRibIndex]?.name || 'Sans nom'}</span>
+                              <ChevronDown className={`w-5 h-5 text-secondary-400 transition-transform ${ribDropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {ribDropdownOpen && (
+                              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-secondary-200 rounded-lg shadow-lg z-10 max-h-60 overflow-auto">
+                                {ribs.map((rib, index) => (
+                                  <button
+                                    key={rib.id}
+                                    onClick={() => {
+                                      setSelectedRibIndex(index);
+                                      setRibDropdownOpen(false);
+                                    }}
+                                    className={`w-full px-4 py-2.5 text-left hover:bg-secondary-50 flex items-center justify-between ${
+                                      index === selectedRibIndex ? 'bg-primary-50 text-primary-700' : ''
+                                    }`}
+                                  >
+                                    <span>{index + 1}. {rib.name || 'Sans nom'}</span>
+                                    {rib.isPrimary && (
+                                      <span className="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded">Principal</span>
+                                    )}
+                                  </button>
+                                ))}
+                              </div>
                             )}
-                          </button>
-                        ))}
+                          </div>
+
+                          {/* Formulaire RIB sélectionné */}
+                          {ribs[selectedRibIndex] && (
+                            <div className="bg-secondary-50 border border-secondary-200 rounded-lg p-4 space-y-4">
+                              <div className="flex gap-4 items-start">
+                                <div className="flex-1">
+                                  <label className="block text-sm font-medium mb-1">
+                                    Libellé <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={ribs[selectedRibIndex].name}
+                                    onChange={(e) => updateRib(selectedRibIndex, 'name', e.target.value)}
+                                    className="w-full px-3 py-2 border border-secondary-200 rounded-lg bg-white"
+                                    placeholder="Nom du RIB"
+                                  />
+                                </div>
+                                <div className="pt-7">
+                                  <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                      type="radio"
+                                      name="primaryRib"
+                                      checked={ribs[selectedRibIndex].isPrimary}
+                                      onChange={() => updateRib(selectedRibIndex, 'isPrimary', true)}
+                                      className="text-primary-600"
+                                    />
+                                    <span className="text-sm font-medium">Principal</span>
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-sm font-medium mb-1">
+                                    IBAN <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={ribs[selectedRibIndex].iban}
+                                    onChange={(e) => updateRib(selectedRibIndex, 'iban', e.target.value.toUpperCase())}
+                                    className="w-full px-3 py-2 border border-secondary-200 rounded-lg font-mono bg-white"
+                                    placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX"
+                                  />
+                                  {ribs[selectedRibIndex].iban && ribs[selectedRibIndex].iban.length < 14 && (
+                                    <p className="text-red-500 text-xs mt-1">L'IBAN saisi est invalide</p>
+                                  )}
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium mb-1">
+                                    BIC <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={ribs[selectedRibIndex].bic}
+                                    onChange={(e) => updateRib(selectedRibIndex, 'bic', e.target.value.toUpperCase())}
+                                    className="w-full px-3 py-2 border border-secondary-200 rounded-lg font-mono bg-white"
+                                    placeholder="XXXXXXXX"
+                                  />
+                                  {ribs[selectedRibIndex].bic && ribs[selectedRibIndex].bic.length < 8 && (
+                                    <p className="text-red-500 text-xs mt-1">Le BIC saisi est invalide</p>
+                                  )}
+                                </div>
+                              </div>
+
+                              {ribs.length > 1 && (
+                                <button
+                                  onClick={() => deleteRib(selectedRibIndex)}
+                                  className="text-red-600 hover:text-red-700 text-sm flex items-center gap-1"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                  Supprimer ce RIB
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Formulaire RIB sélectionné */}
-                  {ribs[selectedRibIndex] && (
-                    <div className="bg-white border border-secondary-200 rounded-xl p-6 space-y-4">
-                      {/* Libellé + Principal */}
-                      <div className="flex gap-4 items-start">
-                        <div className="flex-1">
-                          <label className="block text-sm font-medium mb-1">
-                            Libellé <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={ribs[selectedRibIndex].name}
-                            onChange={(e) => updateRib(selectedRibIndex, 'name', e.target.value)}
-                            className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
-                            placeholder="Nom du RIB"
-                          />
+                  {/* 2. Conditions de paiement */}
+                  <div className="border-b border-secondary-200">
+                    <button
+                      onClick={() => togglePaiementsSection('conditions')}
+                      className="w-full flex items-center justify-between p-4 bg-white hover:bg-secondary-50 text-left"
+                    >
+                      <div>
+                        <h3 className="font-semibold">Conditions de paiement</h3>
+                        <p className="text-sm text-secondary-500">Définissez les délais de paiement par défaut.</p>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-secondary-400 transition-transform ${paiementsSections.conditions ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {paiementsSections.conditions && (
+                      <div className="p-4 pt-0 bg-white space-y-4">
+                        <div className="flex items-end gap-4">
+                          <div className="flex-1">
+                            <label className="block text-sm font-medium mb-1">Délai de paiement</label>
+                            <div className="flex items-center gap-2">
+                              <div className="relative flex-1">
+                                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
+                                <input
+                                  type="number"
+                                  value={conditionsPaiement.delai}
+                                  onChange={(e) => setConditionsPaiement({ ...conditionsPaiement, delai: parseInt(e.target.value) || 0 })}
+                                  className="w-full pl-10 pr-3 py-2 border border-secondary-200 rounded-lg"
+                                  min="0"
+                                />
+                              </div>
+                              <select
+                                value={conditionsPaiement.typeDuree}
+                                onChange={(e) => setConditionsPaiement({ ...conditionsPaiement, typeDuree: e.target.value })}
+                                className="px-3 py-2 border border-secondary-200 rounded-lg"
+                              >
+                                <option value="jours_calendaires">Jours calendaires</option>
+                                <option value="jours_ouvrables">Jours ouvrables</option>
+                                <option value="fin_de_mois">Fin de mois</option>
+                              </select>
+                            </div>
+                          </div>
+                          <button className="px-4 py-2 text-primary-600 hover:bg-primary-50 rounded-lg text-sm font-medium flex items-center gap-1">
+                            <Plus className="w-4 h-4" />
+                            Ajouter des conditions
+                          </button>
                         </div>
-                        <div className="pt-7">
-                          <label className="flex items-center gap-2 cursor-pointer">
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. Devis */}
+                  <div className="border-b border-secondary-200">
+                    <button
+                      onClick={() => togglePaiementsSection('devis')}
+                      className="w-full flex items-center justify-between p-4 bg-white hover:bg-secondary-50 text-left"
+                    >
+                      <div>
+                        <h3 className="font-semibold">Devis</h3>
+                        <p className="text-sm text-secondary-500">Paramètres de validité et acompte des devis.</p>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-secondary-400 transition-transform ${paiementsSections.devis ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {paiementsSections.devis && (
+                      <div className="p-4 pt-0 bg-white space-y-4">
+                        {/* Durée de validité */}
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Durée de validité du devis</label>
+                          <div className="flex items-center gap-2">
                             <input
-                              type="radio"
-                              name="primaryRib"
-                              checked={ribs[selectedRibIndex].isPrimary}
-                              onChange={() => updateRib(selectedRibIndex, 'isPrimary', true)}
-                              className="text-primary-600"
+                              type="number"
+                              value={devisParams.dureeValidite}
+                              onChange={(e) => setDevisParams({ ...devisParams, dureeValidite: parseInt(e.target.value) || 0 })}
+                              className="w-24 px-3 py-2 border border-secondary-200 rounded-lg"
+                              min="1"
                             />
-                            <span className="text-sm font-medium">Principal</span>
-                          </label>
+                            <select
+                              value={devisParams.uniteValidite}
+                              onChange={(e) => setDevisParams({ ...devisParams, uniteValidite: e.target.value })}
+                              className="px-3 py-2 border border-secondary-200 rounded-lg"
+                            >
+                              <option value="jours">Jours</option>
+                              <option value="semaines">Semaines</option>
+                              <option value="mois">Mois</option>
+                            </select>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* IBAN + BIC */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium mb-1">
-                            IBAN <span className="text-red-500">*</span>
-                          </label>
+                        {/* Date de l'acompte */}
+                        <label className="flex items-start gap-3 cursor-pointer pt-2 border-t border-secondary-100">
                           <input
-                            type="text"
-                            value={ribs[selectedRibIndex].iban}
-                            onChange={(e) => updateRib(selectedRibIndex, 'iban', e.target.value.toUpperCase())}
-                            className="w-full px-3 py-2 border border-secondary-200 rounded-lg font-mono"
-                            placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX"
+                            type="checkbox"
+                            checked={devisParams.dateAcompte}
+                            onChange={(e) => setDevisParams({ ...devisParams, dateAcompte: e.target.checked })}
+                            className="mt-1 rounded border-secondary-300"
                           />
-                          {ribs[selectedRibIndex].iban && ribs[selectedRibIndex].iban.length < 14 && (
-                            <p className="text-red-500 text-xs mt-1">L'IBAN saisi est invalide</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-1">
-                            BIC <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={ribs[selectedRibIndex].bic}
-                            onChange={(e) => updateRib(selectedRibIndex, 'bic', e.target.value.toUpperCase())}
-                            className="w-full px-3 py-2 border border-secondary-200 rounded-lg font-mono"
-                            placeholder="XXXXXXXX"
-                          />
-                          {ribs[selectedRibIndex].bic && ribs[selectedRibIndex].bic.length < 8 && (
-                            <p className="text-red-500 text-xs mt-1">Le BIC saisi est invalide</p>
-                          )}
-                        </div>
-                      </div>
+                          <div>
+                            <span className="font-medium">Date de l'acompte</span>
+                            <p className="text-sm text-secondary-500">Afficher la date de l'acompte sur le devis.</p>
+                          </div>
+                        </label>
 
-                      {/* Bouton supprimer */}
-                      {ribs.length > 1 && (
+                        {/* Acompte automatique */}
+                        <label className="flex items-start gap-3 cursor-pointer pt-2 border-t border-secondary-100">
+                          <input
+                            type="checkbox"
+                            checked={devisParams.acompteAuto}
+                            onChange={(e) => setDevisParams({ ...devisParams, acompteAuto: e.target.checked })}
+                            className="mt-1 rounded border-secondary-300"
+                          />
+                          <div>
+                            <span className="font-medium">Acompte automatique</span>
+                            <p className="text-sm text-secondary-500">Générer automatiquement une demande d'acompte.</p>
+                          </div>
+                        </label>
+
+                        {devisParams.acompteAuto && (
+                          <div className="ml-6 pl-4 border-l-2 border-primary-200 space-y-3">
+                            <div className="flex items-center gap-2">
+                              <label className="text-sm">Pourcentage :</label>
+                              <div className="relative">
+                                <input
+                                  type="number"
+                                  value={devisParams.acomptePourcentage}
+                                  onChange={(e) => setDevisParams({ ...devisParams, acomptePourcentage: parseInt(e.target.value) || 0 })}
+                                  className="w-20 px-3 py-1.5 border border-secondary-200 rounded-lg pr-8"
+                                  min="0"
+                                  max="100"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary-400">%</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <label className="text-sm">À régler sous :</label>
+                              <input
+                                type="number"
+                                value={devisParams.acompteDelai}
+                                onChange={(e) => setDevisParams({ ...devisParams, acompteDelai: parseInt(e.target.value) || 0 })}
+                                className="w-20 px-3 py-1.5 border border-secondary-200 rounded-lg"
+                                min="0"
+                              />
+                              <select
+                                value={devisParams.acompteUnite}
+                                onChange={(e) => setDevisParams({ ...devisParams, acompteUnite: e.target.value })}
+                                className="px-3 py-1.5 border border-secondary-200 rounded-lg"
+                              >
+                                <option value="jours">Jours</option>
+                                <option value="semaines">Semaines</option>
+                              </select>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 4. Taux de TVA */}
+                  <div>
+                    <button
+                      onClick={() => togglePaiementsSection('tva')}
+                      className="w-full flex items-center justify-between p-4 bg-white hover:bg-secondary-50 text-left"
+                    >
+                      <div>
+                        <h3 className="font-semibold">Taux de TVA</h3>
+                        <p className="text-sm text-secondary-500">Gérez les taux de TVA disponibles.</p>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-secondary-400 transition-transform ${paiementsSections.tva ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {paiementsSections.tva && (
+                      <div className="p-4 pt-0 bg-white space-y-3">
+                        {tauxTva.map((taux) => (
+                          <div key={taux.id} className="flex items-center gap-3 p-3 bg-secondary-50 rounded-lg border border-secondary-200">
+                            <div className="flex-1">
+                              <label className="block text-xs font-medium text-secondary-500 mb-1">Taux TVA</label>
+                              <div className="relative">
+                                <input
+                                  type="number"
+                                  value={taux.taux}
+                                  onChange={(e) => updateTauxTva(taux.id, 'taux', parseFloat(e.target.value) || 0)}
+                                  className="w-full px-3 py-1.5 border border-secondary-200 rounded-lg pr-8 bg-white"
+                                  step="0.1"
+                                  min="0"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary-400">%</span>
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <label className="block text-xs font-medium text-secondary-500 mb-1">Compte comptable TVA collectée</label>
+                              <div className="flex items-center gap-1">
+                                <span className="text-secondary-500 text-sm">4457</span>
+                                <input
+                                  type="text"
+                                  value={taux.compte.replace('4457', '')}
+                                  onChange={(e) => updateTauxTva(taux.id, 'compte', '4457' + e.target.value)}
+                                  className="flex-1 px-3 py-1.5 border border-secondary-200 rounded-lg bg-white"
+                                  placeholder="1"
+                                />
+                              </div>
+                            </div>
+                            {tauxTva.length > 1 && (
+                              <button
+                                onClick={() => deleteTauxTva(taux.id)}
+                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg mt-5"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+
                         <button
-                          onClick={() => deleteRib(selectedRibIndex)}
-                          className="text-red-600 hover:text-red-700 text-sm flex items-center gap-1"
+                          onClick={addTauxTva}
+                          className="w-full px-4 py-2 border-2 border-dashed border-secondary-300 rounded-lg text-secondary-600 hover:border-primary-400 hover:text-primary-600 text-sm font-medium flex items-center justify-center gap-2"
                         >
-                          <Trash2 className="w-4 h-4" />
-                          Supprimer ce RIB
+                          <Plus className="w-4 h-4" />
+                          Ajouter un taux de TVA
                         </button>
-                      )}
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Bouton sauvegarder */}
