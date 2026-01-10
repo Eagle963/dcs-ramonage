@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Building2, Globe, Mail, Phone, MapPin, Camera,
   FileText, CreditCard, Hash, FileSpreadsheet,
@@ -405,6 +405,24 @@ export default function EntreprisePage() {
   const [editingMetiers, setEditingMetiers] = useState(false);
   const [tempMetiers, setTempMetiers] = useState<string[]>([]);
   const [metiersDropdownOpen, setMetiersDropdownOpen] = useState(false);
+  const metiersDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fermer le dropdown quand on clique ailleurs
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (metiersDropdownRef.current && !metiersDropdownRef.current.contains(event.target as Node)) {
+        setMetiersDropdownOpen(false);
+      }
+    };
+
+    if (metiersDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [metiersDropdownOpen]);
 
   // États pour la section Détails
   const [editingInfos, setEditingInfos] = useState(false);
@@ -821,30 +839,33 @@ export default function EntreprisePage() {
                         </label>
 
                         {/* Input avec tags et dropdown intégré */}
-                        <div className="relative">
+                        <div className="relative" ref={metiersDropdownRef}>
                           <div
-                            className="flex flex-wrap items-center gap-2 p-2 border border-secondary-200 rounded-lg bg-white min-h-[44px] cursor-text"
+                            className="flex gap-2 p-2 border border-secondary-200 rounded-lg bg-white min-h-[44px] cursor-text"
                             onClick={() => setMetiersDropdownOpen(true)}
                           >
-                            {tempMetiers.map((metier) => (
-                              <span
-                                key={metier}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 bg-secondary-100 text-secondary-700 rounded text-sm"
-                              >
-                                {metier}
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setTempMetiers(prev => prev.filter(m => m !== metier));
-                                  }}
-                                  className="hover:text-secondary-900 ml-1"
+                            {/* Zone des tags - s'agrandit */}
+                            <div className="flex-1 flex flex-wrap items-center gap-2">
+                              {tempMetiers.map((metier) => (
+                                <span
+                                  key={metier}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-secondary-100 text-secondary-700 rounded text-sm"
                                 >
-                                  <X className="w-3.5 h-3.5" />
-                                </button>
-                              </span>
-                            ))}
-                            <div className="flex-1 min-w-[100px]" />
-                            <div className="flex items-center gap-2 text-secondary-400">
+                                  {metier}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setTempMetiers(prev => prev.filter(m => m !== metier));
+                                    }}
+                                    className="hover:text-secondary-900 ml-1"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                </span>
+                              ))}
+                            </div>
+                            {/* Bloc icônes - s'étire verticalement, icônes centrées */}
+                            <div className="flex items-center justify-center gap-2 text-secondary-400 self-stretch pl-2 border-l border-secondary-100">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
