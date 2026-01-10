@@ -1591,12 +1591,133 @@ export default function EntreprisePage() {
 
       {/* Onglet Abonnement */}
       {mainTab === 'abonnement' && (
-        <div className="bg-white rounded-xl border border-secondary-100 p-6">
-          <h2 className="font-semibold mb-4">Mon abonnement</h2>
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
-            <p className="text-green-700 font-medium">Abonnement actif</p>
+        <div className="flex gap-6">
+          {/* Colonne principale */}
+          <div className="flex-1 space-y-6">
+            {/* Bannière upgrade */}
+            <div className="bg-white rounded-xl border border-secondary-100 p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">⚡</span>
+                <div>
+                  <p className="font-semibold">Envie de plus ?</p>
+                  <p className="text-secondary-500 text-sm">Profitez de plus de fonctionnalités en passant sur un plan supérieur.</p>
+                </div>
+              </div>
+              <button className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 flex items-center gap-2 whitespace-nowrap">
+                <span>→</span>
+                Je passe à un plan supérieur
+              </button>
+            </div>
+
+            {/* Mes factures */}
+            <div className="bg-white rounded-xl border border-secondary-100 p-6">
+              <h2 className="font-semibold mb-4">Mes factures</h2>
+
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-secondary-100">
+                    <th className="text-left py-3 px-2 text-sm font-medium text-secondary-600">Date</th>
+                    <th className="text-left py-3 px-2 text-sm font-medium text-secondary-600">Numéro</th>
+                    <th className="text-left py-3 px-2 text-sm font-medium text-secondary-600">Statut</th>
+                    <th className="text-left py-3 px-2 text-sm font-medium text-secondary-600">Montant</th>
+                    <th className="py-3 px-2"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-secondary-50">
+                    <td className="py-3 px-2 text-sm">03/01/2026</td>
+                    <td className="py-3 px-2 text-sm">S2026010103</td>
+                    <td className="py-3 px-2">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium">
+                        Payée <Check className="w-3 h-3" />
+                      </span>
+                    </td>
+                    <td className="py-3 px-2 text-sm">24.00 €</td>
+                    <td className="py-3 px-2">
+                      <button className="p-1 hover:bg-secondary-100 rounded">
+                        <Download className="w-4 h-4 text-secondary-400" />
+                      </button>
+                    </td>
+                  </tr>
+                  <tr className="border-b border-secondary-50">
+                    <td className="py-3 px-2 text-sm">03/12/2025</td>
+                    <td className="py-3 px-2 text-sm">S2025120093</td>
+                    <td className="py-3 px-2">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium">
+                        Payée <Check className="w-3 h-3" />
+                      </span>
+                    </td>
+                    <td className="py-3 px-2 text-sm">24.00 €</td>
+                    <td className="py-3 px-2">
+                      <button className="p-1 hover:bg-secondary-100 rounded">
+                        <Download className="w-4 h-4 text-secondary-400" />
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              {/* Pagination */}
+              <div className="flex items-center justify-end gap-2 mt-4 text-sm text-secondary-500">
+                <span>Page 1 sur 1</span>
+                <div className="flex gap-1">
+                  <button className="p-1 border border-secondary-200 rounded hover:bg-secondary-50 disabled:opacity-50" disabled>«</button>
+                  <button className="p-1 border border-secondary-200 rounded hover:bg-secondary-50 disabled:opacity-50" disabled>‹</button>
+                  <button className="p-1 border border-secondary-200 rounded hover:bg-secondary-50 disabled:opacity-50" disabled>›</button>
+                  <button className="p-1 border border-secondary-200 rounded hover:bg-secondary-50 disabled:opacity-50" disabled>»</button>
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="text-secondary-500">Gérez votre abonnement et vos options de facturation.</p>
+
+          {/* Sidebar droite - Mon abonnement */}
+          <div className="w-80 flex-shrink-0">
+            <div className="bg-white rounded-xl border border-secondary-100 p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <h2 className="font-semibold">Mon abonnement</h2>
+                <button className="text-secondary-400 hover:text-secondary-600">
+                  <Info className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-secondary-500 mb-1">Plan</p>
+                  <p className="font-medium">DCS Solo 🏆 (mensuel)</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-secondary-500 mb-1">Prix mensuel</p>
+                  <p className="font-medium">20.00 € HT / utilisateur</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-secondary-500 mb-1">Nombre de licences</p>
+                  <p className="font-medium">1</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-secondary-500 mb-1">Crédits</p>
+                  <p className="font-medium">0.00 €</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-secondary-500 mb-1">Prochaine échéance</p>
+                  <p className="font-medium">03/02/2026</p>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-secondary-500 mb-1">Méthode de paiement</p>
+                    <button className="text-secondary-400 hover:text-secondary-600">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className="font-medium">**** **** **** 0874 9/2028</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
