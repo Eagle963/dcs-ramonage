@@ -199,6 +199,7 @@ const METIERS_LIST = [
   'Courant faible',
   'Couverture',
   'Cuisine Professionnelle',
+  'Diagnostic immobilier',
   'Electricité',
   'Étanchéité',
   'Froid',
