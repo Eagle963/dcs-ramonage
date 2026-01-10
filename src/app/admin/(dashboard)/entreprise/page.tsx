@@ -428,6 +428,26 @@ export default function EntreprisePage() {
   const [editingInfos, setEditingInfos] = useState(false);
   const [editingCoordonnees, setEditingCoordonnees] = useState(false);
 
+  // États pour la numérotation
+  const [numerotation, setNumerotation] = useState({
+    devis: { prefix: 'D', year: '', separator: '', numberLength: '4', nextNumber: '0020' },
+    factures: { prefix: 'F', year: '', separator: '', numberLength: '4', nextNumber: '0354' },
+    avoirs: { prefix: 'AV', year: '', separator: '', numberLength: '4', nextNumber: '0001' },
+  });
+  const [formatModalOpen, setFormatModalOpen] = useState<'devis' | 'factures' | 'avoirs' | null>(null);
+  const [numberModalOpen, setNumberModalOpen] = useState<'devis' | 'factures' | 'avoirs' | null>(null);
+  const [tempFormat, setTempFormat] = useState({ prefix: '', year: '', separator: '', numberLength: '4' });
+  const [tempNextNumber, setTempNextNumber] = useState('');
+
+  const getFormatPreview = (format: { prefix: string; year: string; separator: string; numberLength: string }) => {
+    let result = format.prefix;
+    if (format.year) {
+      result += format.separator + (format.year === 'YYYY' ? '2026' : format.year === 'YY' ? '26' : format.year === 'YYYYMM' ? '202601' : '2601');
+    }
+    result += format.separator + '0'.repeat(parseInt(format.numberLength) - 1) + '1';
+    return result;
+  };
+
   const [entreprise, setEntreprise] = useState({
     name: 'DCS Ramonage Oise & Val d\'Oise',
     slogan: '',
@@ -1347,20 +1367,322 @@ export default function EntreprisePage() {
             )}
 
             {settingsSection === 'numerotation' && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Numérotation</h2>
-                <div className="bg-white border border-secondary-100 rounded-xl p-6 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Format des numéros de devis</label>
-                    <input type="text" defaultValue="D-{YYYY}-{NUM}" className="w-full max-w-xs px-3 py-2 border border-secondary-200 rounded-lg" />
-                    <p className="text-xs text-secondary-500 mt-1">Exemple: D-2026-001</p>
+              <div className="space-y-6" style={{ maxWidth: '800px' }}>
+                {/* Header */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h2 className="text-xl font-semibold">Numérotation</h2>
+                    <button className="text-secondary-400 hover:text-secondary-600">
+                      <Info className="w-4 h-4" />
+                    </button>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Format des numéros de factures</label>
-                    <input type="text" defaultValue="F-{YYYY}-{NUM}" className="w-full max-w-xs px-3 py-2 border border-secondary-200 rounded-lg" />
-                    <p className="text-xs text-secondary-500 mt-1">Exemple: F-2026-001</p>
+                  <p className="text-secondary-500">Configurez le format des prochains numéros de vos documents.</p>
+                </div>
+
+                {/* Devis */}
+                <div className="border-t border-secondary-100 pt-6">
+                  <h3 className="font-semibold mb-3">Devis</h3>
+                  <p className="text-secondary-700 mb-3">
+                    Le prochain numéro sera le <span className="font-semibold">{numerotation.devis.prefix}{numerotation.devis.nextNumber}</span>
+                  </p>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => {
+                        setTempFormat(numerotation.devis);
+                        setFormatModalOpen('devis');
+                      }}
+                      className="text-primary-600 hover:text-primary-700 text-sm flex items-center gap-1"
+                    >
+                      <Hash className="w-4 h-4" />
+                      Modifier le format
+                    </button>
+                    <button
+                      onClick={() => {
+                        setTempNextNumber(numerotation.devis.nextNumber);
+                        setNumberModalOpen('devis');
+                      }}
+                      className="text-primary-600 hover:text-primary-700 text-sm flex items-center gap-1"
+                    >
+                      <Hash className="w-4 h-4" />
+                      Modifier le prochain numéro
+                    </button>
                   </div>
                 </div>
+
+                {/* Factures */}
+                <div className="border-t border-secondary-100 pt-6">
+                  <h3 className="font-semibold mb-3">Factures</h3>
+                  <p className="text-secondary-700 mb-3">
+                    Le prochain numéro sera le <span className="font-semibold">{numerotation.factures.prefix}{numerotation.factures.nextNumber}</span>
+                  </p>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => {
+                        setTempFormat(numerotation.factures);
+                        setFormatModalOpen('factures');
+                      }}
+                      className="text-primary-600 hover:text-primary-700 text-sm flex items-center gap-1"
+                    >
+                      <Hash className="w-4 h-4" />
+                      Modifier le format
+                    </button>
+                    <button
+                      onClick={() => {
+                        setTempNextNumber(numerotation.factures.nextNumber);
+                        setNumberModalOpen('factures');
+                      }}
+                      className="text-primary-600 hover:text-primary-700 text-sm flex items-center gap-1"
+                    >
+                      <Hash className="w-4 h-4" />
+                      Modifier le prochain numéro
+                    </button>
+                  </div>
+                </div>
+
+                {/* Avoirs */}
+                <div className="border-t border-secondary-100 pt-6">
+                  <h3 className="font-semibold mb-3">Avoirs</h3>
+                  <p className="text-secondary-700 mb-3">
+                    Le prochain numéro sera le <span className="font-semibold">{numerotation.avoirs.prefix}{numerotation.avoirs.nextNumber}</span>
+                  </p>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => {
+                        setTempFormat(numerotation.avoirs);
+                        setFormatModalOpen('avoirs');
+                      }}
+                      className="text-primary-600 hover:text-primary-700 text-sm flex items-center gap-1"
+                    >
+                      <Hash className="w-4 h-4" />
+                      Modifier le format
+                    </button>
+                    <button
+                      onClick={() => {
+                        setTempNextNumber(numerotation.avoirs.nextNumber);
+                        setNumberModalOpen('avoirs');
+                      }}
+                      className="text-primary-600 hover:text-primary-700 text-sm flex items-center gap-1"
+                    >
+                      <Hash className="w-4 h-4" />
+                      Modifier le prochain numéro
+                    </button>
+                  </div>
+                </div>
+
+                {/* Modal Format */}
+                {formatModalOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-black/50" onClick={() => setFormatModalOpen(null)} />
+                    <div className="bg-white rounded-xl w-full max-w-lg relative z-10">
+                      <div className="p-6">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="p-2 bg-primary-100 rounded-lg">
+                            <Hash className="w-5 h-5 text-primary-600" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold">Format de la numérotation</h3>
+                            <p className="text-sm text-secondary-500">Configurer le format de la numérotation :</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4 mt-6">
+                          {/* Préfixe */}
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              Préfixe <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={tempFormat.prefix}
+                              onChange={(e) => setTempFormat({ ...tempFormat, prefix: e.target.value })}
+                              className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                            />
+                          </div>
+
+                          {/* Année */}
+                          <div>
+                            <label className="block text-sm font-medium mb-2">Année</label>
+                            <div className="flex flex-wrap gap-2">
+                              {[
+                                { value: '', label: 'Non' },
+                                { value: 'YYYY', label: 'Année (4 chiffres)' },
+                                { value: 'YY', label: 'Année (2 chiffres)' },
+                                { value: 'YYYYMM', label: 'Année (4 chiffres) et Mois' },
+                                { value: 'YYMM', label: 'Année (2 chiffres) et Mois' },
+                              ].map((option) => (
+                                <label
+                                  key={option.value}
+                                  className={`px-3 py-1.5 border rounded-lg text-sm cursor-pointer ${
+                                    tempFormat.year === option.value
+                                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                                      : 'border-secondary-200 hover:bg-secondary-50'
+                                  }`}
+                                >
+                                  <input
+                                    type="radio"
+                                    name="year"
+                                    value={option.value}
+                                    checked={tempFormat.year === option.value}
+                                    onChange={(e) => setTempFormat({ ...tempFormat, year: e.target.value })}
+                                    className="sr-only"
+                                  />
+                                  {option.label}
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Séparateur */}
+                          <div>
+                            <label className="block text-sm font-medium mb-2">Séparateur</label>
+                            <div className="flex flex-wrap gap-2">
+                              {[
+                                { value: '', label: 'Aucun' },
+                                { value: '-', label: 'Tiret (-)' },
+                              ].map((option) => (
+                                <label
+                                  key={option.value}
+                                  className={`px-3 py-1.5 border rounded-lg text-sm cursor-pointer ${
+                                    tempFormat.separator === option.value
+                                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                                      : 'border-secondary-200 hover:bg-secondary-50'
+                                  }`}
+                                >
+                                  <input
+                                    type="radio"
+                                    name="separator"
+                                    value={option.value}
+                                    checked={tempFormat.separator === option.value}
+                                    onChange={(e) => setTempFormat({ ...tempFormat, separator: e.target.value })}
+                                    className="sr-only"
+                                  />
+                                  {option.label}
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Longueur */}
+                          <div>
+                            <label className="block text-sm font-medium mb-2">Longueur du numéro</label>
+                            <div className="flex flex-wrap gap-2">
+                              {['3', '4', '5', '6', '7', '8'].map((len) => (
+                                <label
+                                  key={len}
+                                  className={`px-3 py-1.5 border rounded-lg text-sm cursor-pointer ${
+                                    tempFormat.numberLength === len
+                                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                                      : 'border-secondary-200 hover:bg-secondary-50'
+                                  }`}
+                                >
+                                  <input
+                                    type="radio"
+                                    name="numberLength"
+                                    value={len}
+                                    checked={tempFormat.numberLength === len}
+                                    onChange={(e) => setTempFormat({ ...tempFormat, numberLength: e.target.value })}
+                                    className="sr-only"
+                                  />
+                                  {len}
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Aperçu */}
+                          <div className="bg-secondary-50 rounded-lg p-3">
+                            <p className="text-sm">
+                              Le format de numérotation sera : <span className="font-semibold">{getFormatPreview(tempFormat)}</span>
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Boutons */}
+                        <div className="flex justify-end gap-3 mt-6">
+                          <button
+                            onClick={() => setFormatModalOpen(null)}
+                            className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50"
+                          >
+                            <X className="w-4 h-4" />
+                            Annuler
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (formatModalOpen) {
+                                setNumerotation({
+                                  ...numerotation,
+                                  [formatModalOpen]: { ...numerotation[formatModalOpen], ...tempFormat }
+                                });
+                              }
+                              setFormatModalOpen(null);
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
+                          >
+                            <Check className="w-4 h-4" />
+                            Je confirme
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Modal Numéro */}
+                {numberModalOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 bg-black/50" onClick={() => setNumberModalOpen(null)} />
+                    <div className="bg-white rounded-xl w-full max-w-md relative z-10">
+                      <div className="p-6">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-2 bg-primary-100 rounded-lg">
+                            <Hash className="w-5 h-5 text-primary-600" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold">Modifier le prochain numéro</h3>
+                            <p className="text-sm text-secondary-500">Définir le prochain numéro de la séquence</p>
+                          </div>
+                        </div>
+
+                        <div className="mb-6">
+                          <label className="block text-sm font-medium mb-2">
+                            Prochain numéro <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={tempNextNumber}
+                            onChange={(e) => setTempNextNumber(e.target.value)}
+                            className="w-full px-3 py-2 border border-secondary-200 rounded-lg"
+                          />
+                        </div>
+
+                        <div className="flex justify-end gap-3">
+                          <button
+                            onClick={() => setNumberModalOpen(null)}
+                            className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50"
+                          >
+                            <X className="w-4 h-4" />
+                            Annuler
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (numberModalOpen) {
+                                setNumerotation({
+                                  ...numerotation,
+                                  [numberModalOpen]: { ...numerotation[numberModalOpen], nextNumber: tempNextNumber }
+                                });
+                              }
+                              setNumberModalOpen(null);
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
+                          >
+                            <Check className="w-4 h-4" />
+                            Je confirme
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
