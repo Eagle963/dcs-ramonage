@@ -14,7 +14,7 @@ interface InvoicePDFViewerProps {
   companyPhone?: string;
 }
 
-// Create styles factory
+// Fabrique de styles pour le PDF
 const createStyles = (color: string, isModerne: boolean) => StyleSheet.create({
   page: {
     flexDirection: 'column',
@@ -178,7 +178,7 @@ const createStyles = (color: string, isModerne: boolean) => StyleSheet.create({
   },
 });
 
-// PDF Document Component
+// Composant Document PDF
 const InvoicePDFDocument = ({
   documentColor = '#3b82f6',
   documentStyle = 'classique',
@@ -202,7 +202,7 @@ const InvoicePDFDocument = ({
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Header */}
+        {/* En-tête */}
         <View style={styles.header}>
           <View style={styles.logo}>
             <Text style={styles.logoText}>DCS RAMONAGE</Text>
@@ -214,7 +214,7 @@ const InvoicePDFDocument = ({
           </View>
         </View>
 
-        {/* Company Info */}
+        {/* Infos entreprise */}
         <View style={styles.companySection}>
           <Text style={styles.companyName}>{companyName}</Text>
           <Text style={styles.companyDetail}>{companyAddress}</Text>
@@ -223,7 +223,7 @@ const InvoicePDFDocument = ({
           <Text style={styles.companyDetail}>{formatPhone(companyPhone || '')}</Text>
         </View>
 
-        {/* Client Box */}
+        {/* Bloc client */}
         <View style={styles.clientBox}>
           <Text style={styles.clientTitle}>Client</Text>
           <Text style={styles.clientDetail}>Hedi Maronier</Text>
@@ -231,15 +231,15 @@ const InvoicePDFDocument = ({
           <Text style={styles.clientDetail}>75017 Paris</Text>
         </View>
 
-        {/* Order Number */}
+        {/* Numéro de commande */}
         <Text style={styles.orderNumber}>N° de bon de commande : XXXXXXZZZ</Text>
 
-        {/* Service Title */}
+        {/* Titre service */}
         <Text style={styles.serviceTitle}>Installation climatisation</Text>
 
-        {/* Table */}
+        {/* Tableau */}
         <View style={styles.table}>
-          {/* Header */}
+          {/* En-tête tableau */}
           <View style={[styles.tableHeader, styles.tableRow]}>
             <Text style={[styles.tableCell, styles.cellDesignation]}>Désignation</Text>
             <Text style={[styles.tableCell, styles.cellQty]}>Qté</Text>
@@ -247,7 +247,7 @@ const InvoicePDFDocument = ({
             <Text style={[styles.tableCell, styles.cellTva]}>TVA</Text>
             <Text style={[styles.tableCellLast, styles.cellTotal]}>Total HT</Text>
           </View>
-          {/* Body */}
+          {/* Corps tableau */}
           <View style={styles.tableRow}>
             <Text style={[styles.tableCell, styles.cellDesignation]}>Installation climatisation</Text>
             <Text style={[styles.tableCell, styles.cellQty]}>1</Text>
@@ -257,7 +257,7 @@ const InvoicePDFDocument = ({
           </View>
         </View>
 
-        {/* Totals */}
+        {/* Totaux */}
         <View style={styles.totals}>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Sous-total :</Text>
@@ -273,7 +273,7 @@ const InvoicePDFDocument = ({
           </View>
         </View>
 
-        {/* Footer */}
+        {/* Pied de page */}
         <View style={styles.footer}>
           <Text>DCS Ramonage - SIRET: 123 456 789 00012 - TVA: FR12345678901</Text>
         </View>
@@ -282,7 +282,7 @@ const InvoicePDFDocument = ({
   );
 };
 
-// Main Viewer Component
+// Composant principal du visualiseur PDF
 const InvoicePDFViewer = (props: InvoicePDFViewerProps) => {
   const [isClient, setIsClient] = useState(false);
 

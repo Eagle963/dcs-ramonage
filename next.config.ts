@@ -4,10 +4,10 @@ const nextConfig: NextConfig = {
   // Optimisations pour la production
   reactStrictMode: true,
 
-  // Transpile ESM packages for @react-pdf/renderer
+  // Transpilation des packages ESM pour @react-pdf/renderer
   transpilePackages: ['@react-pdf/renderer'],
 
-  // Webpack configuration for @react-pdf/renderer
+  // Configuration Webpack pour @react-pdf/renderer
   webpack: (config) => {
     config.resolve.alias.canvas = false;
     return config;
