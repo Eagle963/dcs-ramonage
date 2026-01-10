@@ -932,7 +932,7 @@ export default function EntreprisePage() {
 
             {/* Section Détails */}
             {generalSection === 'details' && (
-              <div className="space-y-6">
+              <div className="space-y-6" style={{ maxWidth: '800px' }}>
                 {/* Bloc Informations */}
                 <div className="bg-white rounded-xl border border-secondary-100 p-6">
                   <div className="flex items-center justify-between mb-6">
