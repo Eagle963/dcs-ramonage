@@ -30,6 +30,13 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import dynamic from 'next/dynamic';
+
+// Dynamic import for PDF viewer (no SSR)
+const InvoicePDFViewer = dynamic(
+  () => import('@/components/admin/InvoicePDFViewer'),
+  { ssr: false }
+);
 
 // Composant Sortable pour les services
 function SortableServiceItem({
@@ -1488,78 +1495,21 @@ export default function EntreprisePage() {
                   </div>
                 </div>
 
-                {/* Colonne de droite - Aperçu */}
+                {/* Colonne de droite - Aperçu PDF */}
                 <div className="w-96 flex-shrink-0">
                   <div className="sticky top-4">
-                    {/* Toolbar aperçu */}
-                    <div className="flex items-center justify-center gap-1 mb-4 text-secondary-400">
-                      <button className="p-1.5 hover:bg-secondary-100 rounded">−</button>
-                      <button className="p-1.5 hover:bg-secondary-100 rounded">+</button>
-                      <button className="p-1.5 hover:bg-secondary-100 rounded">↕</button>
-                      <button className="p-1.5 hover:bg-secondary-100 rounded">↔</button>
-                      <button className="p-1.5 hover:bg-secondary-100 rounded"><Download className="w-4 h-4" /></button>
-                      <button className="p-1.5 hover:bg-secondary-100 rounded">🖨</button>
-                    </div>
-
-                    {/* Aperçu de la facture */}
-                    <div className="bg-white border border-secondary-200 rounded-lg shadow-sm p-6 text-xs">
-                      <div className="flex justify-between mb-6">
-                        <div>
-                          <div className="w-20 h-12 bg-secondary-100 rounded flex items-center justify-center text-secondary-400 text-[8px]">
-                            DCS RAMONAGE
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-sm" style={{ color: documentColor }}>Facture F0000</p>
-                          <p className="text-secondary-500">Date émission : 10/01/2026</p>
-                          <p className="text-secondary-500">Date échéance : 10/01/2026</p>
-                        </div>
-                      </div>
-
-                      <div className="mb-4">
-                        <p className="font-semibold" style={{ color: documentColor }}>Dcs Ramonage Oise & Val d'Oise</p>
-                        <p className="text-secondary-600">58 RUE de Monceau</p>
-                        <p className="text-secondary-600">75008 Paris 8e Arrondissement</p>
-                        <p className="text-secondary-600">contact@dcs-ramonage.fr</p>
-                        <p className="text-secondary-600">09 80 80 10 61</p>
-                      </div>
-
-                      <div className="border border-secondary-200 rounded p-2 mb-4">
-                        <p className="font-semibold text-secondary-700">Client</p>
-                        <p className="text-secondary-600">Hedi Maronier</p>
-                        <p className="text-secondary-600">6 rue d'Armaillé</p>
-                        <p className="text-secondary-600">75017 Paris</p>
-                      </div>
-
-                      <p className="text-secondary-500 mb-2">N° de bon de commande : XXXXXXZZZ</p>
-
-                      <p className="font-semibold mb-2" style={{ color: documentColor }}>Installation climatisation</p>
-
-                      <table className="w-full text-[8px] border-collapse mb-4">
-                        <thead>
-                          <tr className="bg-secondary-100">
-                            <th className="border border-secondary-200 p-1 text-left">Désignation</th>
-                            <th className="border border-secondary-200 p-1">Qté</th>
-                            <th className="border border-secondary-200 p-1">Prix U.HT</th>
-                            <th className="border border-secondary-200 p-1">TVA</th>
-                            <th className="border border-secondary-200 p-1">Total HT</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className="border border-secondary-200 p-1">Installation climatisation</td>
-                            <td className="border border-secondary-200 p-1 text-center">1</td>
-                            <td className="border border-secondary-200 p-1 text-right">120,00€</td>
-                            <td className="border border-secondary-200 p-1 text-center">10%</td>
-                            <td className="border border-secondary-200 p-1 text-right">600,00€</td>
-                          </tr>
-                        </tbody>
-                      </table>
-
-                      <div className="text-right">
-                        <p className="text-secondary-600">Sous-total : 600,00 €</p>
-                        <p className="font-bold">Total TTC : 660,00 €</p>
-                      </div>
+                    {/* PDF Viewer - Sans barre de téléchargement */}
+                    <div className="bg-white border border-secondary-200 rounded-lg shadow-sm overflow-hidden" style={{ height: '600px' }}>
+                      <InvoicePDFViewer
+                        documentColor={documentColor}
+                        documentStyle={documentStyle}
+                        phoneInternational={phoneInternational}
+                        companyName="Dcs Ramonage Oise & Val d'Oise"
+                        companyAddress="58 RUE de Monceau"
+                        companyCity="75008 Paris 8e Arrondissement"
+                        companyEmail="contact@dcs-ramonage.fr"
+                        companyPhone="09 80 80 10 61"
+                      />
                     </div>
                   </div>
                 </div>
