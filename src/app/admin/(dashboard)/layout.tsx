@@ -358,9 +358,9 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}`}>
+      <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'} lg:pl-[3px]`}>
         {/* Header */}
-        <header className="h-16 bg-white border-b border-secondary-200 flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
+        <header className="h-16 bg-white border-b border-secondary-200 flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30 lg:mr-[3px]">
           <div className="flex items-center gap-4">
             {/* Toggle sidebar - Desktop */}
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="hidden lg:flex p-2 hover:bg-secondary-100 rounded-lg">
@@ -508,8 +508,10 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page content */}
-        <main className="p-4 lg:p-6">
-          {children}
+        <main className="p-[3px] lg:pr-[3px]">
+          <div className="bg-white rounded-lg p-4 lg:p-6 min-h-[calc(100vh-64px-6px)]">
+            {children}
+          </div>
         </main>
       </div>
     </div>
