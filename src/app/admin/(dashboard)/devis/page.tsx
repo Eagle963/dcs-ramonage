@@ -165,59 +165,7 @@ export default function DevisPage() {
 
   return (
     <div>
-      {/* Stats cards */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        <StatCard 
-          id="tous" label="Tous" count={statsData.tous.count} 
-          montantHT={statsData.tous.montantHT} montantTTC={statsData.tous.montantTTC}
-          icon={<Settings2 className="w-3 h-3 text-secondary-500" />} iconBg="bg-secondary-100"
-          active={activeFilter === 'tous'}
-        />
-        <StatCard 
-          id="brouillons" label="Brouillons" count={statsData.brouillons.count}
-          montantHT={statsData.brouillons.montantHT} montantTTC={statsData.brouillons.montantTTC}
-          icon={<FileText className="w-3 h-3 text-blue-500" />} iconBg="bg-blue-100"
-          active={activeFilter === 'brouillons'}
-        />
-        <StatCard 
-          id="finalise" label="Finalisé" count={statsData.finalise.count}
-          montantHT={statsData.finalise.montantHT} montantTTC={statsData.finalise.montantTTC}
-          icon={<Clock className="w-3 h-3 text-secondary-500" />} iconBg="bg-secondary-100"
-          active={activeFilter === 'finalise'}
-        />
-        <StatCard 
-          id="envoye" label="Envoyé" count={statsData.envoye.count}
-          montantHT={statsData.envoye.montantHT} montantTTC={statsData.envoye.montantTTC}
-          icon={<Send className="w-3 h-3 text-amber-500" />} iconBg="bg-amber-100"
-          active={activeFilter === 'envoye'}
-        />
-        <StatCard 
-          id="accepte" label="Accepté" count={statsData.accepte.count}
-          montantHT={statsData.accepte.montantHT} montantTTC={statsData.accepte.montantTTC}
-          icon={<CheckCircle2 className="w-3 h-3 text-green-500" />} iconBg="bg-green-100"
-          active={activeFilter === 'accepte'}
-        />
-        <StatCard 
-          id="factures" label="Facturés" count={statsData.factures.count}
-          montantHT={statsData.factures.montantHT} montantTTC={statsData.factures.montantTTC}
-          icon={<span className="text-[10px] font-bold text-green-600">€</span>} iconBg="bg-green-100"
-          active={activeFilter === 'factures'}
-        />
-        <StatCard 
-          id="refuse" label="Refusé" count={statsData.refuse.count}
-          montantHT={statsData.refuse.montantHT} montantTTC={statsData.refuse.montantTTC}
-          icon={<XCircle className="w-3 h-3 text-red-500" />} iconBg="bg-red-100"
-          active={activeFilter === 'refuse'}
-        />
-        <StatCard 
-          id="annules" label="Annulés" count={statsData.annules.count}
-          montantHT={statsData.annules.montantHT} montantTTC={statsData.annules.montantTTC}
-          icon={<XCircle className="w-3 h-3 text-red-500" />} iconBg="bg-red-100"
-          active={activeFilter === 'annules'}
-        />
-      </div>
-
-      {/* Filters bar */}
+      {/* Filtres */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
@@ -249,7 +197,59 @@ export default function DevisPage() {
         </button>
       </div>
 
-      {/* Table */}
+      {/* Stats cards */}
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+        <StatCard
+          id="tous" label="Tous" count={statsData.tous.count}
+          montantHT={statsData.tous.montantHT} montantTTC={statsData.tous.montantTTC}
+          icon={<Settings2 className="w-3 h-3 text-secondary-500" />} iconBg="bg-secondary-100"
+          active={activeFilter === 'tous'}
+        />
+        <StatCard
+          id="brouillons" label="Brouillons" count={statsData.brouillons.count}
+          montantHT={statsData.brouillons.montantHT} montantTTC={statsData.brouillons.montantTTC}
+          icon={<FileText className="w-3 h-3 text-blue-500" />} iconBg="bg-blue-100"
+          active={activeFilter === 'brouillons'}
+        />
+        <StatCard
+          id="finalise" label="Finalisé" count={statsData.finalise.count}
+          montantHT={statsData.finalise.montantHT} montantTTC={statsData.finalise.montantTTC}
+          icon={<Clock className="w-3 h-3 text-secondary-500" />} iconBg="bg-secondary-100"
+          active={activeFilter === 'finalise'}
+        />
+        <StatCard
+          id="envoye" label="Envoyé" count={statsData.envoye.count}
+          montantHT={statsData.envoye.montantHT} montantTTC={statsData.envoye.montantTTC}
+          icon={<Send className="w-3 h-3 text-amber-500" />} iconBg="bg-amber-100"
+          active={activeFilter === 'envoye'}
+        />
+        <StatCard
+          id="accepte" label="Accepté" count={statsData.accepte.count}
+          montantHT={statsData.accepte.montantHT} montantTTC={statsData.accepte.montantTTC}
+          icon={<CheckCircle2 className="w-3 h-3 text-green-500" />} iconBg="bg-green-100"
+          active={activeFilter === 'accepte'}
+        />
+        <StatCard
+          id="factures" label="Facturés" count={statsData.factures.count}
+          montantHT={statsData.factures.montantHT} montantTTC={statsData.factures.montantTTC}
+          icon={<span className="text-[10px] font-bold text-green-600">€</span>} iconBg="bg-green-100"
+          active={activeFilter === 'factures'}
+        />
+        <StatCard
+          id="refuse" label="Refusé" count={statsData.refuse.count}
+          montantHT={statsData.refuse.montantHT} montantTTC={statsData.refuse.montantTTC}
+          icon={<XCircle className="w-3 h-3 text-red-500" />} iconBg="bg-red-100"
+          active={activeFilter === 'refuse'}
+        />
+        <StatCard
+          id="annules" label="Annulés" count={statsData.annules.count}
+          montantHT={statsData.annules.montantHT} montantTTC={statsData.annules.montantTTC}
+          icon={<XCircle className="w-3 h-3 text-red-500" />} iconBg="bg-red-100"
+          active={activeFilter === 'annules'}
+        />
+      </div>
+
+      {/* Tableau */}
       <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">

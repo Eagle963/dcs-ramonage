@@ -152,47 +152,7 @@ export default function FacturesPage() {
 
   return (
     <div>
-      {/* Stats cards */}
-      <div className="flex gap-3 mb-6 overflow-x-auto pb-2">
-        <StatCard 
-          id="toutes" label="Toutes" count={statsData.toutes.count} 
-          montantHT={statsData.toutes.montantHT} montantTTC={statsData.toutes.montantTTC}
-          icon={<Settings2 className="w-3.5 h-3.5 text-secondary-500" />} iconBg="bg-secondary-100"
-          active={activeFilter === 'toutes'}
-        />
-        <StatCard 
-          id="brouillons" label="Brouillons" count={statsData.brouillons.count}
-          montantHT={statsData.brouillons.montantHT} montantTTC={statsData.brouillons.montantTTC}
-          icon={<FileText className="w-3.5 h-3.5 text-blue-500" />} iconBg="bg-blue-100"
-          active={activeFilter === 'brouillons'}
-        />
-        <StatCard 
-          id="finalisees" label="Finalisées" count={statsData.finalisees.count}
-          montantHT={statsData.finalisees.montantHT} montantTTC={statsData.finalisees.montantTTC}
-          icon={<Clock className="w-3.5 h-3.5 text-secondary-500" />} iconBg="bg-secondary-100"
-          active={activeFilter === 'finalisees'}
-        />
-        <StatCard 
-          id="envoyee" label="Envoyée" count={statsData.envoyee.count}
-          montantHT={statsData.envoyee.montantHT} montantTTC={statsData.envoyee.montantTTC}
-          icon={<Send className="w-3.5 h-3.5 text-amber-500" />} iconBg="bg-amber-100"
-          active={activeFilter === 'envoyee'}
-        />
-        <StatCard 
-          id="payees" label="Payées" count={statsData.payees.count}
-          montantHT={statsData.payees.montantHT} montantTTC={statsData.payees.montantTTC}
-          icon={<span className="text-xs font-bold text-green-600">€</span>} iconBg="bg-green-100"
-          active={activeFilter === 'payees'}
-        />
-        <StatCard 
-          id="annulees" label="Annulées" count={statsData.annulees.count}
-          montantHT={statsData.annulees.montantHT} montantTTC={statsData.annulees.montantTTC}
-          icon={<XCircle className="w-3.5 h-3.5 text-red-500" />} iconBg="bg-red-100"
-          active={activeFilter === 'annulees'}
-        />
-      </div>
-
-      {/* Filters bar */}
+      {/* Filtres */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
@@ -221,7 +181,47 @@ export default function FacturesPage() {
         </button>
       </div>
 
-      {/* Table */}
+      {/* Stats cards */}
+      <div className="flex gap-3 mb-4 overflow-x-auto pb-2">
+        <StatCard
+          id="toutes" label="Toutes" count={statsData.toutes.count}
+          montantHT={statsData.toutes.montantHT} montantTTC={statsData.toutes.montantTTC}
+          icon={<Settings2 className="w-3.5 h-3.5 text-secondary-500" />} iconBg="bg-secondary-100"
+          active={activeFilter === 'toutes'}
+        />
+        <StatCard
+          id="brouillons" label="Brouillons" count={statsData.brouillons.count}
+          montantHT={statsData.brouillons.montantHT} montantTTC={statsData.brouillons.montantTTC}
+          icon={<FileText className="w-3.5 h-3.5 text-blue-500" />} iconBg="bg-blue-100"
+          active={activeFilter === 'brouillons'}
+        />
+        <StatCard
+          id="finalisees" label="Finalisées" count={statsData.finalisees.count}
+          montantHT={statsData.finalisees.montantHT} montantTTC={statsData.finalisees.montantTTC}
+          icon={<Clock className="w-3.5 h-3.5 text-secondary-500" />} iconBg="bg-secondary-100"
+          active={activeFilter === 'finalisees'}
+        />
+        <StatCard
+          id="envoyee" label="Envoyée" count={statsData.envoyee.count}
+          montantHT={statsData.envoyee.montantHT} montantTTC={statsData.envoyee.montantTTC}
+          icon={<Send className="w-3.5 h-3.5 text-amber-500" />} iconBg="bg-amber-100"
+          active={activeFilter === 'envoyee'}
+        />
+        <StatCard
+          id="payees" label="Payées" count={statsData.payees.count}
+          montantHT={statsData.payees.montantHT} montantTTC={statsData.payees.montantTTC}
+          icon={<span className="text-xs font-bold text-green-600">€</span>} iconBg="bg-green-100"
+          active={activeFilter === 'payees'}
+        />
+        <StatCard
+          id="annulees" label="Annulées" count={statsData.annulees.count}
+          montantHT={statsData.annulees.montantHT} montantTTC={statsData.annulees.montantTTC}
+          icon={<XCircle className="w-3.5 h-3.5 text-red-500" />} iconBg="bg-red-100"
+          active={activeFilter === 'annulees'}
+        />
+      </div>
+
+      {/* Tableau */}
       <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">

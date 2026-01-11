@@ -85,41 +85,7 @@ export default function AvoirsPage() {
 
   return (
     <div>
-      {/* Stats cards */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        <StatCard 
-          id="tous" label="Tous" count={statsData.tous.count} 
-          montantHT={statsData.tous.montantHT} montantTTC={statsData.tous.montantTTC}
-          icon={<Settings2 className="w-3 h-3 text-secondary-500" />} iconBg="bg-secondary-100"
-          active={activeFilter === 'tous'}
-        />
-        <StatCard 
-          id="brouillon" label="Brouillon" count={statsData.brouillon.count}
-          montantHT={statsData.brouillon.montantHT} montantTTC={statsData.brouillon.montantTTC}
-          icon={<FileText className="w-3 h-3 text-blue-500" />} iconBg="bg-blue-100"
-          active={activeFilter === 'brouillon'}
-        />
-        <StatCard 
-          id="finalise" label="Finalisé" count={statsData.finalise.count}
-          montantHT={statsData.finalise.montantHT} montantTTC={statsData.finalise.montantTTC}
-          icon={<Clock className="w-3 h-3 text-secondary-500" />} iconBg="bg-secondary-100"
-          active={activeFilter === 'finalise'}
-        />
-        <StatCard 
-          id="envoye" label="Envoyé" count={statsData.envoye.count}
-          montantHT={statsData.envoye.montantHT} montantTTC={statsData.envoye.montantTTC}
-          icon={<Send className="w-3 h-3 text-amber-500" />} iconBg="bg-amber-100"
-          active={activeFilter === 'envoye'}
-        />
-        <StatCard 
-          id="annule" label="Annulé" count={statsData.annule.count}
-          montantHT={statsData.annule.montantHT} montantTTC={statsData.annule.montantTTC}
-          icon={<XCircle className="w-3 h-3 text-red-500" />} iconBg="bg-red-100"
-          active={activeFilter === 'annule'}
-        />
-      </div>
-
-      {/* Filters bar */}
+      {/* Filtres */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
@@ -145,7 +111,41 @@ export default function AvoirsPage() {
         </button>
       </div>
 
-      {/* Table */}
+      {/* Stats cards */}
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+        <StatCard
+          id="tous" label="Tous" count={statsData.tous.count}
+          montantHT={statsData.tous.montantHT} montantTTC={statsData.tous.montantTTC}
+          icon={<Settings2 className="w-3 h-3 text-secondary-500" />} iconBg="bg-secondary-100"
+          active={activeFilter === 'tous'}
+        />
+        <StatCard
+          id="brouillon" label="Brouillon" count={statsData.brouillon.count}
+          montantHT={statsData.brouillon.montantHT} montantTTC={statsData.brouillon.montantTTC}
+          icon={<FileText className="w-3 h-3 text-blue-500" />} iconBg="bg-blue-100"
+          active={activeFilter === 'brouillon'}
+        />
+        <StatCard
+          id="finalise" label="Finalisé" count={statsData.finalise.count}
+          montantHT={statsData.finalise.montantHT} montantTTC={statsData.finalise.montantTTC}
+          icon={<Clock className="w-3 h-3 text-secondary-500" />} iconBg="bg-secondary-100"
+          active={activeFilter === 'finalise'}
+        />
+        <StatCard
+          id="envoye" label="Envoyé" count={statsData.envoye.count}
+          montantHT={statsData.envoye.montantHT} montantTTC={statsData.envoye.montantTTC}
+          icon={<Send className="w-3 h-3 text-amber-500" />} iconBg="bg-amber-100"
+          active={activeFilter === 'envoye'}
+        />
+        <StatCard
+          id="annule" label="Annulé" count={statsData.annule.count}
+          montantHT={statsData.annule.montantHT} montantTTC={statsData.annule.montantTTC}
+          icon={<XCircle className="w-3 h-3 text-red-500" />} iconBg="bg-red-100"
+          active={activeFilter === 'annule'}
+        />
+      </div>
+
+      {/* Tableau */}
       <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">

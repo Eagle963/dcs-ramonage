@@ -136,31 +136,7 @@ export default function ClientsPage() {
 
   return (
     <div>
-      {/* Stats cards */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        <StatCard 
-          id="all" label="Total clients" value={statsData.total}
-          icon={<User className="w-4 h-4 text-secondary-600" />} iconBg="bg-secondary-100"
-          active={activeFilter === 'all'}
-        />
-        <StatCard 
-          id="particuliers" label="Particuliers" value={statsData.particuliers}
-          icon={<User className="w-4 h-4 text-blue-600" />} iconBg="bg-blue-100"
-          active={activeFilter === 'particuliers'}
-        />
-        <StatCard 
-          id="professionnels" label="Professionnels" value={statsData.professionnels}
-          icon={<Building2 className="w-4 h-4 text-purple-600" />} iconBg="bg-purple-100"
-          active={activeFilter === 'professionnels'}
-        />
-        <StatCard 
-          id="ca" label="CA total" value={formatMoney(statsData.caTotal)}
-          icon={<span className="text-sm font-bold text-green-600">€</span>} iconBg="bg-green-100"
-          active={false}
-        />
-      </div>
-
-      {/* Filters bar */}
+      {/* Filtres */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
@@ -201,6 +177,30 @@ export default function ClientsPage() {
             <Map className="w-4 h-4" />
           </button>
         </div>
+      </div>
+
+      {/* Stats cards */}
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+        <StatCard
+          id="all" label="Total clients" value={statsData.total}
+          icon={<User className="w-4 h-4 text-secondary-600" />} iconBg="bg-secondary-100"
+          active={activeFilter === 'all'}
+        />
+        <StatCard
+          id="particuliers" label="Particuliers" value={statsData.particuliers}
+          icon={<User className="w-4 h-4 text-blue-600" />} iconBg="bg-blue-100"
+          active={activeFilter === 'particuliers'}
+        />
+        <StatCard
+          id="professionnels" label="Professionnels" value={statsData.professionnels}
+          icon={<Building2 className="w-4 h-4 text-purple-600" />} iconBg="bg-purple-100"
+          active={activeFilter === 'professionnels'}
+        />
+        <StatCard
+          id="ca" label="CA total" value={formatMoney(statsData.caTotal)}
+          icon={<span className="text-sm font-bold text-green-600">€</span>} iconBg="bg-green-100"
+          active={false}
+        />
       </div>
 
       {/* Vue Liste */}
