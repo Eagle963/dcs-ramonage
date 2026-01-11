@@ -177,72 +177,57 @@ export default function MaintenancesPage() {
 
   return (
     <div>
-      {/* Onglets */}
-      <div className="flex gap-1 mb-4">
-        <button
-          onClick={() => setActiveTab('toutes')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            activeTab === 'toutes'
-              ? 'bg-secondary-900 text-white'
-              : 'bg-secondary-100 text-secondary-600 hover:bg-secondary-200'
-          }`}
-        >
-          Toutes
-        </button>
-        <button
-          onClick={() => setActiveTab('a-planifier')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            activeTab === 'a-planifier'
-              ? 'bg-secondary-900 text-white'
-              : 'bg-secondary-100 text-secondary-600 hover:bg-secondary-200'
-          }`}
-        >
-          À planifier
-        </button>
-      </div>
-
       {/* Filtres */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        {/* Recherche */}
-        <div className="relative">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
           <input
             type="text"
             placeholder="Rechercher..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm w-48"
+            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm bg-white"
           />
         </div>
-
-        {/* Date Range */}
         <DateRangePicker
           value={dateRange}
           onChange={setDateRange}
         />
-
-        {/* Clients */}
-        <button className="btn-outline btn-sm">
-          <Users className="w-4 h-4" />
-          Clients
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Users className="w-4 h-4" /> Clients
         </button>
-
-        {/* Affectées à */}
-        <button className="btn-outline btn-sm">
-          <UserCheck className="w-4 h-4" />
-          Affectées à
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <UserCheck className="w-4 h-4" /> Affectées à
         </button>
-
-        {/* Actives */}
-        <button className="btn-outline btn-sm">
-          <CheckCircle className="w-4 h-4" />
-          Actives
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <CheckCircle className="w-4 h-4" /> Actives
         </button>
+        <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
+          <X className="w-4 h-4" /> Réinitialiser
+        </button>
+      </div>
 
-        {/* Réinitialiser */}
-        <button className="flex items-center gap-1 text-sm text-secondary-500 hover:text-secondary-700">
-          <X className="w-4 h-4" />
-          Réinitialiser
+      {/* Onglets */}
+      <div className="flex items-center gap-1 mb-4 border-b border-secondary-200">
+        <button
+          onClick={() => setActiveTab('toutes')}
+          className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+            activeTab === 'toutes'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-secondary-500 hover:text-secondary-700'
+          }`}
+        >
+          Toutes
+        </button>
+        <button
+          onClick={() => setActiveTab('a-planifier')}
+          className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+            activeTab === 'a-planifier'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-secondary-500 hover:text-secondary-700'
+          }`}
+        >
+          À planifier
         </button>
       </div>
 

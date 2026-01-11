@@ -91,31 +91,7 @@ export default function PaiementsPage() {
 
   return (
     <div>
-      {/* Tabs */}
-      <div className="flex gap-4 mb-6">
-        <button
-          onClick={() => setActiveTab('consignes')}
-          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-            activeTab === 'consignes' 
-              ? 'bg-primary-50 text-primary-700' 
-              : 'text-secondary-600 hover:bg-secondary-50'
-          }`}
-        >
-          Consignés
-        </button>
-        <button
-          onClick={() => setActiveTab('primes')}
-          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-            activeTab === 'primes' 
-              ? 'bg-primary-50 text-primary-700' 
-              : 'text-secondary-600 hover:bg-secondary-50'
-          }`}
-        >
-          Primes
-        </button>
-      </div>
-
-      {/* Filters bar */}
+      {/* Filtres */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
@@ -144,7 +120,31 @@ export default function PaiementsPage() {
         </button>
       </div>
 
-      {/* Table */}
+      {/* Onglets */}
+      <div className="flex items-center gap-1 mb-4 border-b border-secondary-200">
+        <button
+          onClick={() => setActiveTab('consignes')}
+          className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+            activeTab === 'consignes'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-secondary-500 hover:text-secondary-700'
+          }`}
+        >
+          Consignés
+        </button>
+        <button
+          onClick={() => setActiveTab('primes')}
+          className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+            activeTab === 'primes'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-secondary-500 hover:text-secondary-700'
+          }`}
+        >
+          Primes
+        </button>
+      </div>
+
+      {/* Tableau */}
       <div className="bg-white rounded-xl border border-secondary-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">

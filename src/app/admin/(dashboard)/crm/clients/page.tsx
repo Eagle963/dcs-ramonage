@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { 
+import {
   Plus, Search, ChevronDown, ChevronLeft, ChevronRight,
   User, Building2, Filter, Settings2, Download, XCircle,
   MapPin, Phone, Mail, MoreVertical, Eye, Edit, Calendar,
-  Archive, Map, List
+  Archive, Map, List, RotateCcw
 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import ClientForm from '@/components/forms/ClientForm';
+import { usePageHeader } from '@/contexts/PageHeaderContext';
 
 // Import dynamique pour éviter les erreurs SSR
 const ClientsMap = dynamic(() => import('@/components/map/ClientsMap'), {
@@ -59,13 +60,46 @@ const statsData = {
 
 type ViewType = 'list' | 'map';
 
-export default function ClientsPage() {
+export default function CRMClientsPage() {
+  const { setActions, setInfoTooltip } = usePageHeader();
   const [clients] = useState<Client[]>(mockClients);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [viewType, setViewType] = useState<ViewType>('list');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Actions du header
+  useEffect(() => {
+    setActions([
+      {
+        label: 'Carte',
+        icon: Map,
+        variant: 'outline',
+        onClick: () => setViewType(viewType === 'map' ? 'list' : 'map'),
+      },
+      {
+        label: 'Importer',
+        icon: Download,
+        variant: 'outline',
+        onClick: () => {
+          console.log('Importer des clients');
+        },
+      },
+      {
+        label: 'Ajouter un client',
+        icon: Plus,
+        variant: 'primary',
+        onClick: () => setIsModalOpen(true),
+      },
+    ]);
+    setInfoTooltip('Gérez votre base de clients');
+
+    return () => {
+      setActions([]);
+      setInfoTooltip(undefined);
+    };
+  }, [setActions, setInfoTooltip, viewType]);
 
   const handleCreateClient = (data: any) => {
     console.log('Nouveau client:', data);
@@ -77,7 +111,7 @@ export default function ClientsPage() {
       c.prenom?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.ville.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     if (activeFilter === 'particuliers') return matchSearch && c.type === 'PARTICULIER';
     if (activeFilter === 'professionnels') return matchSearch && c.type === 'PROFESSIONNEL';
     return matchSearch;
@@ -86,7 +120,7 @@ export default function ClientsPage() {
   const formatMoney = (amount: number) => amount.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
   const StatCard = ({ id, label, value, icon, iconBg, active, suffix }: {
-    id: string; label: string; value: number | string; 
+    id: string; label: string; value: number | string;
     icon: React.ReactNode; iconBg: string; active: boolean; suffix?: string;
   }) => (
     <button
@@ -107,10 +141,30 @@ export default function ClientsPage() {
 
   return (
     <div>
-      {/* Header actions */}
-      <div className="flex items-center justify-end gap-2 mb-4">
+      {/* Filtres */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
+          <input
+            type="text"
+            placeholder="Rechercher par nom, référence ou ville..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm bg-white"
+          />
+        </div>
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Filter className="w-4 h-4" /> Type
+        </button>
+        <button className="flex items-center gap-2 px-3 py-2 border border-secondary-200 rounded-lg text-sm bg-white hover:bg-secondary-50">
+          <Archive className="w-4 h-4" /> Archivés
+        </button>
+        <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
+          <RotateCcw className="w-4 h-4" /> Réinitialiser
+        </button>
         {/* Toggle Vue */}
-        <div className="flex border border-secondary-200 rounded-lg overflow-hidden mr-2">
+        <div className="flex-1"></div>
+        <div className="flex border border-secondary-200 rounded-lg overflow-hidden">
           <button
             onClick={() => setViewType('list')}
             className={`flex items-center gap-1 px-3 py-2 text-sm ${
@@ -128,64 +182,30 @@ export default function ClientsPage() {
             <Map className="w-4 h-4" />
           </button>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50 text-sm">
-          <Download className="w-4 h-4" />
-          Importer
-        </button>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="btn-primary"
-        >
-          <Plus className="w-4 h-4" />
-          Ajouter un client
-        </button>
       </div>
 
       {/* Stats cards */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        <StatCard 
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+        <StatCard
           id="all" label="Total clients" value={statsData.total}
           icon={<User className="w-4 h-4 text-secondary-600" />} iconBg="bg-secondary-100"
           active={activeFilter === 'all'}
         />
-        <StatCard 
+        <StatCard
           id="particuliers" label="Particuliers" value={statsData.particuliers}
           icon={<User className="w-4 h-4 text-blue-600" />} iconBg="bg-blue-100"
           active={activeFilter === 'particuliers'}
         />
-        <StatCard 
+        <StatCard
           id="professionnels" label="Professionnels" value={statsData.professionnels}
           icon={<Building2 className="w-4 h-4 text-purple-600" />} iconBg="bg-purple-100"
           active={activeFilter === 'professionnels'}
         />
-        <StatCard 
+        <StatCard
           id="ca" label="CA total" value={formatMoney(statsData.caTotal)}
           icon={<span className="text-sm font-bold text-green-600">€</span>} iconBg="bg-green-100"
           active={false}
         />
-      </div>
-
-      {/* Filters bar */}
-      <div className="flex flex-wrap items-center gap-2 mb-4">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
-          <input
-            type="text"
-            placeholder="Rechercher par nom, référence ou ville..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-secondary-200 rounded-lg text-sm"
-          />
-        </div>
-        <button className="btn-outline btn-sm">
-          <Filter className="w-4 h-4" /> Type
-        </button>
-        <button className="btn-outline btn-sm">
-          <Archive className="w-4 h-4" /> Archivés
-        </button>
-        <button className="flex items-center gap-2 px-3 py-2 text-sm text-secondary-500 hover:text-secondary-700">
-          <XCircle className="w-4 h-4" /> Réinitialiser
-        </button>
       </div>
 
       {/* Vue Liste */}
@@ -226,7 +246,7 @@ export default function ClientsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span className="font-medium text-secondary-900">
-                        {client.type === 'PARTICULIER' 
+                        {client.type === 'PARTICULIER'
                           ? `${client.prenom || ''} ${client.nom}`.trim()
                           : client.nom
                         }
@@ -317,8 +337,8 @@ export default function ClientsPage() {
             </div>
             <div className="divide-y divide-secondary-100 max-h-[calc(100vh-350px)] overflow-y-auto">
               {filteredClients.map((client) => (
-                <div 
-                  key={client.id} 
+                <div
+                  key={client.id}
                   className={`p-3 hover:bg-secondary-50 cursor-pointer transition-colors ${
                     selectedClient?.id === client.id ? 'bg-primary-50 border-l-2 border-primary-500' : ''
                   }`}
@@ -328,14 +348,14 @@ export default function ClientsPage() {
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                       client.type === 'PARTICULIER' ? 'bg-blue-100' : 'bg-purple-100'
                     }`}>
-                      {client.type === 'PARTICULIER' 
+                      {client.type === 'PARTICULIER'
                         ? <User className="w-4 h-4 text-blue-600" />
                         : <Building2 className="w-4 h-4 text-purple-600" />
                       }
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm text-secondary-900 truncate">
-                        {client.type === 'PARTICULIER' 
+                        {client.type === 'PARTICULIER'
                           ? `${client.prenom || ''} ${client.nom}`.trim()
                           : client.nom
                         }
@@ -357,13 +377,13 @@ export default function ClientsPage() {
           {/* Carte à droite */}
           <div className="lg:col-span-8">
             <div className="h-[calc(100vh-280px)] min-h-[500px]">
-              <ClientsMap 
+              <ClientsMap
                 clients={filteredClients}
                 selectedClientId={selectedClient?.id}
                 onClientClick={(client) => setSelectedClient(client)}
               />
             </div>
-            
+
             {/* Légende */}
             <div className="mt-2 flex items-center gap-4 text-xs text-secondary-500">
               <div className="flex items-center gap-1">
