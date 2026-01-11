@@ -1,10 +1,10 @@
 // ===========================================
-// Middleware - Protection des routes
+// Middleware - Protection des routes (Edge Runtime compatible)
 // ===========================================
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { auth } from '@/auth';
+import { getToken } from 'next-auth/jwt';
 
 // Routes publiques (pas besoin d'auth)
 const PUBLIC_ROUTES = [
@@ -22,9 +22,8 @@ const PUBLIC_API_ROUTES = [
   '/api/widget',
 ];
 
-export default auth((req) => {
-  const { pathname } = req.nextUrl;
-  const isLoggedIn = !!req.auth;
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
   // Routes publiques du site (pas /admin)
   if (!pathname.startsWith('/admin') && !pathname.startsWith('/api')) {
@@ -36,11 +35,18 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
+  // Vérifier le token JWT
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET,
+  });
+  const isLoggedIn = !!token;
+
   // Routes admin publiques (login, register, etc.)
   if (PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
     // Si déjà connecté, rediriger vers le dashboard
     if (isLoggedIn) {
-      return NextResponse.redirect(new URL('/admin', req.url));
+      return NextResponse.redirect(new URL('/admin', request.url));
     }
     return NextResponse.next();
   }
@@ -51,7 +57,7 @@ export default auth((req) => {
       // Sauvegarder l'URL de destination pour rediriger après login
       const callbackUrl = encodeURIComponent(pathname);
       return NextResponse.redirect(
-        new URL(`/admin/login?callbackUrl=${callbackUrl}`, req.url)
+        new URL(`/admin/login?callbackUrl=${callbackUrl}`, request.url)
       );
     }
 
@@ -68,7 +74,7 @@ export default auth((req) => {
   }
 
   return NextResponse.next();
-});
+}
 
 // Configuration du matcher
 export const config = {
