@@ -3,6 +3,7 @@ import { Outfit, Plus_Jakarta_Sans } from 'next/font/google';
 import '@/styles/globals.css';
 import { siteConfig } from '@/config/site';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
+import AuthProvider from '@/components/providers/AuthProvider';
 
 // Police display pour les titres - Moderne, bold, caractère
 const fontDisplay = Outfit({
@@ -159,15 +160,17 @@ export default function RootLayout({
         <GoogleAnalytics />
         
         {/* Skip to content pour accessibilité */}
-        <a 
-          href="#main-content" 
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
                      bg-primary-500 text-white px-4 py-2 rounded-lg z-50"
         >
           Aller au contenu principal
         </a>
-        
-        {children}
+
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

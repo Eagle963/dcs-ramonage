@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import {
   Calendar,
   FileText,
@@ -154,11 +155,30 @@ function HeaderActions() {
 // Composant interne du layout
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['Ventes']);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Récupérer les infos utilisateur de la session
+  const userName = session?.user?.name || 'Utilisateur';
+  const userEmail = session?.user?.email || '';
+  const organizationName = session?.user?.organizationName || 'Mon entreprise';
+  const userInitials = userName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2) || 'U';
+
+  // Déconnexion
+  const handleSignOut = async () => {
+    await signOut({ redirect: false });
+    router.push('/admin/login');
+  };
   
   // État pour le DateRangePicker du tableau de bord (année courante)
   const currentYear = new Date().getFullYear();
@@ -312,21 +332,21 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
           {/* User profile at bottom */}
           <div ref={userMenuRef} className="relative border-t border-secondary-200 p-3">
-            <button 
+            <button
               onClick={() => setShowUserMenu(!showUserMenu)}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary-50"
             >
               <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                <span className="text-primary-700 font-semibold text-sm">DR</span>
+                <span className="text-primary-700 font-semibold text-sm">{userInitials}</span>
               </div>
               {sidebarOpen && (
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-medium text-secondary-900">DCS RAMONAGE</p>
-                  <p className="text-xs text-secondary-500">dcsramonage@gmail.com</p>
+                  <p className="text-sm font-medium text-secondary-900">{organizationName}</p>
+                  <p className="text-xs text-secondary-500">{userEmail}</p>
                 </div>
               )}
             </button>
-            
+
             {showUserMenu && sidebarOpen && (
               <div className="absolute bottom-full left-0 w-full mb-2 bg-white border border-secondary-200 rounded-lg shadow-lg py-1">
                 <Link href="/admin/profil" className="flex items-center gap-2 px-4 py-2 text-sm text-secondary-600 hover:bg-secondary-50">
@@ -347,7 +367,10 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   Notifications
                 </Link>
                 <hr className="my-1" />
-                <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                >
                   <LogOut className="w-4 h-4" />
                   Se déconnecter
                 </button>
